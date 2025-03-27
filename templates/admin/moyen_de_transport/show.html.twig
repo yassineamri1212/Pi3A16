@@ -5,14 +5,8 @@
 {% block admin_content %}
     <div class="container-fluid">
         <div class="card shadow">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div class="card-header bg-white">
                 <h1 class="h3 mb-0">Transport Details</h1>
-                <div class="btn-group">
-                    <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-warning">
-                        <i class="fas fa-edit me-1"></i> Edit
-                    </a>
-                    {{ include('admin/moyen_de_transport/_delete_form.html.twig') }}
-                </div>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -20,8 +14,10 @@
                         <dl class="row">
                             <dt class="col-sm-4">ID:</dt>
                             <dd class="col-sm-8">{{ transport.id }}</dd>
+
                             <dt class="col-sm-4">Type:</dt>
                             <dd class="col-sm-8">{{ transport.type }}</dd>
+
                             <dt class="col-sm-4">Price:</dt>
                             <dd class="col-sm-8">{{ transport.prix }} TND</dd>
                         </dl>
@@ -30,6 +26,7 @@
                         <dl class="row">
                             <dt class="col-sm-4">Seats:</dt>
                             <dd class="col-sm-8">{{ transport.nbrePlaces }}</dd>
+
                             <dt class="col-sm-4">Associated Event:</dt>
                             <dd class="col-sm-8">
                                 {% if transport.evenement %}
@@ -52,7 +49,15 @@
                     <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-warning">
                         <i class="fas fa-edit me-1"></i> Edit
                     </a>
-                    {{ include('admin/moyen_de_transport/_delete_form.html.twig', {'transport': transport}) }}
+                    <form method="post" action="{{ path('admin_moyen_de_transport_delete', {'id': transport.id}) }}"
+                          onsubmit="return confirm('Are you sure you want to delete this transport?');"
+                          class="d-inline">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transport.id) }}">
+                        <button class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Delete
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
