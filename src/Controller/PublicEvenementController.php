@@ -1,40 +1,46 @@
 <?php
-// File: src/Controller/PublicEvenementController.php
-namespace App\Controller;
+                        namespace App\Controller;
 
-use App\Repository\EvenementRepository;
-use App\Service\WeatherService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+                        use App\Repository\EvenementRepository;
+                        use App\Service\WeatherService;
+                        use Knp\Component\Pager\PaginatorInterface;
+                        use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+                        use Symfony\Component\HttpFoundation\Request;
+                        use Symfony\Component\HttpFoundation\Response;
+                        use Symfony\Component\Routing\Annotation\Route;
 
-class PublicEvenementController extends AbstractController
-{
-    #[Route('/events', name: 'client_evenement_index', methods: ['GET'])]
-    public function index(Request $request, EvenementRepository $evenementRepository, WeatherService $weatherService): Response
-    {
-        // Get search and sort parameters from the query string (default values are empty string and 'asc' respectively)
-        $search = $request->query->get('search', '');
-        $sort = $request->query->get('sort', 'asc');
+                        class PublicEvenementController extends AbstractController
+                        {
+                            #[Route('/events', name: 'client_evenement_index', methods: ['GET'])]
+                            public function index(
+                                Request $request,
+                                EvenementRepository $evenementRepository,
+                                WeatherService $weatherService,
+                                PaginatorInterface $paginator
+                            ): Response {
+                                $search = $request->query->get('search', '');
+                                $order  = $request->query->get('order', 'asc');
 
-        // Find events based on search and sort criteria (make sure to implement the 'findBySearchAndSort' method in the repository)
-        $events = $evenementRepository->findBySearchAndSort($search, $sort);
+                                $query = $evenementRepository->findBySearchAndSortQuery($search, $order);
 
-        // Get weather data for each event that has a location (lieu)
-        $weathers = [];
-        foreach ($events as $event) {
-            if ($event->getLieu()) {
-                $weathers[$event->getId()] = $weatherService->getWeather($event->getLieu());
-            }
-        }
+                                $pagination = $paginator->paginate(
+                                    $query,
+                                    $request->query->getInt('page', 1),
+                                    3
+                                );
 
-        // Render the events with weather information, search, and sort parameters
-        return $this->render('public/events.html.twig', [
-            'events'  => $events,
-            'weathers' => $weathers,
-            'search'  => $search,
-            'sort'    => $sort
-        ]);
-    }
-}
+                                $weathers = [];
+                                foreach ($pagination as $event) {
+                                    if ($event->getLieu()) {
+                                        $weathers[$event->getId()] = $weatherService->getWeather($event->getLieu());
+                                    }
+                                }
+
+                                return $this->render('public/events.html.twig', [
+                                    'pagination' => $pagination,
+                                    'weathers'   => $weathers,
+                                    'search'     => $search,
+                                    'order'      => $order,
+                                ]);
+                            }
+                        }

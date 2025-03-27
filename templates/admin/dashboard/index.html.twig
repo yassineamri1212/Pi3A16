@@ -5,7 +5,7 @@
         <h1 class="h3 mb-4">Dashboard Overview</h1>
 
         <div class="row">
-            <!-- Stats Card -->
+            <!-- Total Events Card -->
             <div class="col-md-4 mb-4">
                 <div class="card border-0 shadow">
                     <div class="card-body text-center">
@@ -14,12 +14,32 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Upcoming Events Card -->
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Upcoming Events</h5>
+                        <p class="display-4">{{ events|filter(event => event.dateEvenement > "now")|length }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Events Card -->
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Today's Events</h5>
+                        <p class="display-4">{{ events|filter(event => event.dateEvenement|date("Y-m-d") == "now"|date("Y-m-d"))|length }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Recent Events Table -->
+        <!-- Latest Events Table -->
         <div class="card shadow">
             <div class="card-header bg-white">
-                <h5 class="mb-0">Recent Events</h5>
+                <h5 class="mb-0">Latest Events</h5>
             </div>
             <div class="card-body">
                 <table class="table">

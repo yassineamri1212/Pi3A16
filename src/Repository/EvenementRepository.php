@@ -1,29 +1,30 @@
 <?php
-namespace App\Repository;
+                    namespace App\Repository;
 
-use App\Entity\Evenement;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
+                    use App\Entity\Evenement;
+                    use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+                    use Doctrine\Persistence\ManagerRegistry;
+                    use Doctrine\ORM\Query;
 
-class EvenementRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Evenement::class);
-    }
+                    class EvenementRepository extends ServiceEntityRepository
+                    {
+                        public function __construct(ManagerRegistry $registry)
+                        {
+                            parent::__construct($registry, Evenement::class);
+                        }
 
-    public function findBySearchAndSort(?string $search, string $sort = 'asc'): array
-    {
-        $qb = $this->createQueryBuilder('e');
+                        public function findBySearchAndSortQuery(?string $search = '', string $order = 'asc'): Query
+                        {
+                            $qb = $this->createQueryBuilder('e');
 
-        if ($search) {
-            $qb->andWhere('e.nom LIKE :search OR e.description LIKE :search OR e.lieu LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
-        }
+                            if (!empty($search)) {
+                                $qb->andWhere('e.nom LIKE :search OR e.description LIKE :search OR e.lieu LIKE :search')
+                                   ->setParameter('search', '%' . $search . '%');
+                            }
 
-        // Sorting by name (or change the field as needed)
-        $qb->orderBy('e.nom', $sort);
+                            $direction = strtolower($order) === 'asc' ? 'ASC' : 'DESC';
+                            $qb->orderBy('e.nom', $direction);
 
-        return $qb->getQuery()->getResult();
-    }
-}
+                            return $qb->getQuery();
+                        }
+                    }
