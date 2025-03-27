@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MoyenDeTransport{% endblock %}
+
+{% block body %}
+    <h1>MoyenDeTransport</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ moyen_de_transport.id }}</td>
+            </tr>
+            <tr>
+                <th>Prix</th>
+                <td>{{ moyen_de_transport.prix }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ moyen_de_transport.type }}</td>
+            </tr>
+            <tr>
+                <th>NbrePlaces</th>
+                <td>{{ moyen_de_transport.nbrePlaces }}</td>
+            </tr>
+            <tr>
+                <th>EvenementId</th>
+                <td>{{ moyen_de_transport.evenementId }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_moyen_de_transport_index') }}">back to list</a>
+
+    <a href="{{ path('app_moyen_de_transport_edit', {'id': moyen_de_transport.id}) }}">edit</a>
+
+    {{ include('moyen_de_transport/_delete_form.html.twig') }}
+{% endblock %}

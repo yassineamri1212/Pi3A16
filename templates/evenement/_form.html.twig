@@ -1,0 +1,20 @@
+{{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.description) }}
+    {{ form_row(form.lieu) }}
+    {{ form_row(form.date_evenement) }}
+
+    {{ form_row(form.imageFile) }}
+
+{% if evenement.imageEvenement %}
+    <div class="current-image mt-2 mb-3">
+        <img src="{{ asset('uploads/images/' ~ evenement.imageEvenement) }}"
+             alt="Current event image"
+             style="max-height: 150px; border: 1px solid #ddd; padding: 5px;"
+             onerror="this.style.display='none'">
+        <p class="text-muted small mt-1">Current image</p>
+    </div>
+{% endif %}
+
+<button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

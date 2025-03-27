@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'public/_header.html.twig' %}
+
+    <main class="flex-grow-1 py-4">
+        {% block public_content %}{% endblock %}
+    </main>
+
+    {% include 'public/_footer.html.twig' %}
+{% endblock %}

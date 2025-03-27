@@ -1,0 +1,39 @@
+<style>
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .nav-link:hover {
+        color: #f8d7da;
+    }
+    .logout-btn {
+        transition: background-color 0.3s ease;
+    }
+    .logout-btn:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<header class="bg-primary text-white py-4 shadow-sm">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Logo -->
+            <a href="{{ path('app_home') }}" class="text-white text-decoration-none">
+                <h1 class="h3 mb-0 fw-bold">GoMobility</h1>
+            </a>
+
+            <!-- Navigation -->
+            <nav>
+                <ul class="list-unstyled d-flex align-items-center gap-4 mb-0">
+                    <li><a href="{{ path('app_home') }}" class="nav-link fw-semibold">Home</a></li>
+                    <li><a href="{{ path('client_evenement_index') }}" class="nav-link fw-semibold">Events</a></li>
+                    <li><a href="{{ path('client_reserved_trips') }}" class="nav-link fw-semibold">My Reservations</a></li>
+                    <li>
+                        <a href="{{ path('app_logout') }}" class="btn btn-danger btn-sm px-3 logout-btn">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>

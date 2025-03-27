@@ -1,0 +1,60 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Transport Details{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <div class="card shadow">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Transport Details</h1>
+                <div class="btn-group">
+                    <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    {{ include('admin/moyen_de_transport/_delete_form.html.twig') }}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">ID:</dt>
+                            <dd class="col-sm-8">{{ transport.id }}</dd>
+                            <dt class="col-sm-4">Type:</dt>
+                            <dd class="col-sm-8">{{ transport.type }}</dd>
+                            <dt class="col-sm-4">Price:</dt>
+                            <dd class="col-sm-8">{{ transport.prix }} TND</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Seats:</dt>
+                            <dd class="col-sm-8">{{ transport.nbrePlaces }}</dd>
+                            <dt class="col-sm-4">Associated Event:</dt>
+                            <dd class="col-sm-8">
+                                {% if transport.evenement %}
+                                    <a href="{{ path('admin_evenement_show', {'id': transport.evenement.id}) }}">
+                                        {{ transport.evenement.nom }} (ID: {{ transport.evenement.id }})
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Not assigned</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between">
+                <a href="{{ path('admin_moyen_de_transport_index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to list
+                </a>
+                <div class="btn-group">
+                    <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    {{ include('admin/moyen_de_transport/_delete_form.html.twig', {'transport': transport}) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

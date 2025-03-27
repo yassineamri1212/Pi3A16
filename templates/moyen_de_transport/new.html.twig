@@ -1,0 +1,21 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}New Transport{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h1 class="h3 mb-0">Create New Transport</h1>
+            </div>
+            <div class="card-body">
+                {{ include('moyen_de_transport/_form.html.twig') }}
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{{ path('app_moyen_de_transport_index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to list
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

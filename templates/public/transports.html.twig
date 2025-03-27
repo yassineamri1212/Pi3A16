@@ -1,0 +1,38 @@
+{# File: templates/public/transports.html.twig #}
+{% extends 'public/base.html.twig' %}
+
+{% block public_content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Transports for event: {{ event.nom }}</h2>
+    {% for flashType, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ flashType }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+    <div class="row g-4">
+        {% if transports|length > 0 %}
+            {% for transport in transports %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ transport.type }}</h5>
+                        <p class="card-text">Price: {{ transport.prix }}</p>
+                        <p class="card-text">Available Seats: {{ transport.nbrePlaces }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <form action="{{ path('client_transport_reserve', { id: transport.id }) }}" method="post">
+                            <button type="submit" class="btn btn-success btn-sm">Reserver</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <p class="text-center">No transports available for this event.</p>
+        </div>
+        {% endif %}
+    </div>
+    <a href="{{ path('client_evenement_index') }}" class="btn btn-secondary mt-3">Back to events</a>
+</div>
+{% endblock %}

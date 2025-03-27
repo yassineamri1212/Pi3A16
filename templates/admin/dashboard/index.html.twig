@@ -1,0 +1,50 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Dashboard Overview</h1>
+
+        <div class="row">
+            <!-- Stats Card -->
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Events</h5>
+                        <p class="display-4">{{ events|length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Events Table -->
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Events</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for event in events|slice(0, 5) %}
+                        <tr>
+                            <td>{{ event.nom }}</td>
+                            <td>{{ event.dateEvenement|date('Y-m-d') }}</td>
+                            <td>
+                                <a href="{{ path('admin_evenement_show', {'id': event.id}) }}" class="btn btn-sm btn-primary">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

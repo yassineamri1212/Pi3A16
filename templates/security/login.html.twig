@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <!-- Card with Shadow and Rounded Corners -->
+                <div class="card shadow-lg rounded-3 border-0">
+                    <div class="card-header text-center bg-primary text-white rounded-top">
+                        <h4>Login</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Display error message if exists -->
+                        {% if error %}
+                            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                        {% endif %}
+
+                        <!-- Login Form -->
+                        <form method="post" action="{{ path('app_login') }}">
+                            <div class="mb-4">
+                                <label for="inputEmail" class="form-label">Email</label>
+                                <input type="email"
+                                       value="{{ last_username }}"
+                                       name="email"
+                                       id="inputEmail"
+                                       class="form-control form-control-lg"
+                                       autocomplete="email"
+                                       required
+                                       autofocus
+                                       placeholder="Enter your email">
+                            </div>
+                            <div class="mb-4">
+                                <label for="inputPassword" class="form-label">Password</label>
+                                <input type="password"
+                                       name="password"
+                                       id="inputPassword"
+                                       class="form-control form-control-lg"
+                                       autocomplete="current-password"
+                                       required
+                                       placeholder="Enter your password">
+                            </div>
+                            <!-- CSRF Token -->
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                            <!-- Submit Button with Styled Design -->
+                            <button class="btn btn-primary w-100 py-2 fs-5" type="submit">Sign in</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

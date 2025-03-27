@@ -1,0 +1,62 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Event Details{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <div class="card shadow">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Event Details</h1>
+                <div class="btn-group">
+                    <a href="{{ path('admin_evenement_edit', {'id': evenement.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    {{ include('admin/evenement/_delete_form.html.twig') }}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Name:</dt>
+                            <dd class="col-sm-8">{{ evenement.nom }}</dd>
+
+                            <dt class="col-sm-4">Description:</dt>
+                            <dd class="col-sm-8">{{ evenement.description }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Location:</dt>
+                            <dd class="col-sm-8">{{ evenement.lieu }}</dd>
+
+                            <dt class="col-sm-4">Date:</dt>
+                            <dd class="col-sm-8">{{ evenement.dateEvenement|date('Y-m-d H:i') }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                {% if evenement.imageEvenement %}
+                    <div class="mt-4">
+                        <h5 class="mb-3">Event Image</h5>
+                        <img src="{{ asset('uploads/images/' ~ evenement.imageEvenement) }}"
+                             class="img-fluid rounded"
+                             style="max-height: 300px;"
+                             alt="Event image">
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between">
+                <a href="{{ path('admin_evenement_index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to list
+                </a>
+                <div class="btn-group">
+                    <a href="{{ path('admin_evenement_edit', {'id': evenement.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    {{ include('admin/evenement/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

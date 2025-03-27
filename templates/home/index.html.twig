@@ -1,0 +1,44 @@
+{% extends 'public/base.html.twig' %}
+
+{% block public_content %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                {# Hero Section #}
+                <div class="hero-section p-5 mb-4 rounded-3 text-white">
+                    <h1 class="display-4 fw-bold">Welcome to GoMobility</h1>
+                    <p class="fs-4 mb-4">Your premier event management system for easy transportation and event tracking.</p>
+                    <a href="{{ path('client_evenement_index') }}" class="btn btn-lg mt-3">View Upcoming Events</a>
+                </div>
+
+                {# Features Grid #}
+                <div class="row g-4 py-5">
+                    <div class="col-md-4">
+                        <div class="card h-100 feature-card shadow-lg">
+                            <div class="card-body">
+                                <h3 class="card-title">\✓ Simple Management</h3>
+                                <p class="card-text">Easy-to-use admin dashboard with all functionalities at your fingertips.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 feature-card shadow-lg">
+                            <div class="card-body">
+                                <h3 class="card-title">📅 Event Tracking</h3>
+                                <p class="card-text">Keep track of your events and never miss an important date.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 feature-card shadow-lg">
+                            <div class="card-body">
+                                <h3 class="card-title">\🖼️ Media Uploads</h3>
+                                <p class="card-text">Add media such as images to make your events stand out.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

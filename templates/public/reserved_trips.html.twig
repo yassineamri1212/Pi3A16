@@ -1,0 +1,30 @@
+{# File: templates/public/reserved_trips.html.twig #}
+{% extends 'public/base.html.twig' %}
+
+{% block public_content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">My Reserved Trips</h2>
+    {% if reservedTransports|length > 0 %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Transport Type</th>
+                    <th>Event Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transport in reservedTransports %}
+                    <tr>
+                        <td>{{ transport.id }}</td>
+                        <td>{{ transport.type }}</td>
+                        <td>{{ transport.evenement.nom }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no reserved trips.</p>
+    {% endif %}
+</div>
+{% endblock %}

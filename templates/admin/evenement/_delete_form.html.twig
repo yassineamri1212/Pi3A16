@@ -1,0 +1,8 @@
+<form method="post" action="{{ path('admin_evenement_delete', {'id': evenement.id}) }}"
+      onsubmit="return confirm('Are you sure you want to delete this event?');"
+      class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
+    <button class="btn btn-danger btn-sm">
+        <i class="fas fa-trash"></i>
+    </button>
+</form>

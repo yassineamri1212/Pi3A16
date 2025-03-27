@@ -1,0 +1,40 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            {{ form_label(form.type) }}
+            {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            {{ form_label(form.prix) }}
+            {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            {{ form_label(form.nbrePlaces) }}
+            {{ form_widget(form.nbrePlaces, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            {{ form_label(form.evenement) }}
+            {{ form_widget(form.evenement, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mt-4">
+    <button class="btn btn-primary me-2">
+        <i class="fas fa-save me-1"></i> {{ button_label|default('Save') }}
+    </button>
+    <a href="{{ path('admin_moyen_de_transport_index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Cancel
+    </a>
+</div>
+{{ form_end(form) }}

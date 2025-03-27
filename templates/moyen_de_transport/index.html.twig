@@ -1,0 +1,67 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Transport Management{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Transport Management</h1>
+
+        <div class="card shadow">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Transport List</h5>
+                <a href="{{ path('app_moyen_de_transport_new') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i> Create New
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Price</th>
+                            <th>Type</th>
+                            <th>Seats</th>
+                            <th>Event</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for moyen_de_transport in moyen_de_transports %}
+                            <tr>
+                                <td>{{ moyen_de_transport.id }}</td>
+                                <td>{{ moyen_de_transport.prix }} TND</td>
+                                <td>{{ moyen_de_transport.type }}</td>
+                                <td>{{ moyen_de_transport.nbrePlaces }}</td>
+                                <td>
+                                    {% if moyen_de_transport.evenement is not null %}
+                                        {{ moyen_de_transport.evenement.nom }} (ID: {{ moyen_de_transport.evenement.id }})
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ path('app_moyen_de_transport_show', {'id': moyen_de_transport.id}) }}"
+                                           class="btn btn-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_moyen_de_transport_edit', {'id': moyen_de_transport.id}) }}"
+                                           class="btn btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4">No transport records found</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
