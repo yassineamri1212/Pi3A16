@@ -1,4 +1,5 @@
 <?php
+
                     namespace App\Repository;
 
                     use App\Entity\Evenement;
@@ -26,5 +27,15 @@
                             $qb->orderBy('e.nom', $direction);
 
                             return $qb->getQuery();
+                        }
+
+                        public function getEventStatistics(): array
+                        {
+                            $qb = $this->createQueryBuilder('e')
+                                ->select('e.id, e.nom, COUNT(b.id) AS bookings')
+                                ->leftJoin('e.bookings', 'b') // assumes an association named bookings exists
+                                ->groupBy('e.id');
+
+                            return $qb->getQuery()->getResult();
                         }
                     }
