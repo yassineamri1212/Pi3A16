@@ -2,37 +2,75 @@
 {% extends 'public/base.html.twig' %}
 
 {% block public_content %}
-<div class="container my-5">
-    <h2 class="mb-4 text-center">Transports for event: {{ event.nom }}</h2>
-    {% for flashType, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ flashType }}">{{ message }}</div>
+    <div class="container my-5">
+        <h2 class="mb-4 text-center fw-bold text-primary">Transports for event: {{ event.nom }}</h2>
+
+        {% for flashType, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ flashType }} mb-4 rounded">{{ message }}</div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    <div class="row g-4">
-        {% if transports|length > 0 %}
-            {% for transport in transports %}
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ transport.type }}</h5>
-                        <p class="card-text">Price: {{ transport.prix }}</p>
-                        <p class="card-text">Available Seats: {{ transport.nbrePlaces }}</p>
+
+        <div class="row g-4">
+            {% if transports|length > 0 %}
+                {% for transport in transports %}
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">{{ transport.type }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-tag text-muted me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Price</small>
+                                        <div class="fw-bold">{{ transport.prix }}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-chair text-muted me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Available Seats</small>
+                                        <div class="fw-bold">{{ transport.nbrePlaces }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <form action="{{ path('client_transport_reserve', { id: transport.id }) }}" method="post">
+                                    <button type="submit" class="btn btn-success w-100 rounded-pill">
+                                        <i class="fas fa-check-circle me-1"></i> Reserve
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <form action="{{ path('client_transport_reserve', { id: transport.id }) }}" method="post">
-                            <button type="submit" class="btn btn-success btn-sm">Reserver</button>
-                        </form>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5 bg-light rounded-3">
+                        <i class="fas fa-bus-slash text-muted mb-3" style="font-size: 2.5rem;"></i>
+                        <p class="text-muted mb-0">No transports available for this event.</p>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-        {% else %}
-        <div class="col-12">
-            <p class="text-center">No transports available for this event.</p>
+            {% endif %}
         </div>
-        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{{ path('client_evenement_index') }}" class="btn btn-outline-primary rounded-pill px-4">
+                <i class="fas fa-arrow-left me-1"></i> Back to events
+            </a>
+        </div>
     </div>
-    <a href="{{ path('client_evenement_index') }}" class="btn btn-secondary mt-3">Back to events</a>
-</div>
+
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            padding: 1rem 1.25rem;
+        }
+    </style>
 {% endblock %}
