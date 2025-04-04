@@ -12,6 +12,7 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/persistence": "3.4",
+        "endroid/qr-code": "^5.1",
         "guzzlehttp/guzzle": "^7.9",
         "knplabs/knp-paginator-bundle": "^6.7",
         "symfony/asset": "6.4.*",
