@@ -1,36 +1,64 @@
-{{ form_start(form) }}
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group mb-3">
-            {{ form_label(form.nom) }}
-            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group mb-3">
-            {{ form_label(form.date_evenement) }}
-            {{ form_widget(form.date_evenement, {'attr': {'class': 'form-control'}}) }}
-        </div>
+{{ form_start(form, {'attr': {'class': 'row g-4'}}) }}
+
+<!-- Event Name -->
+<div class="col-md-6">
+    <div class="mb-3">
+        {{ form_label(form.nom, 'Event Name', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Enter event name'}}) }}
+        {{ form_errors(form.nom) }}
     </div>
 </div>
 
-<div class="form-group mb-3">
-    {{ form_label(form.description) }}
-    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+<!-- Event Date -->
+<div class="col-md-6">
+    <div class="mb-3">
+        {{ form_label(form.date_evenement, 'Event Date', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.date_evenement, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.date_evenement) }}
+    </div>
 </div>
 
-<div class="form-group mb-3">
-    {{ form_label(form.lieu) }}
-    {{ form_widget(form.lieu, {'attr': {'class': 'form-control'}}) }}
+<!-- Event Description -->
+<div class="col-12">
+    <div class="mb-3">
+        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Enter description'}}) }}
+        {{ form_errors(form.description) }}
+    </div>
 </div>
 
-<div class="form-group mb-4">
-    {{ form_label(form.imageFile) }}
-    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
-    <small class="form-text text-muted">Upload an image for your event</small>
+<!-- Event Location -->
+<div class="col-md-6">
+    <div class="mb-3">
+        {{ form_label(form.lieu, 'Location', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.lieu, {'attr': {'class': 'form-control', 'placeholder': 'Enter location'}}) }}
+        {{ form_errors(form.lieu) }}
+    </div>
 </div>
 
-<button class="btn btn-primary">
-    <i class="fas fa-save me-1"></i> {{ button_label|default('Save') }}
-</button>
+<!-- Event Image Upload -->
+
+
+<!-- Display Current Event Image (only when editing) - Fixed Size Version -->
+{% if form.vars.value.imageEvenement %}
+    <div class="col-12 mb-3">
+        <div class="d-flex flex-column align-items-center">
+            <h5 class="text-muted mb-3">Current Event Image</h5>
+            <div class="image-preview-container" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+                <img src="{{ asset('uploads/images/' ~ form.vars.value.imageEvenement) }}"
+                     style="width: 100%; height: 100%; object-fit: cover;"
+                     alt="Current event image">
+            </div>
+            <p class="text-muted mt-2 mb-0 text-center">This image will be replaced if you upload a new one.</p>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Submit Button -->
+<div class="col-12">
+    <button type="submit" class="btn btn-primary w-100">
+        <i class="fas fa-save me-1"></i> {{ button_label|default('Save') }}
+    </button>
+</div>
+
 {{ form_end(form) }}

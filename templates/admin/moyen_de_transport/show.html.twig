@@ -1,52 +1,111 @@
+{# File: templates/admin/moyen_de_transport/show.html.twig #}
 {% extends 'admin/base.html.twig' %}
 
 {% block title %}Transport Details{% endblock %}
 
 {% block admin_content %}
     <div class="container-fluid">
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <h1 class="h3 mb-0">Transport Details</h1>
+        <div class="card shadow rounded-3">
+            <div class="card-header bg-white border-bottom">
+                <h1 class="h3 mb-0 fw-bold text-primary">Transport Details</h1>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <dl class="row">
-                            <dt class="col-sm-4">ID:</dt>
-                            <dd class="col-sm-8">{{ transport.id }}</dd>
+                <div class="row mb-4">
+                    <!-- Details -->
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5 text-muted">ID:</dt>
+                                    <dd class="col-sm-7">{{ transport.id }}</dd>
 
-                            <dt class="col-sm-4">Type:</dt>
-                            <dd class="col-sm-8">{{ transport.type }}</dd>
+                                    <dt class="col-sm-5 text-muted">Type:</dt>
+                                    <dd class="col-sm-7">{{ transport.type }}</dd>
 
-                            <dt class="col-sm-4">Price:</dt>
-                            <dd class="col-sm-8">{{ transport.prix }} TND</dd>
-                        </dl>
+                                    <dt class="col-sm-5 text-muted">Price:</dt>
+                                    <dd class="col-sm-7">{{ transport.prix }} TND</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5 text-muted">Seats Left:</dt>
+                                    <dd class="col-sm-7">{{ transport.nbrePlaces }}</dd>
+
+                                    <dt class="col-sm-5 text-muted">Associated Event:</dt>
+                                    <dd class="col-sm-7">
+                                        {% if transport.evenement %}
+                                            <a href="{{ path('admin_evenement_show', {'id': transport.evenement.id}) }}" class="text-decoration-none fw-semibold text-dark">
+                                                {{ transport.evenement.nom }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted fst-italic">Not assigned</span>
+                                        {% endif %}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="row">
-                            <dt class="col-sm-4">Seats:</dt>
-                            <dd class="col-sm-8">{{ transport.nbrePlaces }}</dd>
 
-                            <dt class="col-sm-4">Associated Event:</dt>
-                            <dd class="col-sm-8">
-                                {% if transport.evenement %}
-                                    <a href="{{ path('admin_evenement_show', {'id': transport.evenement.id}) }}">
-                                        {{ transport.evenement.nom }} (ID: {{ transport.evenement.id }})
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted">Not assigned</span>
-                                {% endif %}
-                            </dd>
-                        </dl>
+                    <!-- Capacity Statistics -->
+                    <div class="col-lg-4 mt-4 mt-lg-0 d-flex justify-content-center align-items-center">
+                        <div class="text-center">
+                            <h5 class="text-secondary mb-4">Capacity</h5>
+                            <div class="circular-progress position-relative mx-auto mb-2" style="--percentage: {{ fullPercentage }};">
+                                <svg viewBox="0 0 36 36" class="circular-chart">
+                                    <path class="circle-bg"
+                                          d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="circle"
+                                          stroke-dasharray="{{ fullPercentage }}, 100"
+                                          d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                </svg>
+                                <div class="percentage-text fw-bold">{{ fullPercentage }}%</div>
+                                <small class="d-block text-muted">({{ reservedCount }}/{{ totalCapacity }})</small>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
+
+                {% if users is not empty %}
+                    <div class="mt-5">
+                        <h4 class="mb-4 pb-2 border-bottom text-secondary">Users Reserved This Transport</h4>
+                        <div class="d-flex flex-column gap-3">
+                            {% for user in users %}
+                                <div class="card border-0 shadow-sm rounded-2">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary mb-2">
+                                            {% if user.userName is defined and user.userName %}
+                                                {{ user.userName }}
+                                            {% else %}
+                                                {{ user.email }}
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text mb-0"><strong>Email:</strong> {{ user.email }}</p>
+                                        {% if user.roles is defined %}
+                                            <p class="card-text"><strong>Roles:</strong> {{ user.roles|join(', ') }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-light mt-4 border" role="alert">
+                        No users have reserved this transport.
+                    </div>
+                {% endif %}
             </div>
-            <div class="card-footer bg-white d-flex justify-content-between">
-                <a href="{{ path('admin_moyen_de_transport_index') }}" class="btn btn-secondary">
+
+            <div class="card-footer bg-white d-flex justify-content-between border-top">
+                <a href="{{ path('admin_moyen_de_transport_index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-1"></i> Back to list
                 </a>
                 <div class="btn-group">
-                    <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-warning">
+                    <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-outline-warning">
                         <i class="fas fa-edit me-1"></i> Edit
                     </a>
                     <form method="post" action="{{ path('admin_moyen_de_transport_delete', {'id': transport.id}) }}"
@@ -54,12 +113,42 @@
                           class="d-inline">
                         <input type="hidden" name="_method" value="DELETE">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transport.id) }}">
-                        <button class="btn btn-danger">
+                        <button class="btn btn-outline-danger">
                             <i class="fas fa-trash me-1"></i> Delete
                         </button>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
+    </div><style>
+    .circular-chart {
+        width: 120px;
+        height: 120px;
+        transform: rotate(-90deg);
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: #eee;
+        stroke-width: 3.8;
+    }
+
+    .circle {
+        fill: none;
+        stroke: #17a2b8; /* Bootstrap info color */
+        stroke-width: 3.8;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.6s ease;
+    }
+
+    .percentage-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+        font-size: 1.2rem;
+        color: #333;
+    }
+</style>
+
 {% endblock %}
