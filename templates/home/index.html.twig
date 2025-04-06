@@ -1,257 +1,175 @@
+{# templates/home/index.html.twig #}
 {% extends 'public/base.html.twig' %}
 
-{% block title %}Home - GoMobility{% endblock %}
+{% block public_title %}Home - GoMobility{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
-    <style>
-        .hero-section {
-            position: relative;
-            overflow: hidden;
-            min-height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1;
-        }
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-        }
-        .feature-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2) !important;
-        }
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #0d6efd;
-        }
-        .transport-type-card {
-            height: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-        }
-        .transport-type-card img {
-            transition: transform 0.5s ease;
-        }
-        .transport-type-card:hover img {
-            transform: scale(1.1);
-        }
-        .stats-counter {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #0d6efd;
-        }
-        .testimonial-card {
-            border-left: 4px solid #0d6efd;
-        }
-    </style>
+    {# Styles should be in app.css #}
 {% endblock %}
 
 {% block public_content %}
     <div class="container-fluid px-0">
         <!-- Hero Section with Video Background -->
         <section class="hero-section">
+            <div class="hero-video-wrapper">
+                <video autoplay muted loop playsinline>
+                    <source src="{{ asset('uploads/videos/transport-hero.mp4') }}" type="video/mp4">
+                    <img src="{{ asset('uploads/images/app-screenshot.jpg') }}" alt="Transportation Hero Image">
+                </video>
+            </div>
             <div class="hero-overlay"></div>
-            <video autoplay muted loop class="position-absolute w-100 h-100" style="object-fit: cover;">
-                <source src="{{ asset('uploads/videos/transport-hero.mp4') }}" type="video/mp4">
-                <img src="{{ asset('uploads/images/app-screenshot.jpg') }}" alt="Transportation Hero Image" style="width:100%;height:100%;object-fit:cover;">
-            </video>
             <div class="hero-content text-center text-white px-3">
                 <h1 class="display-3 fw-bold mb-4">Journey Smarter with GoMobility</h1>
-                <p class="lead fs-3 mb-5">Seamless transportation solutions for events, business, and leisure travel</p>
+                <p class="lead fs-4 mb-5">Seamless transportation solutions for events, business, and leisure travel</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <a href="{{ path('client_evenement_index') }}" class="btn btn-primary btn-lg px-4 py-3">
+                    <a href="{{ path('client_evenement_index') }}" class="btn btn-primary btn-lg px-4 py-3 fw-semibold">
                         <i class="fas fa-calendar-alt me-2"></i> View Events
                     </a>
-                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4 py-3">
-                        <i class="fas fa-sign-in-alt me-2"></i> Login
-                    </a>
+                    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4 py-3 fw-semibold">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login / Book
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </section>
 
         <!-- Stats Bar -->
-        <section class="bg-light py-4">
+        <section class="stats-section py-5">
             <div class="container">
                 <div class="row text-center g-4">
-                    <div class="col-md-3">
-                        <div class="stats-counter">10,000+</div>
-                        <p class="text-muted">Completed Trips</p>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stats-counter">500+</div>
-                        <p class="text-muted">Events Served</p>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stats-counter">50+</div>
-                        <p class="text-muted">Transport Types</p>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stats-counter">98%</div>
-                        <p class="text-muted">Customer Satisfaction</p>
-                    </div>
+                    <div class="col-md-3 col-6 stats-item animate-on-scroll fade-in-up"> <div class="stats-counter" data-target="10000">0</div>+ <p>Completed Trips</p> </div>
+                    <div class="col-md-3 col-6 stats-item animate-on-scroll fade-in-up delay-100ms"> <div class="stats-counter" data-target="500">0</div>+ <p>Events Served</p> </div>
+                    <div class="col-md-3 col-6 stats-item animate-on-scroll fade-in-up delay-200ms"> <div class="stats-counter" data-target="50">0</div>+ <p>Transport Types</p> </div>
+                    <div class="col-md-3 col-6 stats-item animate-on-scroll fade-in-up delay-300ms"> <div class="stats-counter" data-target="98">0</div>% <p>Customer Satisfaction</p> </div>
                 </div>
             </div>
         </section>
 
         <!-- Transport Types -->
-        <section class="py-5 bg-white">
+        <section class="transport-types-section py-5">
             <div class="container">
-                <h2 class="text-center mb-5 display-4 fw-bold">Our Transport Solutions</h2>
+                <h2 class="text-center mb-5 display-4 fw-bold animate-on-scroll fade-in">Our Transport Solutions</h2>
                 <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="transport-type-card shadow-lg">
-                            <img src="{{ asset('uploads/images/bus-transport.jpg') }}" class="img-fluid w-100" alt="Bus Transport">
-                            <div class="p-4 position-absolute bottom-0 start-0 w-100" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent)">
-                                <h3>Event Shuttles</h3>
-                                <p>Comfortable group transportation for all your event needs</p>
-                                <a href="{{ path('client_evenement_index') }}" class="btn btn-sm btn-primary">Book Now</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="transport-type-card shadow-lg">
-                            <img src="{{ asset('uploads/images/luxury-transport.jpg') }}" class="img-fluid w-100" alt="Luxury Transport">
-                            <div class="p-4 position-absolute bottom-0 start-0 w-100" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent)">
-                                <h3>VIP Services</h3>
-                                <p>Premium vehicles for executive and special occasion travel</p>
-                                <a href="{{ path('client_evenement_index') }}" class="btn btn-sm btn-primary">Explore</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="transport-type-card shadow-lg">
-                            <img src="{{ asset('uploads/images/eco-transport.jpg') }}" class="img-fluid w-100" alt="Eco Transport">
-                            <div class="p-4 position-absolute bottom-0 start-0 w-100" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent)">
-                                <h3>Eco-Friendly Options</h3>
-                                <p>Sustainable transportation solutions for green events</p>
-                                <a href="{{ path('client_evenement_index') }}" class="btn btn-sm btn-primary">Learn More</a>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="col-lg-4 col-md-6 animate-on-scroll fade-in-up"> <div class="transport-type-card shadow-sm"> <div class="img-wrapper"><img src="{{ asset('uploads/images/bus-transport.jpg') }}" alt="Bus Transport"></div> <div class="card-content"> <h3>Event Shuttles</h3><p>Comfortable group transportation for all your event needs.</p> <a href="{{ path('client_evenement_index') }}" class="btn btn-sm btn-primary stretched-link">Book Now <i class="fas fa-arrow-right ms-1"></i></a> </div> </div> </div>
+                    <div class="col-lg-4 col-md-6 animate-on-scroll fade-in-up delay-100ms"> <div class="transport-type-card shadow-sm"> <div class="img-wrapper"><img src="{{ asset('uploads/images/luxury-transport.jpg') }}" alt="Luxury Transport"></div> <div class="card-content"> <h3>VIP Services</h3><p>Premium vehicles for executive and special occasion travel.</p> <a href="{{ path('client_evenement_index') }}" class="btn btn-sm btn-primary stretched-link">Explore <i class="fas fa-arrow-right ms-1"></i></a> </div> </div> </div>
+                    <div class="col-lg-4 col-md-6 animate-on-scroll fade-in-up delay-200ms"> <div class="transport-type-card shadow-sm"> <div class="img-wrapper"><img src="{{ asset('uploads/images/eco-transport.jpg') }}" alt="Eco Transport"></div> <div class="card-content"> <h3>Eco-Friendly Options</h3><p>Sustainable transportation solutions for green events.</p> <a href="{{ path('client_evenement_index') }}" class="btn btn-sm btn-primary stretched-link">Learn More <i class="fas fa-arrow-right ms-1"></i></a> </div> </div> </div>
                 </div>
             </div>
         </section>
 
         <!-- Features Section -->
-        <section class="py-5 bg-light">
+        <section class="features-section py-5">
             <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <img src="{{ asset('uploads/images/app-screenshot.jpg') }}" class="img-fluid rounded-3 shadow" alt="App Screenshot">
-                    </div>
-                    <div class="col-lg-6">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6 mb-4 mb-lg-0 animate-on-scroll fade-in-left feature-image"> <img src="{{ asset('uploads/images/app-screenshot.jpg') }}" class="img-fluid" alt="App Screenshot"> </div>
+                    <div class="col-lg-6 animate-on-scroll fade-in-right">
                         <h2 class="display-5 fw-bold mb-4">Why Choose GoMobility?</h2>
-                        <div class="d-flex mb-4">
-                            <div class="me-4">
-                                <div class="feature-icon">🚌</div>
-                            </div>
-                            <div>
-                                <h3>Diverse Fleet</h3>
-                                <p class="text-muted">From minivans to coaches, we have the perfect vehicle for every group size and occasion.</p>
-                            </div>
-                        </div>
-                        <div class="d-flex mb-4">
-                            <div class="me-4">
-                                <div class="feature-icon">⏱️</div>
-                            </div>
-                            <div>
-                                <h3>Real-Time Tracking</h3>
-                                <p class="text-muted">Monitor your transportation in real-time with our advanced tracking system.</p>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <div class="me-4">
-                                <div class="feature-icon">📱</div>
-                            </div>
-                            <div>
-                                <h3>Mobile Friendly</h3>
-                                <p class="text-muted">Manage bookings, track vehicles, and communicate with drivers from any device.</p>
-                            </div>
-                        </div>
+                        <div class="feature-item"> <div class="feature-icon-wrapper">🚌</div> <div class="feature-content"><h3>Diverse Fleet</h3><p>From minivans to coaches, we have the perfect vehicle for every group size and occasion.</p></div> </div>
+                        <div class="feature-item"> <div class="feature-icon-wrapper">⏱️</div> <div class="feature-content"><h3>Real-Time Tracking</h3><p>Monitor your transportation in real-time with our advanced tracking system.</p></div> </div>
+                        <div class="feature-item mb-0"> <div class="feature-icon-wrapper">📱</div> <div class="feature-content"><h3>Mobile Friendly</h3><p>Manage bookings, track vehicles, and communicate with drivers from any device.</p></div> </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Testimonials -->
-        <section class="py-5 bg-white">
+        <section class="testimonials-section py-5">
             <div class="container">
-                <h2 class="text-center mb-5 display-5 fw-bold">What Our Clients Say</h2>
+                <h2 class="text-center mb-5 display-5 fw-bold animate-on-scroll fade-in">What Our Clients Say</h2>
                 <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="testimonial-card p-4 h-100 bg-light shadow-sm">
-                            <div class="d-flex align-items-center mb-3">
-                                <img src="{{ asset('uploads/images/client1.jpg') }}" class="rounded-circle me-3" width="60" alt="Client">
-                                <div>
-                                    <h5 class="mb-0">Sarah Johnson</h5>
-                                    <small class="text-muted">Event Planner</small>
-                                </div>
-                            </div>
-                            <p>"GoMobility made transporting 200 guests to our conference seamless. The real-time updates were a game-changer!"</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="testimonial-card p-4 h-100 bg-light shadow-sm">
-                            <div class="d-flex align-items-center mb-3">
-                                <img src="{{ asset('uploads/images/client2.jpg') }}" class="rounded-circle me-3" width="60" alt="Client">
-                                <div>
-                                    <h5 class="mb-0">Michael Chen</h5>
-                                    <small class="text-muted">Corporate Travel Manager</small>
-                                </div>
-                            </div>
-                            <p>"The VIP service saved us during our executive summit. Professional drivers and luxury vehicles impressed our guests."</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="testimonial-card p-4 h-100 bg-light shadow-sm">
-                            <div class="d-flex align-items-center mb-3">
-                                <img src="{{ asset('uploads/images/client3.jpg') }}" class="rounded-circle me-3" width="60" alt="Client">
-                                <div>
-                                    <h5 class="mb-0">Emma Rodriguez</h5>
-                                    <small class="text-muted">Wedding Coordinator</small>
-                                </div>
-                            </div>
-                            <p>"Our wedding guests loved the eco-friendly shuttles! Beautiful vehicles that matched our green wedding theme."</p>
-                        </div>
-                    </div>
+                    <div class="col-md-4 animate-on-scroll fade-in-up"> <div class="testimonial-card p-4 shadow-sm"> <div class="d-flex align-items-center mb-3 testimonial-client"> <img src="{{ asset('uploads/images/client1.jpg') }}" class="rounded-circle me-3" alt="Client Sarah Johnson"> <div><h5 class="mb-0">Sarah Johnson</h5><small class="text-muted">Event Planner</small></div></div><p>"GoMobility made transporting 200 guests to our conference seamless. The real-time updates were a game-changer!"</p></div></div>
+                    <div class="col-md-4 animate-on-scroll fade-in-up delay-100ms"> <div class="testimonial-card p-4 shadow-sm"> <div class="d-flex align-items-center mb-3 testimonial-client"> <img src="{{ asset('uploads/images/client2.jpg') }}" class="rounded-circle me-3" alt="Client Michael Chen"> <div><h5 class="mb-0">Michael Chen</h5><small class="text-muted">Corporate Travel Manager</small></div></div><p>"The VIP service saved us during our executive summit. Professional drivers and luxury vehicles impressed our guests."</p></div></div>
+                    <div class="col-md-4 animate-on-scroll fade-in-up delay-200ms"> <div class="testimonial-card p-4 shadow-sm"> <div class="d-flex align-items-center mb-3 testimonial-client"> <img src="{{ asset('uploads/images/client3.jpg') }}" class="rounded-circle me-3" alt="Client Emma Rodriguez"> <div><h5 class="mb-0">Emma Rodriguez</h5><small class="text-muted">Wedding Coordinator</small></div></div><p>"Our wedding guests loved the eco-friendly shuttles! Beautiful vehicles that matched our green wedding theme."</p></div></div>
                 </div>
             </div>
         </section>
 
         <!-- CTA Section -->
-        <section class="py-5 bg-primary text-white">
-            <div class="container text-center">
+        <section class="cta-section py-5 text-white">
+            <div class="container text-center animate-on-scroll fade-in">
                 <h2 class="display-5 fw-bold mb-4">Ready to Transform Your Transportation?</h2>
                 <p class="lead mb-5">Join thousands of satisfied clients who trust GoMobility for their event transportation needs.</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <a href="{{ path('app_login') }}" class="btn btn-light btn-lg px-4 py-3">
-                        <i class="fas fa-sign-in-alt me-2"></i> Login to Book
-                    </a>
-
+                    {# --- CONDITIONAL CTA BUTTON --- #}
+                    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <a href="{{ path('app_login') }}" class="btn btn-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-sign-in-alt me-2"></i> Login to Book </a>
+                    {% else %}
+                        <a href="{{ path('client_evenement_index') }}" class="btn btn-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-calendar-alt me-2"></i> Browse Events </a>
+                    {% endif %}
+                    {# --- REMOVED THE OFFENDING REGISTER BUTTON --- #}
+                    {# <a href="{{ path('app_register') }}" class="btn btn-outline-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-user-plus me-2"></i> Register Now </a> #}
                 </div>
             </div>
         </section>
-    </div>
+
+    </div> {# End Container fluid #}
+{% endblock %} {# End public_content block #}
+
+{# --- KEEP THE PAGE-SPECIFIC JAVASCRIPT HERE --- #}
+{% block public_javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Intersection Observer for Scroll Animations
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animated');
+                            // observer.unobserve(entry.target); // Optional
+                        } else {
+                            // entry.target.classList.remove('animated'); // Optional
+                        }
+                    });
+                }, { threshold: 0.1 });
+                animatedElements.forEach(el => observer.observe(el));
+            } else {
+                animatedElements.forEach(el => el.classList.add('animated'));
+                console.warn("IntersectionObserver not supported, animations shown immediately.");
+            }
+
+            // Animated Counter
+            const counters = document.querySelectorAll('.stats-counter[data-target]');
+            const startCounter = (counter) => {
+                const target = +counter.getAttribute('data-target');
+                if (isNaN(target)) return;
+                const duration = 1500;
+                const increment = target / (duration / 16);
+                let current = 0;
+                counter.innerText = '0'; // Start at 0
+
+                const updateCounter = () => {
+                    current += increment;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current).toLocaleString();
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target.toLocaleString();
+                        if (counter.nextSibling && counter.nextSibling.nodeType === Node.TEXT_NODE) {
+                            counter.innerText += counter.nextSibling.textContent.trim().charAt(0);
+                        }
+                    }
+                };
+                requestAnimationFrame(updateCounter);
+            };
+            if ("IntersectionObserver" in window) {
+                const counterObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !entry.target.dataset.animated) {
+                            startCounter(entry.target);
+                            entry.target.dataset.animated = 'true';
+                            // observer.unobserve(entry.target); // Optional
+                        }
+                    });
+                }, { threshold: 0.5 });
+                counters.forEach(counter => counterObserver.observe(counter));
+            } else {
+                counters.forEach(counter => startCounter(counter));
+                console.warn("IntersectionObserver not supported, counters started immediately.");
+            }
+        });
+    </script>
 {% endblock %}

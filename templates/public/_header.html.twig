@@ -1,21 +1,8 @@
-<style>
-    .nav-link {
-        color: white;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    .nav-link:hover {
-        color: #f8d7da;
-    }
-    .logout-btn {
-        transition: background-color 0.3s ease;
-    }
-    .logout-btn:hover {
-        background-color: #c82333;
-    }
-</style>
+{# File: templates/public/_header.html.twig #}
 
-<header class="bg-primary text-white py-4 shadow-sm">
+{# Styles should be in app.css, ensure no <style> block here #}
+
+<header id="main-header" class="bg-primary text-white py-3 shadow-sm sticky-top-initial">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <!-- Logo -->
@@ -23,17 +10,53 @@
                 <h1 class="h3 mb-0 fw-bold">GoMobility</h1>
             </a>
 
-            <!-- Navigation -->
-            <nav>
-                <ul class="list-unstyled d-flex align-items-center gap-4 mb-0">
-                    <li><a href="{{ path('app_home') }}" class="nav-link fw-semibold">Home</a></li>
-                    <li><a href="{{ path('client_evenement_index') }}" class="nav-link fw-semibold">Events</a></li>
-                    <li><a href="{{ path('client_reserved_trips') }}" class="nav-link fw-semibold">My Reservations</a></li>
-                    <li>
-                        <a href="{{ path('app_logout') }}" class="btn btn-danger btn-sm px-3 logout-btn">Logout</a>
-                    </li>
-                </ul>
-            </nav>
+            <!-- Right side controls (Desktop Nav + Toggles) -->
+            <div class="d-flex align-items-center"> {# Wrap desktop nav and toggles for better alignment #}
+
+                <!-- Desktop Navigation -->
+                <nav class="d-none d-lg-block me-2" id="main-navbar"> {# Added margin-end (me-2) #}
+                    <ul class="list-unstyled d-flex align-items-center gap-4 mb-0 main-nav-ul">
+                        <li><a href="{{ path('app_home') }}" class="nav-link fw-semibold">Home</a></li>
+                        <li><a href="{{ path('client_evenement_index') }}" class="nav-link fw-semibold">Events</a></li>
+                        <li><a href="{{ path('client_reserved_trips') }}" class="nav-link fw-semibold">My Reservations</a></li>
+                        <li>
+                            <a href="{{ path('app_reclamation_my') }}" class="nav-link fw-semibold">
+                                Pass Reclamation
+                            </a>
+                        </li>
+                        <li> {# Conditional button LI remains #}
+                            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                <a href="{{ path('app_logout') }}" class="btn btn-danger btn-sm px-3 logout-btn">Logout</a>
+                            {% else %}
+                                <a href="{{ path('app_login') }}" class="btn btn-sm px-3 login-btn fw-semibold">Login</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- === ADDED: Dark Mode Toggle Button === -->
+                <!-- This button is visible on all screen sizes by default -->
+                <button id="dark-mode-toggle" class="btn btn-outline-light btn-sm ms-lg-2" title="Toggle Dark Mode"> {# Use outline-light, add margin on large screens #}
+                    <i class="fas fa-moon"></i> {# Start with moon icon #}
+                </button>
+                <!-- === END ADDED === -->
+
+                <!-- Mobile Nav Toggle Button (Hidden on large screens) -->
+                <button class="navbar-toggler d-lg-none ms-2" type="button" id="mobile-menu-toggle" aria-controls="main-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation"> {# Added margin-start #}
+                    <i class="fas fa-bars text-white"></i>
+                </button>
+
+            </div> {# End Right side controls #}
+
+
+            <!-- Collapsible container for Mobile Nav (Initially empty) -->
+            <div class="navbar-collapse-mobile d-lg-none" id="main-navbar-collapse">
+                {# JS will clone desktop nav items here #}
+                {# Optional: Add dark mode toggle inside mobile menu too? #}
+                {# Consider adding another button here if you want it inside the mobile dropdown #}
+                {# <button id="dark-mode-toggle-mobile" class="btn btn-outline-light btn-sm w-100 mt-3">Toggle Dark Mode</button> #}
+            </div>
+
         </div>
     </div>
 </header>

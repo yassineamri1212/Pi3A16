@@ -1,17 +1,31 @@
+{# templates/admin/evenement/new.html.twig #}
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Create New Event{% endblock %}
+{% block admin_title %}Create New Event{% endblock %} {# Use specific title block #}
 
 {% block admin_content %}
-    <div class="container-fluid">
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <h1 class="h3 mb-0">Create New Event</h1>
+    <div class="container-fluid my-4"> {# Added top/bottom margin #}
+
+        {# Render Flash Messages #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card shadow rounded-3"> {# Added rounded corners #}
+            <div class="card-header bg-primary text-white"> {# Primary header background #}
+                <h1 class="h4 mb-0">Create New Event</h1> {# Slightly smaller heading #}
             </div>
-            <div class="card-body">
-                {{ include('admin/evenement/_form.html.twig') }}
+            <div class="card-body p-4"> {# Added more padding #}
+                {# Include the form, pass a specific button label if desired #}
+                {# The submit button is now inside the _form partial #}
+                {{ include('admin/evenement/_form.html.twig', {'button_label': 'Create Event'}) }}
             </div>
-            <div class="card-footer bg-white">
+            <div class="card-footer bg-light d-flex justify-content-start"> {# Use bg-light, align start #}
                 <a href="{{ path('admin_evenement_index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-1"></i> Back to list
                 </a>

@@ -5,3 +5,9 @@ vich_uploader:
       uri_prefix: /uploads/images
       upload_destination: '%kernel.project_dir%/public/uploads/images'
       namer: Vich\UploaderBundle\Naming\UniqidNamer
+
+      # --- Add these lines ---
+      inject_on_load: false
+      delete_on_update: true  # Delete old file when uploading new one? (Commonly true)
+      delete_on_remove: true  # Delete file when entity is removed? (Commonly true)
+      # --- End added lines ---

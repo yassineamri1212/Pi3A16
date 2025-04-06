@@ -1,11 +1,48 @@
+{# File: templates/public/base.html.twig (No Changes Needed Here) #}
 {% extends 'base.html.twig' %}
 
+{# Define a block for the specific page title within the main title block #}
+{% block title %}{% block public_title %}GoMobility{% endblock %}{% endblock %}
+
+{# Inherit base stylesheets defined in base.html.twig #}
+{% block stylesheets %}
+    {{ parent() }}
+    {# Add any CSS specific ONLY to the public section layout if needed #}
+{% endblock %}
+
 {% block body %}
+    {# Include the original public header partial #}
+    {# Make sure 'public/_header.html.twig' contains the header you had before #}
     {% include 'public/_header.html.twig' %}
 
-    <main class="flex-grow-1 py-4">
+    {# Original main content area structure #}
+    <main class="flex-grow-1 py-4"> {# Keep Bootstrap spacing/flex if desired #}
+        {# Flash Messages can go here #}
+        <div class="container"> {# Wrap flash messages in a container #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        {# Content from child templates like home/index goes here #}
         {% block public_content %}{% endblock %}
     </main>
 
+    {# Include the original public footer partial #}
+    {# Make sure 'public/_footer.html.twig' contains the footer you had before #}
     {% include 'public/_footer.html.twig' %}
+
+{% endblock %} {# End block body #}
+
+
+{# Define the block for page-specific scripts, inheriting base JS #}
+{% block javascripts %}
+    {{ parent() }} {# Includes app.js from base.html.twig #}
+    {# Page-specific JS (like homepage animations) goes here #}
+    {% block public_javascripts %}{% endblock %}
 {% endblock %}

@@ -1,21 +1,36 @@
+{# templates/admin/evenement/edit.html.twig #}
 {% extends 'admin/base.html.twig' %}
 
 {% block title %}Edit Event{% endblock %}
 
 {% block admin_content %}
     <div class="container-fluid my-4">
+        {# Optional: Render flash messages if you added them in the controller #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
         <div class="card shadow rounded-3">
             <div class="card-header bg-primary text-white">
-                <h1 class="h4 mb-0">Edit Event</h1>
+                {# Use evenement.nom to show which event is being edited #}
+                <h1 class="h4 mb-0">Edit Event: {{ evenement.nom|default('New Event') }}</h1>
             </div>
             <div class="card-body">
+                {# Ensure _form.html.twig includes the imageFile field #}
                 {{ include('admin/evenement/_form.html.twig', {'button_label': 'Update'}) }}
             </div>
-            <div class="card-footer d-flex justify-content-between">
+            <div class="card-footer d-flex justify-content-between align-items-center"> {# Added align-items-center #}
                 <a href="{{ path('admin_evenement_index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-1"></i> Back to list
                 </a>
-                {{ include('evenement/_delete_form.html.twig') }}
+                {# Make sure the path to the delete form is correct #}
+                {# Assuming it's in the same directory: 'admin/evenement/_delete_form.html.twig' #}
+                {{ include('admin/evenement/_delete_form.html.twig') }}
             </div>
         </div>
     </div>

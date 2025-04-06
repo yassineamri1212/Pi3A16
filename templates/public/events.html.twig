@@ -1,116 +1,125 @@
 {# File: templates/public/events.html.twig #}
 {% extends 'public/base.html.twig' %}
 
+{# Make sure public_title block is defined in public/base.html.twig if you use it #}
+{% block public_title %}Available Events - GoMobility{% endblock %}
+
 {% block public_content %}
     <div class="container my-5">
-        <h2 class="mb-4 text-center fw-bold" style="color: #2c3e50; position: relative;">
-            <span style="position: relative; z-index: 1; padding: 0 15px; background: white;">Available Events</span>
-            <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #3498db, transparent); z-index: 0;"></span>
+        {# Use text-body-secondary for less emphasis in dark mode? #}
+        <h2 class="mb-4 text-center fw-bold text-body-secondary" style="position: relative;">
+            <span style="position: relative; z-index: 1; padding: 0 15px; background: var(--bs-body-bg);">Available Events</span> {# Use variable for background #}
+            <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--bs-primary), transparent); z-index: 0;"></span> {# Use variable for color #}
         </h2>
 
-        <form method="get" class="mb-4 bg-light p-4 rounded-3 shadow-sm">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="fas fa-search text-muted"></i>
-                    </span>
-                        <input type="text" name="search" value="{{ search }}"
-                               placeholder="Search events..."
-                               class="form-control border-start-0">
+        {# Add card class for better styling context #}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" class=""> {# Removed bg-light p-4 rounded-3 shadow-sm - handled by card #}
+                    <div class="row g-3 align-items-center"> {# Added align-items-center #}
+                        <div class="col-md-6">
+                            <label for="event-search" class="visually-hidden">Search Events</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span> {# Simplified #}
+                                <input type="text" id="event-search" name="search" value="{{ search|default('') }}" {# Added default filter #}
+                                       placeholder="Search events..."
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="event-order" class="visually-hidden">Sort Order</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-sort"></i></span> {# Simplified #}
+                                <select id="event-order" name="order" class="form-select">
+                                    <option value="asc" {% if order|default('asc') == 'asc' %}selected{% endif %}>Sort A-Z</option> {# Added default #}
+                                    <option value="desc" {% if order == 'desc' %}selected{% endif %}>Sort Z-A</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-1"></i> Apply
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="fas fa-sort text-muted"></i>
-                    </span>
-                        <select name="order" class="form-select">
-                            <option value="asc" {% if order == 'asc' %}selected{% endif %}>Sort A-Z</option>
-                            <option value="desc" {% if order == 'desc' %}selected{% endif %}>Sort Z-A</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-filter me-1"></i> Apply
-                    </button>
-                </div>
+                </form>
             </div>
-        </form>
+        </div>
+
 
         <div class="row g-4">
             {% for event in pagination %}
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="transition: all 0.3s ease;">
+                <div class="col-md-4 d-flex align-items-stretch"> {# Use d-flex for equal height cards #}
+                    {# Added event-card class for specific hover/dark styles #}
+                    <div class="card event-card w-100 border-0 shadow-sm rounded-3 overflow-hidden">
                         {% if event.imageEvenement %}
-                            <div class="card-img-top overflow-hidden" style="height: 180px;">
+                            <div class="card-img-top-wrapper overflow-hidden" style="height: 180px;"> {# Wrapper class #}
                                 <img src="{{ asset('uploads/images/' ~ event.imageEvenement) }}"
-                                     class="img-fluid w-100 h-100 object-fit-cover"
+                                     class="img-fluid w-100 h-100 object-fit-cover event-card-img" {# Added class #}
                                      alt="{{ event.nom }}">
                             </div>
+                        {% else %}
+                            {# Optional Placeholder #}
+                            <div class="card-img-top-wrapper d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                                <i class="fas fa-image fa-3x text-body-tertiary"></i>
+                            </div>
                         {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold text-primary mb-3">{{ event.nom }}</h5>
-                            <p class="card-text text-muted mb-4">
-                                {% if event.description|length > 100 %}
-                                    {{ event.description|slice(0, 100) }}...
-                                {% else %}
-                                    {{ event.description }}
-                                {% endif %}
-                            </p>
+                        <div class="card-body d-flex flex-column"> {# Flex column body #}
+                            <h5 class="card-title fw-bold text-primary mb-2">{{ event.nom }}</h5> {# Reduced margin #}
 
-                            {% if event.lieu and weathers[event.id] is defined and weathers[event.id] is not null %}
-                                <div class="bg-light p-3 rounded-2 mb-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                                        <span class="text-muted">{{ event.lieu }}</span>
+                            {# Weather/Location Info #}
+                            <div class="mb-3 fs-sm text-body-secondary"> {# Grouped location/weather #}
+                                {% if event.lieu %}
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fas fa-map-marker-alt text-danger me-2 fa-fw"></i> {# Fixed width icon #}
+                                        <span>{{ event.lieu }}</span>
                                     </div>
+                                {% endif %}
+                                {% if event.lieu and weathers[event.id] is defined and weathers[event.id] is not null %}
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-temperature-low text-info me-2"></i>
-                                        <span class="text-muted">
-                                        {{ weathers[event.id].main.temp }} °C -
-                                        {{ weathers[event.id].weather[0].description|capitalize }}
+                                        <i class="fas fa-temperature-low text-info me-2 fa-fw"></i> {# Fixed width icon #}
+                                        <span>
+                                        {{ weathers[event.id].main.temp }}°C - {{ weathers[event.id].weather[0].description|capitalize }}
                                     </span>
                                     </div>
-                                </div>
-                            {% endif %}
+                                {% endif %}
+                            </div>
+
+                            {# Description - Limit lines with CSS instead of slice? (Optional) #}
+                            <p class="card-text text-body-secondary mb-4 description-clamp flex-grow-1"> {# Added clamp class and flex-grow #}
+                                {{ event.description|default('No description available.') }}
+                            </p>
+
+                            {# Footer pushed to bottom by flex-grow on description #}
+                            <div class="mt-auto"> {# Push button to bottom #}
+                                <a href="{{ path('client_transport_index', { eventId: event.id }) }}"
+                                   class="btn btn-primary w-100 rounded-pill">
+                                    <i class="fas fa-bus me-1"></i> View Transport
+                                </a>
+                            </div>
                         </div>
-                        <div class="card-footer bg-white border-top-0 pt-0">
-                            <a href="{{ path('client_transport_index', { eventId: event.id }) }}"
-                               class="btn btn-primary w-100 rounded-pill">
-                                <i class="fas fa-bus me-1"></i> Get Transport
-                            </a>
-                        </div>
+                        {# Removed card-footer #}
                     </div>
                 </div>
             {% else %}
                 <div class="col-12">
-                    <div class="text-center py-5 bg-light rounded-3">
-                        <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 2.5rem;"></i>
-                        <h5 class="text-muted">No events available</h5>
-                        <p class="text-muted mb-0">Try adjusting your search criteria</p>
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-calendar-times text-body-tertiary mb-3" style="font-size: 2.5rem;"></i>
+                            <h5 class="text-body-secondary">No events available</h5>
+                            <p class="text-body-secondary mb-0">Try adjusting your search criteria.</p>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
 
-        <div class="mt-4">
+        {# Pagination - Render function handles Bootstrap classes #}
+        <div class="mt-4 d-flex justify-content-center">
             {{ knp_pagination_render(pagination) }}
         </div>
     </div>
 
-    <style>
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-        .pagination .page-link {
-            color: #3498db;
-        }
-    </style>
+    {# REMOVED INLINE STYLE BLOCK - Styles moved to app.css #}
+    {# <style> ... </style> #}
 {% endblock %}

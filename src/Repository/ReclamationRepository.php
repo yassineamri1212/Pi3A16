@@ -1,43 +1,49 @@
 <?php
+                // src/Repository/ReclamationRepository.php
 
-namespace App\Repository;
+                namespace App\Repository;
 
-use App\Entity\Reclamation;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
+                use App\Entity\Reclamation;
+                use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+                use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Reclamation>
- */
-class ReclamationRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Reclamation::class);
-    }
+                class ReclamationRepository extends ServiceEntityRepository
+                {
+                    public function __construct(ManagerRegistry $registry)
+                    {
+                        parent::__construct($registry, Reclamation::class);
+                    }
 
-    //    /**
-    //     * @return Reclamation[] Returns an array of Reclamation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+                    public function findByUserWithSearchAndSort($userId, $search = null, $sort = null)
+                    {
+                        $qb = $this->createQueryBuilder('r')
+                            ->leftJoin('r.reponses', 'resp')
+                            ->addSelect('resp')
+                            ->where('r.utilisateur_id = :userId')
+                            ->setParameter('userId', $userId);
 
-    //    public function findOneBySomeField($value): ?Reclamation
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-}
+                        if ($search) {
+                            $qb->andWhere('r.sujet LIKE :search OR r.description LIKE :search')
+                               ->setParameter('search', '%' . $search . '%');
+                        }
+
+                        if ($sort === 'with_responses') {
+                            $qb->andWhere('resp.id IS NOT NULL');
+                        } elseif ($sort === 'without_responses') {
+                            $qb->andWhere('resp.id IS NULL');
+                        }
+
+                        return $qb->orderBy('r.date', 'DESC')
+                            ->getQuery()
+                            ->getResult();
+                    }
+
+                    public function findAllWithResponses()
+                    {
+                        $qb = $this->createQueryBuilder('r')
+                            ->leftJoin('r.reponses', 'resp')
+                            ->addSelect('resp')
+                            ->orderBy('r.date', 'DESC');
+                        return $qb->getQuery()->getResult();
+                    }
+                }

@@ -1,63 +1,101 @@
-{{ form_start(form, {'attr': {'class': 'row g-4'}}) }}
+{# templates/admin/evenement/_form.html.twig #}
 
-<!-- Event Name -->
-<div class="col-md-6">
-    <div class="mb-3">
-        {{ form_label(form.nom, 'Event Name', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Enter event name'}}) }}
-        {{ form_errors(form.nom) }}
-    </div>
-</div>
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-<!-- Event Date -->
-<div class="col-md-6">
-    <div class="mb-3">
-        {{ form_label(form.date_evenement, 'Event Date', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.date_evenement, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.date_evenement) }}
-    </div>
-</div>
-
-<!-- Event Description -->
-<div class="col-12">
-    <div class="mb-3">
-        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Enter description'}}) }}
-        {{ form_errors(form.description) }}
-    </div>
-</div>
-
-<!-- Event Location -->
-<div class="col-md-6">
-    <div class="mb-3">
-        {{ form_label(form.lieu, 'Location', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.lieu, {'attr': {'class': 'form-control', 'placeholder': 'Enter location'}}) }}
-        {{ form_errors(form.lieu) }}
-    </div>
-</div>
-
-<!-- Event Image Upload -->
-
-
-<!-- Display Current Event Image (only when editing) - Fixed Size Version -->
-{% if form.vars.value.imageEvenement %}
-    <div class="col-12 mb-3">
-        <div class="d-flex flex-column align-items-center">
-            <h5 class="text-muted mb-3">Current Event Image</h5>
-            <div class="image-preview-container" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
-                <img src="{{ asset('uploads/images/' ~ form.vars.value.imageEvenement) }}"
-                     style="width: 100%; height: 100%; object-fit: cover;"
-                     alt="Current event image">
-            </div>
-            <p class="text-muted mt-2 mb-0 text-center">This image will be replaced if you upload a new one.</p>
-        </div>
+{% if form_errors(form) %}
+    <div class="alert alert-danger mb-4">
+        {{ form_errors(form) }}
     </div>
 {% endif %}
 
-<!-- Submit Button -->
-<div class="col-12">
-    <button type="submit" class="btn btn-primary w-100">
-        <i class="fas fa-save me-1"></i> {{ button_label|default('Save') }}
+{# --- Event Details Section --- #}
+<fieldset class="mb-4">
+    <legend class="h5 mb-3 fw-normal border-bottom pb-2">Event Details</legend>
+    <div class="row g-3">
+        <div class="col-md-12">
+            {{ form_row(form.nom, {
+                'label': 'Event Name *',
+                'label_attr': {'class': 'form-label'},
+                'attr': {
+                    'class': 'form-control form-control-lg',
+                    'placeholder': 'Enter the name of the event'
+                }
+            }) }}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.lieu, 'Location (Optional)') }}
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-map-marker-alt text-secondary"></i></span>
+                {{ form_widget(form.lieu, {
+                    'required': false,
+                    'attr': {
+                        'class': 'form-control',
+                        'placeholder': 'e.g., City Conference Center'
+                    }
+                }) }}
+            </div>
+            {{ form_errors(form.lieu) }}
+            {{ form_help(form.lieu) }}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.date_evenement, 'Date and Time *') }}
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-calendar-alt text-secondary"></i></span>
+                {{ form_widget(form.date_evenement, {
+                    'attr': {'class': 'form-control'}
+                }) }}
+            </div>
+            {{ form_errors(form.date_evenement) }}
+            {{ form_help(form.date_evenement) }}
+        </div>
+
+        <div class="col-12">
+            {{ form_row(form.description, {
+                'label': 'Description *',
+                'label_attr': {'class': 'form-label'},
+                'attr': {
+                    'class': 'form-control',
+                    'rows': 5,
+                    'placeholder': 'Provide details about the event...'
+                }
+            }) }}
+        </div>
+    </div>
+</fieldset>
+
+{# --- Image Section --- #}
+<fieldset class="mb-4">
+    <legend class="h5 mb-3 fw-normal border-bottom pb-2">Event Image</legend>
+    <div class="row g-3">
+        <div class="col-md-7">
+            {{ form_row(form.imageFile, {
+                'label': 'Upload New Image (Optional)',
+                'label_attr': {'class': 'form-label'},
+                'help': 'Max 2MB (JPG/PNG). Leave empty to keep current image (if editing).',
+                'required': false
+            }) }}
+        </div>
+
+        {% if form.vars.data is defined and form.vars.data and form.vars.data.id is not null and form.vars.data.imageEvenement %}
+            <div class="col-md-5 align-self-center">
+                <div class="text-center text-md-start">
+                    <label class="form-label d-block mb-2">Current Image:</label>
+                    <img src="{{ vich_uploader_asset(form.vars.data, 'imageFile') }}"
+                         alt="{{ form.vars.data.nom|default('Current image') }}"
+                         class="img-thumbnail mb-2"
+                         style="max-height: 120px; max-width: 100%; object-fit: cover;">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</fieldset>
+
+{# --- Form Actions --- #}
+<div class="col-12 text-end mt-3">
+    <button type="submit" class="btn btn-primary btn-lg">
+        <i class="fas fa-save me-1"></i> {{ button_label|default('Save Event') }}
     </button>
 </div>
 

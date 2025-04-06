@@ -1,35 +1,67 @@
+{# File: templates/admin/base.html.twig #}
 {% extends 'base.html.twig' %}
 
+{# Define the title for admin pages #}
+{% block title %}Admin - {% block admin_title %}{% endblock %}{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    {# Specific JS for admin pages can go here if needed later #}
+{% endblock %}
+
+{# app.css is included via parent() in base.html.twig #}
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
-    <style>
-        .admin-layout {
-            display: flex;
-            height: 100vh;
-        }
-
-        .admin-sidebar {
-            width: 250px;
-            position: fixed;
-            height: 100%;
-            overflow-y: auto;
-        }
-
-        .admin-content {
-            flex-grow: 1;
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-        }
-    </style>
+    {# Specific CSS for admin pages can go here if needed later #}
 {% endblock %}
 
 {% block body %}
+    {# admin-layout styled by app.css (Flexbox) #}
+    {# Add data attribute for dark mode detection by JS if needed, though body class is standard #}
     <div class="admin-layout">
-        {% include 'admin/_sidebar.html.twig' %}
+
+        {# Sidebar partial (styled by app.css) #}
+        {# Pass current route to sidebar for active class handling #}
+        {% include 'admin/_sidebar.html.twig' with {'current_route': app.request.attributes.get('_route')} %}
+
+        {# Main content area (styled by app.css) #}
         <main class="admin-content">
+
+            {# Buttons for toggling sidebar and dark mode - Moved to a header/control bar #}
+            <div class="admin-controls">
+                {# Sidebar Toggle Button with Icon #}
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                {# Dark Mode Toggle Button with Icon #}
+                <button id="dark-mode-toggle" class="btn btn-outline-secondary btn-sm" title="Toggle Dark Mode">
+                    {# Icons can be swapped via JS later if desired, start with one #}
+                    <i class="fas fa-moon"></i>
+                    {# <i class="fas fa-sun"></i> #}
+                </button>
+
+                {# Optional: Add welcome message or user dropdown here later #}
+                {# <span class="ms-auto">Welcome, Admin!</span> #}
+            </div>
+
+            {# Render Flash Messages (Optional but Recommended) #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    {# Use Bootstrap alert classes #}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+
+            {# Child admin templates will inject their content here #}
             {% block admin_content %}{% endblock %}
-        </main>
-    </div>
+
+        </main> {# End admin-content #}
+
+    </div> {# End admin-layout #}
 {% endblock %}
