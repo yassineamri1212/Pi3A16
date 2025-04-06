@@ -1,3 +1,26 @@
+# config/routes.yaml
+# This file defines the main routes for your application.
+
+# Your specific home route definition
 home:
     path: /home
     controller: App\Controller\HomeController::index
+
+# Import controller routes defined using PHP 8 Attributes (like #[Route])
+# This block looks for #[Route] attributes in all PHP files within the src/Controller/ directory.
+controllers:
+    # The resource path is relative to this config/ directory.
+    # '../' goes up one level to the project root, then into 'src/Controller/'.
+    resource: ../src/Controller/
+    # Specify that we are loading routes from PHP Attributes.
+    type: attribute
+
+# Import the routes required by the LiipImagineBundle for image filtering.
+# These routes handle URLs like /media/cache/resolve/...
+_liip_imagine:
+    # The '@BundleName' syntax refers to the bundle's main directory.
+    # Check vendor/liip/imagine-bundle/Resources/config/ to see if you have 'routing.yaml' or 'routing.xml'.
+    # Use the correct file extension below. 'routing.yaml' is more common in recent versions.
+    resource: "@LiipImagineBundle/Resources/config/routing.yaml"
+    # Optionally, you can add a prefix if you want all imagine routes under a specific path, e.g.:
+    # prefix: /media/cache

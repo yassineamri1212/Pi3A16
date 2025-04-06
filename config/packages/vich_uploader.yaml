@@ -1,13 +1,25 @@
+# config/packages/vich_uploader.yaml
 vich_uploader:
-  db_driver: orm
-  mappings:
-    event_images:
-      uri_prefix: /uploads/images
-      upload_destination: '%kernel.project_dir%/public/uploads/images'
-      namer: Vich\UploaderBundle\Naming\UniqidNamer
+  db_driver: orm # Your database driver
 
-      # --- Add these lines ---
+  # Mappings section - contains configurations for different uploads
+  mappings:
+
+    # --- Your EXISTING Mapping for Events ---
+    event_images:
+      uri_prefix: /uploads/images # Public web path for event images
+      upload_destination: '%kernel.project_dir%/public/uploads/images' # Server path for event images
+      namer: Vich\UploaderBundle\Naming\UniqidNamer # Keep using UniqidNamer for events if that's what you had
       inject_on_load: false
-      delete_on_update: true  # Delete old file when uploading new one? (Commonly true)
-      delete_on_remove: true  # Delete file when entity is removed? (Commonly true)
-      # --- End added lines ---
+      delete_on_update: true
+      delete_on_remove: true
+
+    # --- Add the NEW Mapping for Offres ---
+    offre_photos: # This key MUST match the 'mapping' option in Offre entity
+      uri_prefix: /uploads/offre_photos # DIFFERENT public web path for offre photos
+      upload_destination: '%kernel.project_dir%/public/uploads/offre_photos' # DIFFERENT server path for offre photos
+      # Use SmartUniqueNamer or UniqidNamer based on preference, SmartUnique is often better
+      namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+      inject_on_load: false
+      delete_on_update: true
+      delete_on_remove: true

@@ -35,6 +35,26 @@
                 <i class="fas fa-users"></i> <span>Manage Users</span>
             </a>
         </li>
+        {# ... other nav items like Manage Users ... #}
+
+        <li class="nav-item">
+            {# Check if the current route *starts with* 'app_parcour_' #}
+            <a href="{{ path('app_parcour_index') }}"
+               class="nav-link{{ current_route starts with 'app_parcour_' ? ' active' : '' }}">
+                <i class="fas fa-route"></i> {# Icon for routes/parcours #}
+                <span>Manage Parcours</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            {# Check if the current route *starts with* 'app_offre_' #}
+            <a href="{{ path('app_offre_index') }}"
+               class="nav-link{{ current_route starts with 'app_offre_' ? ' active' : '' }}">
+                <i class="fas fa-car-side"></i> {# Icon for car offers #}
+                <span>Manage Offres</span>
+            </a>
+        </li>
+
+        {# ... other nav items like Reclamations, Logout ... #}
         <li class="nav-item">
             {# Check if the current route *starts with* 'admin_reclamations_' #}
             <a href="{{ path('admin_reclamations_index') }}"

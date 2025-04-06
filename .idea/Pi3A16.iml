@@ -98,6 +98,10 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/endroid/qr-code" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/egulias/email-validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/mailer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/imagine/imagine" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/liip/imagine-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/extra-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/string-extra" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
