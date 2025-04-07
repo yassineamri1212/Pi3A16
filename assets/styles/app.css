@@ -1,3 +1,158 @@
 body {
-    background-color: skyblue;
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #1a1a1a; /* Dark gray for contrast */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.title {
+    text-align: center;
+    color: #ffd700; /* Gold color */
+    margin-bottom: 20px;
+}
+
+.form-container {
+    margin-bottom: 20px;
+}
+
+.form-wrapper {
+    background-color: #1a1a1a; /* Dark gray background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-fields input, .form-fields textarea, .form-fields select {
+    padding: 10px;
+    border: 1px solid #333; /* Dark gray border */
+    border-radius: 5px;
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+}
+
+.form-fields input:focus, .form-fields textarea:focus, .form-fields select:focus {
+    outline: none;
+    border-color: #ffd700; /* Gold border on focus */
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #000;
+    background-color: #ffd700; /* Gold button */
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #e6c200; /* Slightly darker gold on hover */
+}
+
+.btn-back {
+    color: #fff;
+    background-color: #333; /* Dark gray for back button */
+}
+
+.btn-back:hover {
+    background-color: #555; /* Lighter gray on hover */
+}
+
+.btn-delete {
+    background-color: #ff4d4d; /* Red for delete button */
+    color: #fff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-delete:hover {
+    background-color: #e60000; /* Darker red on hover */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #1a1a1a; /* Dark gray */
+    color: #fff; /* White text */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #333; /* Darker gray for borders */
+}
+
+.table th {
+    background-color: #333; /* Darker gray for header */
+    color: #ffd700; /* Gold text */
+    text-transform: uppercase;
+}
+
+.table tr:hover {
+    background-color: #2a2a2a; /* Slightly lighter gray on hover */
+}
+
+.no-records {
+    text-align: center;
+    color: #ffd700; /* Gold text for no records */
+}
+
+.create-new {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.create-new .btn {
+    background-color: #ffd700; /* Gold button */
+    color: #000; /* Black text */
+}
+
+.create-new .btn:hover {
+    background-color: #e6c200; /* Slightly darker gold */
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.actions .btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.actions .btn-back {
+    color: #fff;
+    background-color: #333; /* Dark gray for back button */
+}
+
+.actions .btn-back:hover {
+    background-color: #555; /* Lighter gray on hover */
 }

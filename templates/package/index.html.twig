@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Package index{% endblock %}
+
+{% block body %}
+    <h1>Package index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Weight_packag</th>
+                <th>Description_packag</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for package in packages %}
+            <tr>
+                <td>{{ package.id }}</td>
+                <td>{{ package.weightPackag }}</td>
+                <td>{{ package.descriptionPackag }}</td>
+                <td>
+                    <a href="{{ path('app_package_show', {'id': package.id}) }}">show</a>
+                    <a href="{{ path('app_package_edit', {'id': package.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_package_new') }}">Create new</a>
+{% endblock %}
