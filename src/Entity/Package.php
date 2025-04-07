@@ -2,58 +2,81 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
 use App\Repository\PackageRepository;
+use Doctrine\DBAL\Types\Types; // Import Types
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert; // Import Assert
 
 #[ORM\Entity(repositoryClass: PackageRepository::class)]
-#[ORM\Table(name: 'package')]
+#[ORM\Table(name: 'package')] // Explicit table name
 class Package
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')] // FIXED: Changed from 'decimal' to 'integer'
-    private ?int $idPackage = null;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    public function getIdPackage(): ?int
+    #[ORM\Column(type: Types::INTEGER)]
+    #[Assert\NotBlank(message: 'Weight cannot be empty.')]
+    #[Assert\Positive(message: 'Weight must be a positive number.')]
+    private ?int $weightPackage = null; // Changed to camelCase (consider unit, e.g., grams?)
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Description cannot be empty.')]
+    #[Assert\Length(max: 255)]
+    private ?string $descriptionPackage = null; // Changed to camelCase
+
+    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'packages')]
+    #[ORM\JoinColumn(name: 'livraison_id', referencedColumnName: 'id', nullable: false)] // Explicit JoinColumn, make mandatory
+    #[Assert\NotBlank(message: 'Package must be associated with a delivery.')]
+    private ?Livraison $livraison = null;
+
+    public function getId(): ?int
     {
-        return $this->idPackage;
+        return $this->id;
+    }
+    // No Setter for ID
+
+    public function getWeightPackage(): ?int
+    {
+        return $this->weightPackage;
     }
 
-    public function setIdPackage(int $idPackage): self
+    public function setWeightPackage(int $weightPackage): static
     {
-        $this->idPackage = $idPackage;
+        $this->weightPackage = $weightPackage;
         return $this;
     }
 
-    #[ORM\Column(type: 'float', nullable: false)] // FIXED: Changed from 'decimal' to 'float'
-    private ?float $weight = null;
-
-    public function getWeight(): ?float
+    public function getDescriptionPackage(): ?string
     {
-        return $this->weight;
+        return $this->descriptionPackage;
     }
 
-    public function setWeight(float $weight): self
+    public function setDescriptionPackage(string $descriptionPackage): static
     {
-        $this->weight = $weight;
+        $this->descriptionPackage = $descriptionPackage;
         return $this;
     }
 
-    #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $description = null;
-
-    public function getDescription(): ?string
+    public function getLivraison(): ?Livraison
     {
-        return $this->description;
+        return $this->livraison;
     }
 
-    public function setDescription(string $description): self
+    public function setLivraison(?Livraison $livraison): static
     {
-        $this->description = $description;
+        $this->livraison = $livraison;
         return $this;
+    }
+
+    // __toString for easier identification
+    public function __toString(): string
+    {
+        return sprintf('Package #%d (%d units, %s)', // Adjust unit if weight isn't 'units'
+            $this->id ?? 'New',
+            $this->weightPackage ?? 0,
+            $this->descriptionPackage ? '"' . substr($this->descriptionPackage, 0, 20) . '..."' : 'N/A'
+        );
     }
 }

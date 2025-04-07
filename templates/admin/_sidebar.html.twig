@@ -5,68 +5,76 @@
 <aside class="admin-sidebar"> {# Styled by app.css #}
     <h4>Admin Panel</h4>
     <ul class="nav flex-column">
+
+        {# --- Standard Admin Links --- #}
         <li class="nav-item">
-            {# Check if the current route *is* 'admin_dashboard' #}
             <a href="{{ path('admin_dashboard') }}"
                class="nav-link{{ current_route == 'admin_dashboard' ? ' active' : '' }}">
                 <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
             </a>
         </li>
         <li class="nav-item">
-            {# Check if the current route *starts with* 'admin_evenement_' #}
-            {# This makes 'index', 'new', 'edit', 'show' all activate this link #}
             <a href="{{ path('admin_evenement_index') }}"
                class="nav-link{{ current_route starts with 'admin_evenement_' ? ' active' : '' }}">
                 <i class="fas fa-calendar-alt"></i> <span>Manage Events</span>
             </a>
         </li>
         <li class="nav-item">
-            {# Check if the current route *starts with* 'admin_moyen_de_transport_' #}
             <a href="{{ path('admin_moyen_de_transport_index') }}"
                class="nav-link{{ current_route starts with 'admin_moyen_de_transport_' ? ' active' : '' }}">
                 <i class="fas fa-shuttle-van"></i> <span>Manage Transports</span>
             </a>
         </li>
+
+        {# --- User Link --- #}
         <li class="nav-item">
-            {# Check if the current route *starts with* 'app_user_' (adjust if your admin user routes have a different prefix) #}
             <a href="{{ path('app_user_index') }}"
                class="nav-link{{ current_route starts with 'app_user_' ? ' active' : '' }}">
-                {# Maybe use 'admin_user_' if you have separate routes #}
                 <i class="fas fa-users"></i> <span>Manage Users</span>
             </a>
         </li>
-        {# ... other nav items like Manage Users ... #}
+        {# --- END User Link --- #}
 
+        {# --- Links for New/Corrected Gestions --- #}
         <li class="nav-item">
-            {# Check if the current route *starts with* 'app_parcour_' #}
-            <a href="{{ path('app_parcour_index') }}"
-               class="nav-link{{ current_route starts with 'app_parcour_' ? ' active' : '' }}">
-                <i class="fas fa-route"></i> {# Icon for routes/parcours #}
+            <a href="{{ path('app_admin_parcour_index') }}"
+               class="nav-link{{ current_route starts with 'app_admin_parcour_' ? ' active' : '' }}">
+                <i class="fas fa-route"></i>
                 <span>Manage Parcours</span>
             </a>
         </li>
         <li class="nav-item">
-            {# Check if the current route *starts with* 'app_offre_' #}
+            {# <<< ENSURE THIS PATH IS CORRECT >>> #}
             <a href="{{ path('app_offre_index') }}"
                class="nav-link{{ current_route starts with 'app_offre_' ? ' active' : '' }}">
-                <i class="fas fa-car-side"></i> {# Icon for car offers #}
+                <i class="fas fa-car-side"></i>
                 <span>Manage Offres</span>
             </a>
         </li>
-
-        {# ... other nav items like Reclamations, Logout ... #}
         <li class="nav-item">
-            {# Check if the current route *starts with* 'admin_reclamations_' #}
+            <a href="{{ path('app_admin_livraison_index') }}"
+               class="nav-link{{ current_route starts with 'app_admin_livraison_' ? ' active' : '' }}">
+                <i class="fas fa-truck-loading"></i>
+                <span>Manage Deliveries</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_package_index') }}"
+               class="nav-link{{ current_route starts with 'app_package_' ? ' active' : '' }}">
+                <i class="fas fa-box-open"></i>
+                <span>Manage Packages</span>
+            </a>
+        </li>
+
+        {# --- Other Admin Links --- #}
+        <li class="nav-item">
             <a href="{{ path('admin_reclamations_index') }}"
                class="nav-link{{ current_route starts with 'admin_reclamations_' ? ' active' : '' }}">
                 <i class="fas fa-envelope-open-text"></i> <span>View Reclamations</span>
             </a>
         </li>
 
-        {# Add other nav items here following the same pattern #}
-
-        {# Logout Link - Use mt-auto to push to bottom (requires parent ul to be flex column with height) #}
-        {# The CSS provided already styles .mt-auto correctly #}
+        {# --- Logout --- #}
         <li class="nav-item mt-auto">
             <a href="{{ path('app_logout') }}" class="nav-link text-danger">
                 <i class="fas fa-sign-out-alt"></i> <span>Logout</span>

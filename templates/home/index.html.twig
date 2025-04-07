@@ -28,9 +28,11 @@
                     <a href="{{ path('client_evenement_index') }}" class="btn btn-primary btn-lg px-4 py-3 fw-semibold">
                         <i class="fas fa-calendar-alt me-2"></i> View Events
                     </a>
-                    {# Add Link to Carpool Offers Here too? #}
-                    <a href="{{ path('app_public_offers_index') }}" class="btn btn-success btn-lg px-4 py-3 fw-semibold"> {# Example: Green Button #}
+                    <a href="{{ path('app_public_offers_index') }}" class="btn btn-success btn-lg px-4 py-3 fw-semibold">
                         <i class="fas fa-car-side me-2"></i> Find a Ride
+                    </a>
+                    <a href="{{ path('app_public_deliveries_index') }}" class="btn btn-info btn-lg px-4 py-3 fw-semibold"> {# Added button for Deliveries #}
+                        <i class="fas fa-truck me-2"></i> View Deliveries
                     </a>
                     {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                         <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg px-4 py-3 fw-semibold">
@@ -74,28 +76,25 @@
                         <h2 class="display-5 fw-bold mb-4">Why Choose GoMobility?</h2>
                         <div class="feature-item"> <div class="feature-icon-wrapper">🚌</div> <div class="feature-content"><h3>Diverse Fleet</h3><p>From minivans to coaches, we have the perfect vehicle for every group size and occasion.</p></div> </div>
                         <div class="feature-item"> <div class="feature-icon-wrapper">⏱️</div> <div class="feature-content"><h3>Real-Time Tracking</h3><p>Monitor your transportation in real-time with our advanced tracking system.</p></div> </div>
-                        <div class="feature-item"> <div class="feature-icon-wrapper">🤝</div> <div class="feature-content"><h3>Carpool Matching</h3><p>Find or offer rides easily with our integrated carpooling system.</p></div> </div> {# Added Carpool Feature #}
+                        <div class="feature-item"> <div class="feature-icon-wrapper">🤝</div> <div class="feature-content"><h3>Carpool Matching</h3><p>Find or offer rides easily with our integrated carpooling system.</p></div> </div>
+                        <div class="feature-item"> <div class="feature-icon-wrapper">📦</div> <div class="feature-content"><h3>Package Delivery</h3><p>Reliable and timely delivery services integrated with our network.</p></div> </div> {# Added Delivery Feature #}
                         <div class="feature-item mb-0"> <div class="feature-icon-wrapper">📱</div> <div class="feature-content"><h3>Mobile Friendly</h3><p>Manage bookings, track vehicles, and communicate with drivers from any device.</p></div> </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        {# --- START: ADDED LATEST OFFERS SECTION --- #}
-        {# Only display if the controller passed non-empty offers #}
+        {# --- START: LATEST OFFERS SECTION --- #}
         {% if latest_offers is defined and latest_offers is not empty %}
             <section class="latest-offers-section py-5 bg-light-subtle"> {# Use subtle background #}
                 <div class="container">
                     <h2 class="text-center mb-5 display-5 fw-bold animate-on-scroll fade-in">Latest Carpool Offers</h2>
                     <div class="row g-4 justify-content-center"> {# Center cards if fewer than 3 #}
                         {% for offre in latest_offers %}
-                            {# Apply animation classes here #}
                             <div class="col-lg-4 col-md-6 d-flex align-items-stretch animate-on-scroll fade-in-up">
-                                {# --- Reusable Card Structure (Adapted from public/offers/index.html.twig) --- #}
-                                <div class="card w-100 border-0 shadow-sm rounded-3 overflow-hidden h-100"> {# Added h-100 for flex #}
+                                <div class="card w-100 border-0 shadow-sm rounded-3 overflow-hidden h-100">
                                     {% if offre.photo %}
                                         <div class="card-img-top-wrapper overflow-hidden" style="height: 200px;">
-                                            {# Make sure 'offer_list_thumb' filter exists in liip_imagine.yaml #}
                                             <img src="{{ vich_uploader_asset(offre, 'photoFile') | imagine_filter('offer_list_thumb') }}"
                                                  class="img-fluid w-100 h-100 object-fit-cover"
                                                  alt="Photo for {{ offre.parcour.trajet }}">
@@ -105,12 +104,12 @@
                                             <i class="fas fa-car text-body-tertiary" style="font-size: 3rem;"></i>
                                         </div>
                                     {% endif %}
-                                    <div class="card-body d-flex flex-column"> {# Use flex column for layout #}
+                                    <div class="card-body d-flex flex-column">
                                         <h5 class="card-title fw-bold text-primary mb-2">{{ offre.parcour.trajet }}</h5>
-                                        <div class="mb-3 fs-sm text-body-secondary d-flex flex-column gap-1"> {# Column layout for details #}
+                                        <div class="mb-3 fs-sm text-body-secondary d-flex flex-column gap-1">
                                             <div title="Departure">
                                                 <i class="fas fa-calendar-alt text-info me-1 fa-fw"></i>
-                                                {{ offre.dateDepart|date('M j, Y H:i') }} {# Adjusted date format #}
+                                                {{ offre.dateDepart|date('M j, Y H:i') }}
                                             </div>
                                             <div title="Price per Seat">
                                                 <i class="fas fa-dollar-sign text-success me-1 fa-fw"></i>
@@ -121,22 +120,18 @@
                                                 {{ offre.nombrePlaces }} Seat(s) available
                                             </div>
                                         </div>
-                                        {# Pushes button to bottom #}
                                         <div class="mt-auto pt-2">
-                                            {# Link to future details page or main index #}
-                                            <a href="{{ path('app_public_offers_index') }}" {# Modify later if you have a show route #}
+                                            <a href="{{ path('app_public_offers_index') }}"
                                                class="btn btn-primary w-100 rounded-pill">
                                                 <i class="fas fa-info-circle me-1"></i> View Details
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                                {# --- END Reusable Card Structure --- #}
                             </div>
                         {% endfor %}
                     </div>
-                    {# Link to view all offers page #}
-                    <div class="text-center mt-5"> {# Increased margin #}
+                    <div class="text-center mt-5">
                         <a href="{{ path('app_public_offers_index') }}" class="btn btn-outline-primary btn-lg px-4">
                             View All Carpool Offers <i class="fas fa-arrow-right ms-2"></i>
                         </a>
@@ -144,7 +139,56 @@
                 </div>
             </section>
         {% endif %}
-        {# --- END: ADDED LATEST OFFERS SECTION --- #}
+        {# --- END: LATEST OFFERS SECTION --- #}
+
+        {# --- START: LATEST DELIVERIES SECTION --- #}
+        {% if latest_deliveries is defined and latest_deliveries is not empty %}
+            <section class="latest-deliveries-section py-5"> {# Add different background? Or keep subtle? #}
+                <div class="container">
+                    <h2 class="text-center mb-5 display-5 fw-bold animate-on-scroll fade-in">Recent Delivery Activity</h2>
+                    <div class="row g-4 justify-content-center">
+                        {% for livraison in latest_deliveries %}
+                            <div class="col-lg-4 col-md-6 d-flex align-items-stretch animate-on-scroll fade-in-up">
+                                <div class="card w-100 border-0 shadow-sm rounded-3 h-100 delivery-card">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="mb-2">
+                                            <span class="badge bg-secondary text-uppercase me-1">From</span>
+                                            <span class="fw-semibold">{{ livraison.startLocation }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="badge bg-primary text-uppercase me-1">To</span>
+                                            <span class="fw-semibold">{{ livraison.deliveryLocation }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-clock me-1"></i> Pending / In Transit
+                                            </span>
+                                        </div>
+                                        <div class="fs-sm text-body-secondary mb-3 flex-grow-1">
+                                            <i class="fas fa-box-open me-1 text-muted"></i>
+                                            {{ livraison.packages.count }} package(s) included.
+                                        </div>
+                                        <div class="mt-auto pt-2">
+                                            <a href="{{ path('app_public_delivery_status', {'id': livraison.id }) }}" class="btn btn-outline-primary w-100 rounded-pill btn-sm">
+                                                <i class="fas fa-search-location me-1"></i> View Status
+                                            </a>
+                                        </div>
+                                    </div> {# End card-body #}
+                                </div> {# End card #}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {# Link to view all deliveries page #}
+                    <div class="text-center mt-5">
+                        <a href="{{ path('app_public_deliveries_index') }}" class="btn btn-outline-info btn-lg px-4">
+                            View All Active Deliveries <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+        {# --- END: LATEST DELIVERIES SECTION --- #}
+
 
         <!-- Testimonials -->
         <section class="testimonials-section py-5">
@@ -168,8 +212,8 @@
                         <a href="{{ path('app_login') }}" class="btn btn-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-sign-in-alt me-2"></i> Login to Book </a>
                     {% else %}
                         <a href="{{ path('client_evenement_index') }}" class="btn btn-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-calendar-alt me-2"></i> Browse Events </a>
-                        {# Add link to offers if logged in #}
                         <a href="{{ path('app_public_offers_index') }}" class="btn btn-outline-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-car-side me-2"></i> Find Rides </a>
+                        <a href="{{ path('app_public_deliveries_index') }}" class="btn btn-outline-light btn-lg px-5 py-3 fw-semibold"> <i class="fas fa-truck me-2"></i> View Deliveries </a> {# Added Button Here Too #}
                     {% endif %}
                 </div>
             </div>
@@ -178,7 +222,7 @@
     </div> {# End Container fluid #}
 {% endblock %} {# End public_content block #}
 
-{# --- KEEP YOUR EXISTING PAGE-SPECIFIC JAVASCRIPT HERE --- #}
+{# --- Your Existing Homepage JavaScript Block --- #}
 {% block public_javascripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {

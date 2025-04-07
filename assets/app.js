@@ -1,3 +1,4 @@
+import './bootstrap.js';
 // File: assets/app.js
 
 // Import base styles, Bootstrap JS, and Font Awesome CSS

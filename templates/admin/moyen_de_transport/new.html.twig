@@ -1,0 +1,33 @@
+{# File: templates/admin/moyen_de_transport/new.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}New Transport{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="my-4">Create New Transport</h1>
+
+        <div class="card shadow">
+            <div class="card-body">
+                {{ form_start(form) }}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(field, {'attr': {'class': 'form-control', 'placeholder': 'Enter ' ~ field.vars.label}}) }}
+                        {% if field.vars.help %}
+                            <small class="form-text text-muted">{{ field.vars.help }}</small>
+                        {% endif %}
+                        {{ form_errors(field) }}
+                    </div>
+                {% endfor %}
+
+                <button class="btn btn-success mt-3">
+                    <i class="fas fa-plus me-1"></i> Create Transport
+                </button>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

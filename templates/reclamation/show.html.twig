@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+                                    {% block title %}Reclamation Details{% endblock %}
+
+                                    {% block body %}
+                                        <div class="container py-4">
+                                            <div class="row justify-content-center">
+                                                <div class="col-lg-8">
+                                                    <div class="card shadow-sm">
+                                                        <div class="card-header bg-light">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <h2 class="h5 mb-0 text-primary">Reclamation Details</h2>
+                                                                <div class="btn-group">
+                                                                    <a href="{{ path('app_reclamation_my') }}" class="btn btn-sm btn-outline-secondary">
+                                                                        <i class="fas fa-arrow-left me-1"></i> Back to list
+                                                                    </a>
+                                                                    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                                        <i class="fas fa-edit me-1"></i> Edit
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card-body">
+                                                            <div class="row mb-3">
+                                                                <div class="col-md-6">
+                                                                    <h5 class="text-muted mb-1">Personal Information</h5>
+                                                                    <dl class="row">
+                                                                        <dt class="col-sm-4">Name</dt>
+                                                                        <dd class="col-sm-8">{{ reclamation.nom }}</dd>
+
+                                                                        <dt class="col-sm-4">Surname</dt>
+                                                                        <dd class="col-sm-8">{{ reclamation.prenom }}</dd>
+
+                                                                        <dt class="col-sm-4">Email</dt>
+                                                                        <dd class="col-sm-8">{{ reclamation.email }}</dd>
+
+                                                                        <dt class="col-sm-4">Phone</dt>
+                                                                        <dd class="col-sm-8">{{ reclamation.numTele }}</dd>
+                                                                    </dl>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <h5 class="text-muted mb-1">Reclamation Details</h5>
+                                                                    <dl class="row">
+                                                                        <dt class="col-sm-4">Status</dt>
+                                                                        <dd class="col-sm-8">
+                                                                        <span class="badge bg-{{ reclamation.etat == 'new' ? 'info' : (reclamation.etat == 'in_progress' ? 'warning' : 'success') }}">
+                                                                            {{ reclamation.etat }}
+                                                                        </span>
+                                                                        </dd>
+
+                                                                        <dt class="col-sm-4">Subject</dt>
+                                                                        <dd class="col-sm-8">{{ reclamation.sujet }}</dd>
+
+                                                                        <dt class="col-sm-4">Date</dt>
+                                                                        <dd class="col-sm-8">{{ reclamation.date ? reclamation.date|date('M d, Y H:i') : '' }}</dd>
+                                                                    </dl>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <h5 class="text-muted mb-2">Description</h5>
+                                                                <div class="p-3 bg-light rounded">
+                                                                    {{ reclamation.description }}
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <h5 class="text-muted mb-2">Responses</h5>
+                                                                {% if reclamation.reponses|length > 0 %}
+                                                                    <div class="responses-container">
+                                                                        <ul class="list-group">
+                                                                            {% for reponse in reclamation.reponses %}
+                                                                                <li class="list-group-item">
+                                                                                    <div class="d-flex justify-content-between mb-2">
+                                                                                        <span class="text-muted small">
+                                                                                            <i class="fas fa-user-circle me-1"></i> Admin
+                                                                                        </span>
+                                                                                        <span class="text-muted small">
+                                                                                            <i class="fas fa-clock me-1"></i> {{ reponse.date|date('M d, Y H:i') }}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <p class="mb-0">{{ reponse.reponse }}</p>
+                                                                                </li>
+                                                                            {% endfor %}
+                                                                        </ul>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="alert alert-info">No responses yet</div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card-footer bg-white text-end">
+                                                            {{ include('reclamation/_delete_form.html.twig') }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <style>
+                                            .card {
+                                                border-radius: 8px;
+                                            }
+                                            dt {
+                                                font-weight: 500;
+                                                color: #6c757d;
+                                            }
+                                            .bg-light {
+                                                background-color: #f8f9fa!important;
+                                            }
+                                            .badge {
+                                                font-size: 0.875em;
+                                                padding: 0.35em 0.65em;
+                                            }
+                                        </style>
+                                    {% endblock %}

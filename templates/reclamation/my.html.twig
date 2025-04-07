@@ -1,0 +1,148 @@
+{# templates/reclamation/my.html.twig #}
+                                          {% extends 'public/base.html.twig' %}
+
+                                          {% block public_content %}
+                                              <div class="container py-5">
+                                                  <div class="d-flex justify-content-between align-items-center mb-5">
+                                                      <h1 class="h3 mb-0 text-primary">
+                                                          <i class="fas fa-exclamation-circle me-2"></i> My Reclamations
+                                                      </h1>
+                                                      <a href="{{ path('app_reclamation_new') }}" class="btn btn-success btn-lg">
+                                                          <i class="fas fa-plus-circle me-2"></i> New Reclamation
+                                                      </a>
+                                                  </div>
+
+                                                  <form method="get" action="{{ path('app_reclamation_my') }}" class="mb-4">
+                                                      <div class="row g-3">
+                                                          <div class="col-md-6">
+                                                              <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by subject or description">
+                                                          </div>
+                                                          <div class="col-md-4">
+                                                              <select name="sort" class="form-select">
+                                                                  <option value="">Sort by</option>
+                                                                  <option value="with_responses" {% if sort == 'with_responses' %}selected{% endif %}>With Responses</option>
+                                                                  <option value="without_responses" {% if sort == 'without_responses' %}selected{% endif %}>Without Responses</option>
+                                                              </select>
+                                                          </div>
+                                                          <div class="col-md-2">
+                                                              <button type="submit" class="btn btn-primary w-100">Search</button>
+                                                          </div>
+                                                      </div>
+                                                  </form>
+
+                                                  {% if reclamations is not empty %}
+                                                      <div class="row g-4">
+                                                          {% for reclamation in reclamations %}
+                                                              <div class="col-12 col-lg-6">
+                                                                  <div class="card border-0 shadow-hover h-100">
+                                                                      <div class="card-header bg-primary text-white py-3">
+                                                                          <div class="d-flex justify-content-between align-items-center">
+                                                                              <h5 class="card-title mb-0">
+                                                                                  <i class="fas fa-tag me-2"></i> {{ reclamation.sujet }}
+                                                                              </h5>
+                                                                              <span class="badge bg-light text-dark">
+                                                                              #{{ reclamation.id }} | {{ reclamation.date|date('M d') }}
+                                                                          </span>
+                                                                          </div>
+                                                                      </div>
+
+                                                                      <div class="card-body">
+                                                                          <div class="mb-3">
+                                                                              <p class="card-text">
+                                                                                  {{ reclamation.description|length > 150 ?
+                                                                                  reclamation.description|slice(0, 150) ~ '...' :
+                                                                                  reclamation.description }}
+                                                                              </p>
+                                                                          </div>
+
+                                                                          {% if reclamation.reponses|length > 0 %}
+                                                                              <div class="responses-container mt-4">
+                                                                                  <h6 class="section-title mb-3">
+                                                                                      <i class="fas fa-reply me-2"></i> Responses
+                                                                                      <span class="badge bg-info ms-2">{{ reclamation.reponses|length }}</span>
+                                                                                  </h6>
+
+                                                                                  <div class="response-list">
+                                                                                      {% for reponse in reclamation.reponses %}
+                                                                                          <div class="response-item p-3 mb-3 bg-light rounded">
+                                                                                              <div class="d-flex justify-content-between mb-2">
+                                                                                              <span class="text-muted small">
+                                                                                                  <i class="fas fa-user-circle me-1"></i> Admin
+                                                                                              </span>
+                                                                                                  <span class="text-muted small">
+                                                                                                  <i class="fas fa-clock me-1"></i> {{ reponse.date|date('M d, Y H:i') }}
+                                                                                              </span>
+                                                                                              </div>
+                                                                                              <p class="mb-0">{{ reponse.reponse }}</p>
+                                                                                          </div>
+                                                                                      {% endfor %}
+                                                                                  </div>
+                                                                              </div>
+                                                                          {% else %}
+                                                                              <div class="alert alert-info mt-3 mb-0">
+                                                                                  <i class="fas fa-info-circle me-2"></i> No responses yet
+                                                                              </div>
+                                                                          {% endif %}
+                                                                      </div>
+
+                                                                      <div class="card-footer bg-white border-top-0 pt-0">
+                                                                          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                                              <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}"
+                                                                                 class="btn btn-outline-primary">
+                                                                                  <i class="fas fa-eye me-1"></i> View Details
+                                                                              </a>
+                                                                              <form method="post"
+                                                                                    action="{{ path('app_reclamation_delete', {'id': reclamation.id}) }}"
+                                                                                    onsubmit="return confirm('Are you sure you want to delete this reclamation?');">
+                                                                                  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                                                                  <button class="btn btn-outline-danger">
+                                                                                      <i class="fas fa-trash-alt me-1"></i> Delete
+                                                                                  </button>
+                                                                              </form>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          {% endfor %}
+                                                      </div>
+                                                  {% else %}
+                                                      <div class="empty-state text-center py-5 bg-light rounded-4">
+                                                          <div class="mb-4">
+                                                              <i class="fas fa-inbox fa-4x text-muted"></i>
+                                                          </div>
+                                                          <h3 class="h4 text-muted mb-3">No Reclamations Found</h3>
+                                                          <p class="text-muted mb-4">You haven't submitted any reclamations yet.</p>
+                                                          <a href="{{ path('app_reclamation_new') }}" class="btn btn-primary btn-lg px-4">
+                                                              <i class="fas fa-plus-circle me-2"></i> Create Your First Reclamation
+                                                          </a>
+                                                      </div>
+                                                  {% endif %}
+                                              </div>
+
+                                              <style>
+                                                  .shadow-hover {
+                                                      transition: all 0.3s ease;
+                                                      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                                                  }
+                                                  .shadow-hover:hover {
+                                                      transform: translateY(-3px);
+                                                      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                                                  }
+                                                  .section-title {
+                                                      color: #495057;
+                                                      font-weight: 600;
+                                                      border-bottom: 2px solid #dee2e6;
+                                                      padding-bottom: 0.5rem;
+                                                  }
+                                                  .response-item {
+                                                      border-left: 3px solid #0d6efd;
+                                                  }
+                                                  .empty-state {
+                                                      max-width: 600px;
+                                                      margin: 0 auto;
+                                                  }
+                                                  .card-header {
+                                                      border-radius: 0.375rem 0.375rem 0 0 !important;
+                                                  }
+                                              </style>
+                                          {% endblock %}

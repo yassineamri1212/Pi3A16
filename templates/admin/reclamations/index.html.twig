@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="mb-4">Reclamations Management</h1>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for reclamation in reclamations %}
+                        <tr>
+                            <td>{{ reclamation.id }}</td>
+                            <td>{{ reclamation.nom }} {{ reclamation.prenom }}</td>
+                            <td>{{ reclamation.sujet }}</td>
+                            <td>{{ reclamation.date|date('Y-m-d H:i') }}</td>
+                            <td>
+                                    <span class="badge bg-{{ reclamation.etat == 'new' ? 'warning' : 'success' }}">
+                                        {{ reclamation.etat }}
+                                    </span>
+                            </td>
+                            <td>
+                                {# Only keep View/Respond and Delete buttons #}
+                                <a href="{{ path('admin_reclamations_show', {'id': reclamation.id}) }}"
+                                   class="btn btn-primary btn-sm">
+                                    View/Respond
+                                </a>
+                                <form method="post"
+                                      action="{{ path('admin_reclamations_delete', {'id': reclamation.id}) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Are you sure?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">No reclamations found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

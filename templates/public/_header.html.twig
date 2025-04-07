@@ -17,7 +17,9 @@
                 <nav class="d-none d-lg-block me-2" id="main-navbar"> {# Added margin-end (me-2) #}
                     <ul class="list-unstyled d-flex align-items-center gap-4 mb-0 main-nav-ul">
                         <li><a href="{{ path('app_home') }}" class="nav-link fw-semibold">Home</a></li>
+                        {# --- START: LINKS FOR NEW GESTIONS --- #}
                         <li><a href="{{ path('app_public_offers_index') }}" class="nav-link fw-semibold">Carpool Offers</a></li>
+                        <li><a href="{{ path('app_public_deliveries_index') }}" class="nav-link fw-semibold">Deliveries</a></li>
                         <li><a href="{{ path('client_evenement_index') }}" class="nav-link fw-semibold">Events</a></li>
                         <li><a href="{{ path('client_reserved_trips') }}" class="nav-link fw-semibold">My Reservations</a></li>
                         <li>
@@ -27,6 +29,7 @@
                         </li>
                         <li> {# Conditional button LI remains #}
                             {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                {# --- Consider adding user profile/dropdown here instead of just logout --- #}
                                 <a href="{{ path('app_logout') }}" class="btn btn-danger btn-sm px-3 logout-btn">Logout</a>
                             {% else %}
                                 <a href="{{ path('app_login') }}" class="btn btn-sm px-3 login-btn fw-semibold">Login</a>
@@ -35,15 +38,13 @@
                     </ul>
                 </nav>
 
-                <!-- === ADDED: Dark Mode Toggle Button === -->
-                <!-- This button is visible on all screen sizes by default -->
-                <button id="dark-mode-toggle" class="btn btn-outline-light btn-sm ms-lg-2" title="Toggle Dark Mode"> {# Use outline-light, add margin on large screens #}
-                    <i class="fas fa-moon"></i> {# Start with moon icon #}
+                <!-- Dark Mode Toggle Button -->
+                <button id="dark-mode-toggle" class="btn btn-outline-light btn-sm ms-lg-2" title="Toggle Dark Mode">
+                    <i class="fas fa-moon"></i>
                 </button>
-                <!-- === END ADDED === -->
 
                 <!-- Mobile Nav Toggle Button (Hidden on large screens) -->
-                <button class="navbar-toggler d-lg-none ms-2" type="button" id="mobile-menu-toggle" aria-controls="main-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation"> {# Added margin-start #}
+                <button class="navbar-toggler d-lg-none ms-2" type="button" id="mobile-menu-toggle" aria-controls="main-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fas fa-bars text-white"></i>
                 </button>
 
@@ -52,10 +53,7 @@
 
             <!-- Collapsible container for Mobile Nav (Initially empty) -->
             <div class="navbar-collapse-mobile d-lg-none" id="main-navbar-collapse">
-                {# JS will clone desktop nav items here #}
-                {# Optional: Add dark mode toggle inside mobile menu too? #}
-                {# Consider adding another button here if you want it inside the mobile dropdown #}
-                {# <button id="dark-mode-toggle-mobile" class="btn btn-outline-light btn-sm w-100 mt-3">Toggle Dark Mode</button> #}
+                {# JS should clone desktop nav items here (including the new links) #}
             </div>
 
         </div>

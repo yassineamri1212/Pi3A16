@@ -1,0 +1,30 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Create New Offre{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Create New Offre</h1>
+
+        <div class="card shadow">
+            <div class="card-body">
+                {{ form_start(form) }}
+
+                {# Render all form fields using default Bootstrap theme #}
+                {{ form_widget(form) }}
+
+                <div class="mt-4">
+                    <button class="btn btn-success">
+                        <i class="fas fa-save"></i> {{ button_label|default('Save Offre') }}
+                    </button>
+                    <a href="{{ path('app_offre_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to list
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

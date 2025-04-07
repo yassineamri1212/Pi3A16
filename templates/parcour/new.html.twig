@@ -1,0 +1,32 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Create New Parcour{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Create New Parcour</h1>
+
+        <div class="card shadow">
+            <div class="card-body">
+                {# Render the form using Bootstrap 5 theme (should be default in newer Symfony) #}
+                {{ form_start(form) }}
+
+                {# Render form fields - form_widget(form) renders all unrendered fields #}
+                {# Or render row-by-row for more control: {{ form_row(form.trajet) }} etc. #}
+                {{ form_widget(form) }}
+
+                <div class="mt-4"> {# Spacing before buttons #}
+                    <button class="btn btn-success">
+                        <i class="fas fa-save"></i> {{ button_label|default('Save Parcour') }}
+                    </button>
+                    <a href="{{ path('app_admin_parcour_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to list
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

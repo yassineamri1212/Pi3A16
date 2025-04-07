@@ -1,0 +1,46 @@
+# config/packages/liip_imagine.yaml
+liip_imagine:
+  # configure resolvers
+  resolvers:
+    # setup the default resolver
+    default:
+      # use the default web path resolver
+      web_path: ~
+
+  # your filter sets are defined here
+  filter_sets:
+    cache: ~ # Default cache resolver
+
+    # --- Admin Filters (Already Added) ---
+    admin_thumb:
+      quality: 75
+      filters:
+        thumbnail:
+          size:          [60, 40] # Width, Height
+          mode:          outbound # Crop if necessary
+          allow_upscale: true
+    admin_large_thumb:
+      quality: 80
+      filters:
+        thumbnail:
+          size:          [300, 200]
+          mode:          inset # Fit within dimensions
+          allow_upscale: false
+
+    # --- NEW Frontend Filter ---
+    offer_list_thumb: # This name MUST match the filter used in your frontend Twig template
+      quality: 80 # Adjust quality as needed
+      filters:
+        thumbnail:
+          # Define appropriate dimensions for your frontend list view
+          # Example: A slightly larger thumbnail than the admin list
+          size:          [150, 100] # Width, Height (Adjust these!)
+          # 'outbound' crops the image to fill the exact dimensions
+          # 'inset' fits the image within the dimensions, preserving aspect ratio
+          mode:          outbound # Or 'inset' depending on desired look
+          allow_upscale: false # Usually false for frontend to avoid pixelation
+
+  # --- Twig Configuration (Already Added) ---
+  twig:
+    # Use the modern, lazy-loaded Twig integration mode
+    mode: lazy

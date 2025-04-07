@@ -1,0 +1,92 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Offre Details{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Offre Details #{{ offre.idOffre }}</h1>
+
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <h5 class="mb-0">Offre from {{ offre.parcour.trajet }}</h5>
+                <a href="{{ path('app_offre_index') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to list
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <th>ID</th>
+                                <td>{{ offre.idOffre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Parcour (Route)</th>
+                                <td>
+                                    <a href="{{ path('app_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">
+                                        {{ offre.parcour.trajet }}
+                                    </a>
+                                    ({{ offre.parcour.distance|number_format(1,'.',',') }} km, ~{{ offre.parcour.estimationTemps }} min)
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Departure Date/Time</th>
+                                <td>{{ offre.dateDepart ? offre.dateDepart|date('l, F j, Y \\a\\t H:i') : 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Price per Seat</th>
+                                <td>{{ offre.prix|number_format(3, '.', ',') }} TND</td> {# Show 3 decimals for millimes #}
+                            </tr>
+                            <tr>
+                                <th>Available Seats</th>
+                                <td>{{ offre.nombrePlaces }}</td>
+                            </tr>
+                            <tr>
+                                <th>Fuel Type</th>
+                                <td>{{ offre.typeFuel|capitalize }}</td>
+                            </tr>
+                            <tr>
+                                <th>Air Conditioned</th>
+                                <td>{{ offre.climatisee ? 'Yes' : 'No' }}</td>
+                            </tr>
+                            {# Add other fields if necessary #}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        {% if offre.photo %}
+                            <label class="form-label">Photo:</label><br>
+                            <a href="{{ vich_uploader_asset(offre, 'photoFile') }}" target="_blank">
+                                <img src="{{ vich_uploader_asset(offre, 'photoFile') | imagine_filter('admin_large_thumb') }}" {# Larger thumb filter #}
+                                     alt="Offre Photo" class="img-fluid rounded shadow-sm">
+                                {# Fallback:
+                            <img src="{{ vich_uploader_asset(offre, 'photoFile') }}" alt="Offre Photo" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                                #}
+                            </a>
+                        {% else %}
+                            <div class="text-center text-muted border rounded p-4">
+                                <i class="fas fa-image fa-3x mb-2"></i><br>
+                                No photo uploaded.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <hr>
+
+                <div class="d-flex justify-content-start gap-2"> {# Use gap for spacing #}
+                    <a href="{{ path('app_offre_edit', {'idOffre': offre.idOffre}) }}" class="btn btn-warning">
+                        <i class="fas fa-pencil-alt"></i> Edit
+                    </a>
+                    {# Include delete form #}
+                    {{ include('offre/_delete_form.html.twig', { 'offre': offre }) }}
+                </div>
+
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

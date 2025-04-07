@@ -1,0 +1,72 @@
+{# templates/admin/reclamations_index.html.twig #}
+                                             {% extends 'admin/base.html.twig' %}
+
+                                             {% block admin_content %}
+                                                 <h1 class="mb-4">Reclamations</h1>
+
+                                                 <table class="table table-striped">
+                                                     <thead>
+                                                         <tr>
+                                                             <th>ID</th>
+                                                             <th>Nom</th>
+                                                             <th>Email</th>
+                                                             <th>Sujet</th>
+                                                             <th>Date</th>
+                                                             <th>Actions</th>
+                                                         </tr>
+                                                     </thead>
+                                                     <tbody>
+                                                         {% for rec in reclamations %}
+                                                             <tr>
+                                                                 <td>{{ rec.id }}</td>
+                                                                 <td>{{ rec.nom }}</td>
+                                                                 <td>{{ rec.email }}</td>
+                                                                 <td>{{ rec.sujet }}</td>
+                                                                 <td>{{ rec.date|date('Y-m-d H:i') }}</td>
+                                                                 <td>
+                                                                     <a href="{{ path('admin_reclamations_show', {'id': rec.id}) }}" class="btn btn-sm btn-info">View</a>
+                                                                     <a href="{{ path('admin_reclamations_delete', {'id': rec.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+                                                                     <a href="{{ path('app_reponse_new', {'reclamation': rec.id}) }}" class="btn btn-sm btn-success">Response</a>
+                                                                 </td>
+                                                             </tr>
+                                                             {% if responses[rec.id] is defined and responses[rec.id]|length %}
+                                                             <tr>
+                                                                 <td colspan="6">
+                                                                     <ul class="list-group">
+                                                                         {% for rep in responses[rec.id] %}
+                                                                             <li class="list-group-item">
+                                                                                 <div>
+                                                                                     <strong>Date:</strong> {{ rep.date|date('Y-m-d H:i') }}
+                                                                                 </div>
+                                                                                 <div>
+                                                                                     <strong>Response:</strong> {{ rep.reponse }}
+                                                                                 </div>
+                                                                                 <div>
+                                                                                     <strong>Subject:</strong> {{ rec.sujet }}
+                                                                                 </div>
+                                                                                 <div>
+                                                                                     <strong>User:</strong> {{ rec.nom }}
+                                                                                 </div>
+                                                                                 <!-- Toggle button for response details -->
+                                                                                 <a class="btn btn-sm btn-info mt-2" data-bs-toggle="collapse" data-bs-target="#response-{{ rep.id }}">
+                                                                                     View Response
+                                                                                 </a>
+                                                                                 <!-- Collapsible response details container -->
+                                                                                 <div id="response-{{ rep.id }}" class="collapse mt-2">
+                                                                                     <div class="card card-body">
+                                                                                         <p><strong>Date:</strong> {{ rep.date|date('Y-m-d H:i') }}</p>
+                                                                                         <p><strong>Response:</strong> {{ rep.reponse }}</p>
+                                                                                         <p><strong>Subject:</strong> {{ rec.sujet }}</p>
+                                                                                         <p><strong>User:</strong> {{ rec.nom }}</p>
+                                                                                     </div>
+                                                                                 </div>
+                                                                             </li>
+                                                                         {% endfor %}
+                                                                     </ul>
+                                                                 </td>
+                                                             </tr>
+                                                             {% endif %}
+                                                         {% endfor %}
+                                                     </tbody>
+                                                 </table>
+                                             {% endblock %}

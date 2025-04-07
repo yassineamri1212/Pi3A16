@@ -1,0 +1,13 @@
+{# File: templates/public/reservation_success.html.twig #}
+{% extends 'public/base.html.twig' %}
+
+{% block public_content %}
+<div class="container my-5 text-center">
+    <h2 class="mb-4">Reservation Confirmed</h2>
+    <p>Your reservation is confirmed. Show the QR code below to the transporter.</p>
+    <div>
+        <img src="data:image/png;base64,{{ qrCode }}" alt="QR Code">
+    </div>
+    <a href="{{ path('client_evenement_index') }}" class="btn btn-primary mt-4">Back to Events</a>
+</div>
+{% endblock %}
