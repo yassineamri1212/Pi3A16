@@ -1,0 +1,70 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Manage Packages{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Manage Packages</h1>
+            {# Add link to standalone new if you allow it #}
+            {# <a href="{{ path('app_package_new') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New Package
+        </a> #}
+            <p class="text-muted mb-0">Packages are typically managed via the Delivery form.</p>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-sm"> {# Use table-sm for denser list #}
+                        <thead>
+                        <tr>
+                            <th>{{ knp_pagination_sortable(pagination, 'ID', 'p.id') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Weight (g)', 'p.weightPackage') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Description', 'p.descriptionPackage') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Delivery ID', 'l.id') }}</th> {# Sort by related ID #}
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for package in pagination %} {# Loop through pagination object #}
+                            <tr>
+                                <td>{{ package.id }}</td>
+                                <td>{{ package.weightPackage }} g</td>
+                                <td>{{ package.descriptionPackage|slice(0, 50) }}{{ package.descriptionPackage|length > 50 ? '...' : '' }}</td> {# Use slice instead of truncate #}
+                                <td>
+                                    {% if package.livraison %}
+                                        <a href="{{ path('app_admin_livraison_show', {'id': package.livraison.id}) }}" title="View Delivery #{{ package.livraison.id }}">
+                                            #{{ package.livraison.id }}
+                                        </a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ path('app_package_show', {'id': package.id}) }}" class="btn btn-info btn-sm" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_package_edit', {'id': package.id}) }}" class="btn btn-warning btn-sm" title="Edit Package">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    {{ include('package/_delete_form.html.twig', { 'package': package }) }}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No packages found.</td> {# Adjust colspan #}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div> {# End table-responsive #}
+            </div>{# End card-body #}
+
+            <div class="card-footer bg-white d-flex justify-content-center">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

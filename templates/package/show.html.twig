@@ -1,0 +1,62 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Package Details{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Package Details #{{ package.id }}</h1>
+
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <h5 class="mb-0">Package Information</h5>
+                <div>
+                    <a href="{{ path('app_package_index') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Back to list
+                    </a>
+                    {% if package.livraison %}
+                        <a href="{{ path('app_admin_livraison_show', {'id': package.livraison.id }) }}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-truck"></i> View Delivery #{{ package.livraison.id }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tbody>
+                    <tr>
+                        <th style="width: 25%;">ID</th>
+                        <td>{{ package.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Weight</th>
+                        <td>{{ package.weightPackage }} grams</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ package.descriptionPackage }}</td>
+                    </tr>
+                    <tr>
+                        <th>Associated Delivery</th>
+                        <td>
+                            {% if package.livraison %}
+                                <a href="{{ path('app_admin_livraison_show', {'id': package.livraison.id}) }}">
+                                    #{{ package.livraison.id }} ({{ package.livraison.startLocation }} to {{ package.livraison.deliveryLocation }})
+                                </a>
+                            {% else %}
+                                <span class="text-muted">None</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <div class="d-flex justify-content-start gap-2">
+                    <a href="{{ path('app_package_edit', {'id': package.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-pencil-alt"></i> Edit
+                    </a>
+                    {{ include('package/_delete_form.html.twig', { 'package': package }) }}
+                </div>
+            </div> {# End card-body #}
+        </div> {# End card #}
+    </div> {# End container-fluid #}
+{% endblock %}

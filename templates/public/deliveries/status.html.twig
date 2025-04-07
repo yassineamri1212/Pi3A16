@@ -1,0 +1,86 @@
+{# templates/public/deliveries/status.html.twig #}
+{% extends 'public/base.html.twig' %}
+
+{% block public_title %}Delivery Status{% endblock %}
+
+{% block public_content %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i> Delivery Status</h3>
+                        <a href="{{ path('app_public_delivery_track_form') }}" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-search me-1"></i> Track Another
+                        </a>
+                    </div>
+
+                    <div class="card-body p-4">
+                        {# Display error if lookup failed #}
+                        {% if error %}
+                            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <div>{{ error }}</div>
+                            </div>
+                        {% endif %}
+
+                        {# Display delivery details if found #}
+                        {% if livraison %}
+                            <h4 class="mb-3">Details for Delivery ID: <span class="fw-bold text-primary">{{ livraison.id }}</span></h4>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <p class="mb-1"><strong class="text-muted">From:</strong></p>
+                                    <p class="fs-5"><i class="fas fa-map-marker-alt text-secondary me-1"></i> {{ livraison.startLocation }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong class="text-muted">To:</strong></p>
+                                    <p class="fs-5"><i class="fas fa-flag-checkered text-secondary me-1"></i> {{ livraison.deliveryLocation }}</p>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <p class="mb-1"><strong class="text-muted">Current Status:</strong></p>
+                            {% if livraison.isDelivered %}
+                                <p class="fs-4 text-success fw-semibold">
+                                    <i class="fas fa-check-circle me-1"></i> Delivered
+                                </p>
+                            {% else %}
+                                <p class="fs-4 text-warning fw-semibold">
+                                    <i class="fas fa-clock me-1"></i> Pending / In Transit
+                                </p>
+                            {% endif %}
+
+                            {# List Packages #}
+                            {% if livraison.packages is not empty %}
+                                <hr>
+                                <h5 class="mt-4 mb-3">Package(s) Included:</h5>
+                                <ul class="list-group list-group-flush">
+                                    {% for package in livraison.packages %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">Package #{{ package.id }}</div>
+                                                {{ package.descriptionPackage }}
+                                            </div>
+                                            <span class="badge bg-secondary rounded-pill">{{ package.weightPackage }} g</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+
+                        {% elseif submitted_id %}
+                            {# Message if ID was submitted but nothing found (error already shown above) #}
+                            <p class="text-muted text-center mt-3">If the ID is correct, the delivery may not be in our system yet.</p>
+
+                        {% else %}
+                            {# Message if page accessed directly without ID or form submission #}
+                            <p class="text-muted text-center">Please use the tracking form to check a delivery status.</p>
+                        {% endif %}
+
+                    </div> {# End card-body #}
+                </div> {# End card #}
+            </div> {# End col #}
+        </div> {# End row #}
+    </div> {# End container #}
+{% endblock %}

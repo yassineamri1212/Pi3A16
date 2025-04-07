@@ -1,0 +1,136 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Edit Delivery{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Edit Delivery #{{ livraison.id }}</h1>
+
+        <div class="card shadow">
+            <div class="card-body">
+                {# Ensure form theme is loaded if needed #}
+                {# {% form_theme form 'bootstrap_5_layout.html.twig' %} #}
+
+                {{ form_start(form) }}
+
+                {{ form_row(form.startLocation) }}
+                {{ form_row(form.deliveryLocation) }}
+                {{ form_row(form.isDelivered) }}
+
+                <hr>
+                {# --- Package Collection Rendering --- #}
+                <fieldset class="mb-3">
+                    <legend>{{ form_label(form.packages) }}</legend>
+
+                    {# Container for package entries. Use ID for JS. Data attributes hold prototype & index. #}
+                    <div id="packages-wrapper" {# Changed ID #}
+                         class="packages-collection mb-2" {# Custom class #}
+                         data-index="{{ form.packages|length > 0 ? form.packages|last.vars.name + 1 : 0 }}"
+                         data-prototype="{{ form_widget(form.packages.vars.prototype)|e('html_attr') }}"
+                    >
+
+                        {# Render existing entries - IMPORTANT for edit #}
+                        {% for packageForm in form.packages %}
+                            {# Add class for easier removal targeting #}
+                            <div class="package-entry border p-2 mb-2 rounded bg-light">
+                                <h6 class="package-entry-label">Package #{{ loop.index }}</h6> {# Use loop.index for label #}
+                                {{ form_row(packageForm.weightPackage) }}
+                                {{ form_row(packageForm.descriptionPackage) }}
+                                {# Add remove button with specific class #}
+                                <button type="button" class="btn btn-danger btn-sm remove-package-button mt-2">
+                                    <i class="fas fa-trash"></i> Remove Package
+                                </button>
+                                <hr>
+                            </div>
+                        {% endfor %}
+                    </div> {# End #packages-wrapper #}
+
+                    {# Add button with specific ID #}
+                    <button type="button" id="add-package-button" class="btn btn-secondary btn-sm add_item_link">
+                        <i class="fas fa-plus"></i> Add Package
+                    </button>
+                </fieldset>
+                {# --- End Package Collection --- #}
+
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Delivery
+                        </button>
+                        <a href="{{ path('app_admin_livraison_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to list
+                        </a>
+                    </div>
+                    {# Place delete form here on edit page #}
+                    {{ include('livraison/_delete_form.html.twig', { 'livraison': livraison, 'button_label': 'Delete', 'button_class': 'btn btn-danger' }) }}
+                </div>
+
+                {{ form_end(form) }}
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}
+
+{# Add the plain JS block at the end #}
+{% block javascripts %}
+    {{ parent() }} {# Include base JS #}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const addPackageButton = document.getElementById('add-package-button');
+            const packagesWrapper = document.getElementById('packages-wrapper');
+
+            // Function to add remove listener to a button WITHIN a specific entry
+            const addRemoveListener = (entryDiv) => {
+                const removeButton = entryDiv.querySelector('.remove-package-button');
+                if (removeButton) {
+                    removeButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        entryDiv.remove(); // Remove the whole package-entry div
+                    });
+                }
+            };
+
+            // Add listener for the main "Add Package" button
+            if (addPackageButton && packagesWrapper) {
+                addPackageButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Get the prototype and index
+                    let index = parseInt(packagesWrapper.dataset.index || '0');
+                    const prototype = packagesWrapper.dataset.prototype;
+
+                    // Replace '__name__' with the current index
+                    const newFormHtml = prototype.replace(/__name__/g, index);
+
+                    // Create a div to hold the new entry
+                    const newEntryDiv = document.createElement('div');
+                    newEntryDiv.classList.add('package-entry', 'border', 'p-2', 'mb-2', 'rounded', 'bg-light'); // Apply styles
+                    newEntryDiv.innerHTML = newFormHtml;
+
+                    // Add a remove button dynamically
+                    const removeButton = document.createElement('button');
+                    removeButton.type = 'button';
+                    removeButton.innerHTML = '<i class="fas fa-trash"></i> Remove Package';
+                    removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'remove-package-button', 'mt-2');
+                    newEntryDiv.appendChild(document.createElement('hr'));
+                    newEntryDiv.appendChild(removeButton);
+
+                    // Add the remove listener to the new button
+                    addRemoveListener(newEntryDiv);
+
+                    // Append the new entry to the wrapper
+                    packagesWrapper.appendChild(newEntryDiv);
+
+                    // Increment the index for the next addition
+                    packagesWrapper.dataset.index = index + 1;
+                });
+            }
+
+            // Add remove listeners to any package entries already present on page load (for edit form)
+            packagesWrapper.querySelectorAll('.package-entry').forEach(entry => {
+                addRemoveListener(entry);
+            });
+        });
+    </script>
+{% endblock %}
