@@ -1,5 +1,6 @@
 // File: webpack.config.js
 const Encore = require('@symfony/webpack-encore');
+const path = require('path'); // Make sure 'path' is required
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -9,11 +10,8 @@ Encore
     .setOutputPath('public/build/')
     .setPublicPath('/build')
 
-    // Main entry for JS and CSS (app.js should import app.css)
+    // Main entry point (Ensure app.js imports bootstrap.js)
     .addEntry('app', './assets/app.js')
-
-    // No longer need a separate entry for admin-sidebar.js
-    // .addEntry('admin-sidebar', './assets/admin/admin-sidebar.js') // REMOVED
 
     // Create shared runtime chunk
     .enableSingleRuntimeChunk()
@@ -22,23 +20,25 @@ Encore
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
 
-    // Uncomment if you use Sass/SCSS files
-    // .enableSassLoader()
+    // --- RE-ADD THE ALIAS ---
+    // This alias is REQUIRED by the loader invoked in bootstrap.js
+    .addAliases({
+        '@symfony/stimulus-bridge/controllers.json$': path.resolve(__dirname, 'assets/controllers.json')
+        // Add any other aliases you might need here
+    })
+    // --- END ALIAS ---
 
-    // Enable jQuery globally
-    //.autoProvidejQuery()
+    // --- Keep this commented out or removed if bootstrap.js handles loading ---
+    // .enableStimulusBridge('./assets/controllers.json')
+    // ---
 
-    // Configure Babel for modern JS features (optional but recommended)
+    // Configure Babel
     .configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
-        config.corejs = 3;
+        config.corejs = '3.23'; // Or your core-js version
     })
 
-// Example: Copy static assets (uncomment/adjust if needed)
-// .copyFiles({
-//     from: './assets/images',
-//     to: 'images/[path][name].[hash:8].[ext]',
-// })
+// .copyFiles(...) // If needed
 ;
 
 module.exports = Encore.getWebpackConfig();

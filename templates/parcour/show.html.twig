@@ -9,7 +9,7 @@
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-center bg-white">
                 <h5 class="mb-0">{{ parcour.trajet }}</h5>
-                <a href="{{ path('app_parcour_index') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ path('app_admin_parcour_index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Back to list
                 </a>
             </div>
@@ -56,7 +56,7 @@
                 <hr>
 
                 <div class="d-flex justify-content-start gap-2"> {# Use gap for spacing #}
-                    <a href="{{ path('app_parcour_edit', {'idParcours': parcour.idParcours}) }}" class="btn btn-warning">
+                    <a href="{{ path('app_admin_parcour_edit', {'idParcours': parcour.idParcours}) }}" class="btn btn-warning">
                         <i class="fas fa-pencil-alt"></i> Edit
                     </a>
                     {# Include delete form #}
