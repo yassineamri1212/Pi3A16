@@ -2,6 +2,7 @@ parameters:
   openweather_api_key: '%env(OPENWEATHER_API_KEY)%'
 
 services:
+  # Default configuration for services
   _defaults:
     autowire: true
     autoconfigure: true

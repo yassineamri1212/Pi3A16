@@ -1,0 +1,63 @@
+{# templates/registration/register.html.twig #}
+{% extends 'public/base.html.twig' %} {# <-- Use your FRONTEND base layout #}
+
+{% block public_title %}Register - {{ parent() }}{% endblock %} {# Set specific page title #}
+
+{% block public_content %} {# Use the content block from your public base #}
+    <div class="container my-5"> {# Standard Bootstrap container and margin #}
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6"> {# Slightly wider column #}
+                <div class="card shadow-lg border-0"> {# More prominent shadow, no border #}
+                    <div class="card-body p-4 p-md-5"> {# More padding #}
+                        <h1 class="card-title text-center mb-4 h2">Create Your Account</h1>
+
+                        {# Display general form errors (optional) #}
+                        {{ form_errors(registrationForm) }}
+
+                        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }} {# Add novalidate to rely on server-side validation #}
+
+                        {# Render fields row by row for better control with Bootstrap #}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.userName) }}
+                            {{ form_widget(registrationForm.userName, {'attr': {'class': 'form-control form-control-lg'}}) }} {# Larger input #}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(registrationForm.userName) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+                        </div>
+
+                        {# Password Fields - RepeatedType renders both #}
+                        <div class="mb-3">
+                            {# Label is handled by 'first_options' and 'second_options' in the FormType #}
+                            {{ form_row(registrationForm.plainPassword) }} {# form_row includes label, widget, errors for both fields #}
+                        </div>
+
+                        {# Agree Terms Checkbox #}
+                        {# Render row to include label/widget/errors - styling applied in FormType #}
+                        {{ form_row(registrationForm.agreeTerms) }}
+
+
+                        <div class="d-grid mt-4"> {# Full-width button #}
+                            <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                        </div>
+
+                        {{ form_end(registrationForm) }}
+
+                        <hr class="my-4"> {# Separator #}
+
+                        <p class="text-center mb-0">
+                            Already have an account? <a href="{{ path('app_login') }}">Login here</a> {# Link to your login route #}
+                        </p>
+                    </div> {# End card-body #}
+                </div> {# End card #}
+            </div> {# End col #}
+        </div> {# End row #}
+    </div> {# End container #}
+{% endblock %}

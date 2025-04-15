@@ -1,0 +1,67 @@
+{# templates/profile/edit.html.twig #}
+{% extends 'public/base.html.twig' %} {# Use your PUBLIC base layout #}
+
+{% block public_title %}Edit Your Profile{% endblock %}
+
+{% block public_content %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6"> {# Adjusted column width #}
+
+                <h2 class="text-center mb-4 fw-bold text-primary">Edit Your Profile</h2>
+
+                {# Display Flash Messages #}
+                {# Assuming you have this partial setup or include the flash message loop directly #}
+                {# {% include 'admin/_flash_messages.html.twig' %} #}
+                {# Direct rendering: #}
+                <div class="flash-messages mb-3">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            {% set alert_class = label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : (label == 'success' ? 'success' : 'info')) %}
+                            <div class="alert alert-{{ alert_class }} alert-dismissible fade show shadow-sm rounded" role="alert">
+                                <i class="fas fa-{% if alert_class == 'danger' %}exclamation-triangle{% elseif alert_class == 'warning' %}exclamation-circle{% elseif alert_class == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body p-4 p-md-5"> {# Added more padding #}
+
+                        {{ form_start(profileForm) }}
+
+                        {# Display global form errors #}
+                        {{ form_errors(profileForm) }}
+
+                        {# Render form fields using form_row for cleaner output #}
+                        {{ form_row(profileForm.userName) }}
+                        {{ form_row(profileForm.email) }}
+
+                        {# Password fields require careful rendering if using RepeatedType #}
+                        <div class="password-section mt-4 pt-3 border-top">
+                            <h5 class="mb-3 text-muted">Change Password (Optional)</h5>
+                            {# Render first password field #}
+                            {{ form_row(profileForm.plainPassword.first) }}
+                            {# Render second password field (confirmation) #}
+                            {{ form_row(profileForm.plainPassword.second) }}
+                        </div>
+
+                        {# Submit Button #}
+                        <div class="d-grid gap-2 mt-4"> {# Use d-grid for full-width button #}
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+
+                        {{ form_end(profileForm) }}
+
+                    </div> {# End card-body #}
+                </div> {# End card #}
+
+            </div> {# End col #}
+        </div> {# End row #}
+    </div> {# End container #}
+{% endblock %}

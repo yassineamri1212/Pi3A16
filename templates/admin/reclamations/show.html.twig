@@ -1,128 +1,163 @@
 {# File: templates/admin/reclamations/show.html.twig #}
-                                                            {% extends 'admin/base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
-                                                            {% block admin_content %}
-                                                                <div class="container-fluid">
-                                                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                                                        <h1 class="h3 mb-0">Reclamation #{{ reclamation.id }}</h1>
-                                                                        <a href="{{ path('admin_reclamations_index') }}" class="btn btn-secondary">
-                                                                            <i class="fas fa-arrow-left me-1"></i> Back to list
-                                                                        </a>
-                                                                    </div>
+{% block admin_title %}Reclamation #{{ reclamation.id }}{% endblock %} {# Added dynamic title #}
 
-                                                                    <div class="card shadow mb-4">
-                                                                        <div class="card-header py-3">
-                                                                            <h6 class="m-0 font-weight-bold text-primary">Reclamation Details</h6>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            <div class="row mb-4">
-                                                                                <div class="col-md-6">
-                                                                                    <h5 class="text-muted mb-3">User Information</h5>
-                                                                                    <dl class="row">
-                                                                                        <dt class="col-sm-4">Name</dt>
-                                                                                        <dd class="col-sm-8">{{ reclamation.nom }} {{ reclamation.prenom }}</dd>
+{% block admin_content %}
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Reclamation #{{ reclamation.id }}</h1> {# Adjusted class #}
+            <a href="{{ path('admin_reclamations_index') }}" class="btn btn-secondary btn-sm"> {# Added btn-sm #}
+                <i class="fas fa-arrow-left fa-sm me-1"></i> Back to list
+            </a>
+        </div>
 
-                                                                                        <dt class="col-sm-4">Email</dt>
-                                                                                        <dd class="col-sm-8">{{ reclamation.email }}</dd>
+        {# Display Flash Messages Here #}
+        {# --- START: Render Flash Messages Directly --- #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                {# Use Bootstrap alert classes - adjust 'label' mapping if needed (e.g., map 'error' to 'danger') #}
+                {% set alert_class = label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : (label == 'success' ? 'success' : 'info')) %}
+                <div class="alert alert-{{ alert_class }} alert-dismissible fade show shadow-sm rounded mb-3" role="alert">
+                    <i class="fas fa-{% if alert_class == 'danger' %}exclamation-triangle{% elseif alert_class == 'warning' %}exclamation-circle{% elseif alert_class == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {# --- END: Render Flash Messages Directly --- #}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Reclamation Details</h6> {# Used fw-bold #}
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-3">User Information</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Name</dt>
+                            {# Display 'N/A' if nom/prenom are null #}
+                            <dd class="col-sm-8">{{ reclamation.nom|default('N/A') }} {{ reclamation.prenom|default('') }}</dd>
 
-                                                                                        <dt class="col-sm-4">Phone</dt>
-                                                                                        <dd class="col-sm-8">{{ reclamation.numTele }}</dd>
-                                                                                    </dl>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <h5 class="text-muted mb-3">Reclamation Details</h5>
-                                                                                    <dl class="row">
-                                                                                        <dt class="col-sm-4">Status</dt>
-                                                                                        <dd class="col-sm-8">
-                                                                                            [...]
-                                                                                        </dd>
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8">{{ reclamation.email }}</dd>
 
-                                                                                        <dt class="col-sm-4">Date</dt>
-                                                                                        <dd class="col-sm-8">{{ reclamation.date|date('Y-m-d H:i') }}</dd>
+                            <dt class="col-sm-4">Phone</dt>
+                            {# Display 'N/A' if phone is null #}
+                            <dd class="col-sm-8">{{ reclamation.numTele|default('N/A') }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-3">Reclamation Info</h5> {# Changed heading #}
+                        <dl class="row">
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">
+                                {# Adjusted status badge logic #}
+                                {% set status_class = 'secondary' %}
+                                {% if reclamation.etat|lower == 'new' or reclamation.etat|lower == 'pending' %}
+                                    {% set status_class = 'warning' %}
+                                {% elseif reclamation.etat|lower in ['resolved', 'closed'] %}
+                                    {% set status_class = 'success' %}
+                                {% elseif reclamation.etat|lower == 'in progress' %}
+                                    {% set status_class = 'info' %}
+                                {% endif %}
+                                <span class="badge bg-{{ status_class }} text-dark">{{ reclamation.etat|capitalize }}</span> {# Added text-dark for light badges #}
+                            </dd>
 
-                                                                                        <dt class="col-sm-4">Subject</dt>
-                                                                                        <dd class="col-sm-8">{{ reclamation.sujet }}</dd>
-                                                                                    </dl>
-                                                                                </div>
-                                                                            </div>
+                            <dt class="col-sm-4">Date Submitted</dt> {# Changed label #}
+                            <dd class="col-sm-8">{{ reclamation.date|date('Y-m-d H:i') }}</dd>
 
-                                                                            <div class="mb-4">
-                                                                                <h5 class="text-muted mb-3">Description</h5>
-                                                                                <div class="p-3 bg-light rounded">
-                                                                                    {{ reclamation.description }}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                            <dt class="col-sm-4">Subject</dt>
+                            <dd class="col-sm-8">{{ reclamation.sujet }}</dd>
+                        </dl>
+                    </div>
+                </div>
 
-                                                                    <div class="card shadow mb-4">
-                                                                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                                                                            <h6 class="m-0 font-weight-bold text-primary">Responses</h6>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            {% if reclamation.reponses|length > 0 %}
-                                                                                {% for response in reclamation.reponses %}
-                                                                                    <div class="card mb-3">
-                                                                                        <div class="card-body">
-                                                                                            <div class="d-flex justify-content-between mb-2">
-                                                                                                <div>
-                                                                                                    <strong>{{ response.username }}</strong>
-                                                                                                    <small class="text-muted ms-2">{{ response.date|date('Y-m-d H:i') }}</small>
-                                                                                                </div>
-                                                                                                <div class="d-flex">
-                                                                                                    <a href="{{ path('app_reponse_edit', {'id': response.id}) }}" class="btn btn-sm btn-secondary me-2">
-                                                                                                        <i class="fas fa-edit me-1"></i> Edit
-                                                                                                    </a>
-                                                                                                    <form method="post" action="{{ path('app_reponse_delete', {'id': response.id}) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                                                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ response.id) }}">
-                                                                                                        <button class="btn btn-sm btn-danger">
-                                                                                                            <i class="fas fa-trash me-1"></i> Delete
-                                                                                                        </button>
-                                                                                                    </form>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                            <p class="mb-0">{{ response.reponse }}</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                {% endfor %}
-                                                                            {% else %}
-                                                                                <div class="alert alert-info mb-0">No responses yet</div>
-                                                                            {% endif %}
-                                                                        </div>
-                                                                    </div>
+                <div class="mb-4">
+                    <h5 class="text-muted mb-3">User's Description</h5> {# Changed heading #}
+                    <div class="p-3 bg-light border rounded"> {# Added border #}
+                        {# Use nl2br filter to respect line breaks #}
+                        <p class="mb-0">{{ reclamation.description|nl2br }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                                                    <div class="card shadow">
-                                                                        <div class="card-header py-3">
-                                                                            <h6 class="m-0 font-weight-bold text-primary">Add Response</h6>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            {{ form_start(form) }}
-                                                                            <div class="form-group">
-                                                                                {{ form_label(form.reponse) }}
-                                                                                {{ form_widget(form.reponse, {'attr': {'class': 'form-control', 'rows': 5}}) }}
-                                                                            </div>
-                                                                            <button type="submit" class="btn btn-primary">
-                                                                                <i class="fas fa-paper-plane me-1"></i> Submit Response
-                                                                            </button>
-                                                                            {{ form_end(form) }}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+        {# --- Responses Section --- #}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold text-primary">Responses</h6>
+            </div>
+            <div class="card-body">
+                {% if reclamation.reponses|length > 0 %}
+                    {% for response in reclamation.reponses|sort((a, b) => a.date <=> b.date) %} {# Sort responses by date #}
+                        {# Use border-bottom except for last item #}
+                        <div class="response-item pb-3 mb-3 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start mb-1"> {# Use align-items-start #}
+                                <div>
+                                    <strong class="text-success"><i class="fas fa-user-shield me-1"></i>{{ response.username }}</strong> {# Added icon #}
+                                    <small class="text-muted ms-2">{{ response.date|date('Y-m-d H:i') }}</small>
+                                </div>
+                                <div class="btn-group btn-group-sm"> {# Grouped buttons #}
+                                    {# Use CORRECT route name for edit #}
+                                    <a href="{{ path('admin_reponse_edit', {'id': response.id}) }}" class="btn btn-outline-secondary" title="Edit Response">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {# Use CORRECT route name for delete #}
+                                    <form method="post" action="{{ path('admin_reponse_delete', {'id': response.id}) }}" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ response.id) }}">
+                                        <button class="btn btn-outline-danger" title="Delete Response">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <p class="mb-0 ps-1"> {# Added padding #}
+                                {{ response.reponse|nl2br }} {# Respect line breaks #}
+                            </p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-light border text-center mb-0">No responses yet.</div> {# Used border and text-center #}
+                {% endif %}
+            </div>
+        </div>
 
-                                                                <style>
-                                                                    .card {
-                                                                        border-radius: 8px;
-                                                                    }
-                                                                    dt {
-                                                                        font-weight: 500;
-                                                                        color: #6c757d;
-                                                                    }
-                                                                    .bg-light {
-                                                                        background-color: #f8f9fa!important;
-                                                                    }
-                                                                    .badge {
-                                                                        font-size: 0.875em;
-                                                                        padding: 0.35em 0.65em;
-                                                                    }
-                                                                </style>
-                                                            {% endblock %}
+        {# --- Add Response Form Section --- #}
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Add Your Response</h6>
+            </div>
+            <div class="card-body">
+                {# Make sure the 'form' variable passed from the controller is for a NEW response #}
+                {# The controller logic needs adjustment if 'form' here is pre-filled with an existing response #}
+                {# Point form action to the NEW response route, passing reclamation ID #}
+                <form method="post" action="{{ path('admin_reponse_new', {'reclamationId': reclamation.id}) }}" name="reponse_form" novalidate="novalidate">
+                    {# Display global form errors #}
+                    {{ form_errors(form) }}
+
+                    {# Render the response text area using form_row #}
+                    {{ form_row(form.reponse, {
+                        'label': 'Response Text',
+                        'label_attr': {'class': 'fw-bold'},
+                        'attr': {'rows': 5, 'placeholder': 'Enter your response...'}
+                    }) }}
+
+                    {# CSRF token - crucial for security #}
+                    {{ form_widget(form._token) }} {# Render CSRF token if it's named _token #}
+                    {# If ReponseType doesn't explicitly add CSRF, form_end might render it #}
+
+                    <div class="mt-3"> {# Added margin top #}
+                        <button type="submit" class="btn btn-success"> {# Changed color #}
+                            <i class="fas fa-paper-plane me-1"></i> Submit Response
+                        </button>
+                    </div>
+
+                    {# Removed form_end as we started the form manually to set the action #}
+                </form>
+            </div>
+        </div>
+    </div> {# End container-fluid #}
+
+    {# --- Removed Style block --- #}
+{% endblock %}

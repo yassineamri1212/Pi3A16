@@ -1,4 +1,4 @@
-{% extends 'admin/base.html.twig' %}
+{% extends 'admin/base.html.twig' %} {# Assuming this extends admin base #}
 
 {% block title %}User Management{% endblock %}
 
@@ -6,10 +6,28 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h3 mb-0">User Management</h1>
+            {# Ensure route name matches controller ('app_user_new' based on reverted controller) #}
             <a href="{{ path('app_user_new') }}" class="btn btn-success btn-sm">
                 <i class="fas fa-plus me-2"></i> Create New User
             </a>
         </div>
+
+        {# Display Flash Messages #}
+        {# --- START: Render Flash Messages Directly --- #}
+        <div class="flash-messages mb-3"> {# Optional wrapper div #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    {# Use Bootstrap alert classes - map common labels #}
+                    {% set alert_class = label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : (label == 'success' ? 'success' : 'info')) %}
+                    <div class="alert alert-{{ alert_class }} alert-dismissible fade show shadow-sm rounded" role="alert">
+                        <i class="fas fa-{% if alert_class == 'danger' %}exclamation-triangle{% elseif alert_class == 'warning' %}exclamation-circle{% elseif alert_class == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {# --- END: Render Flash Messages Directly --- #}
 
         <div class="card shadow">
             <div class="card-body">
@@ -21,50 +39,75 @@
                             <th>Email</th>
                             <th>Username</th>
                             <th>Roles</th>
+                            {# ---> Optional: Add Status Column <--- #}
+                            <th>Status</th>
                             <th class="text-end">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for user in users %}
-                            <tr>
+                            {# Optional: Add class if user is blocked #}
+                            <tr class="{{ user.isBlocked ? 'table-secondary text-muted' : '' }}">
                                 <td>{{ user.id }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>{{ user.userName }}</td>
                                 <td>
                                     {% for role in user.roles %}
-                                        <span class="badge bg-primary me-1">{{ role|replace({'ROLE_': ''}) }}</span>
+                                        {# Make ADMIN role stand out #}
+                                        {% set badge_color = role == 'ROLE_ADMIN' ? 'danger' : 'primary' %}
+                                        <span class="badge bg-{{ badge_color }} me-1">{{ role|replace({'ROLE_': ''})|capitalize }}</span>
                                     {% endfor %}
+                                </td>
+                                {# ---> Optional: Status Cell <--- #}
+                                <td>
+                                    {% if user.isBlocked %}
+                                        <span class="badge bg-danger"><i class="fas fa-lock me-1"></i> Blocked</span>
+                                    {% else %}
+                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Active</span>
+                                    {% endif %}
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group btn-group-sm">
-                                        <!-- View Button -->
-                                        <a href="{{ path('app_user_show', {'id': user.id}) }}"
-                                           class="btn btn-info" title="View">
-                                            <i class="fas fa-eye me-1"></i> View
-                                        </a>
+                                        {# Ensure route names match controller #}
+                                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-info" title="View"><i class="fas fa-eye"></i></a>
+                                        <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-warning" title="Edit"><i class="fas fa-edit"></i></a>
 
-                                        <!-- Edit Button -->
-                                        <a href="{{ path('app_user_edit', {'id': user.id}) }}"
-                                           class="btn btn-warning" title="Edit">
-                                            <i class="fas fa-edit me-1"></i> Edit
-                                        </a>
+                                        {# ---> Block/Unblock Button/Form <--- #}
+                                        {# Don't show block button for the currently logged-in admin #}
+                                        {% if app.user != user %}
+                                            <form method="post" action="{{ path('app_user_toggle_block', {'id': user.id}) }}" class="d-inline">
+                                                {# Use a unique token name per user for toggle action #}
+                                                <input type="hidden" name="_token" value="{{ csrf_token('toggle_block' ~ user.id) }}">
+                                                {% if user.isBlocked %}
+                                                    {# Show Unblock button #}
+                                                    <button class="btn btn-success" title="Unblock User">
+                                                        <i class="fas fa-unlock"></i>
+                                                    </button>
+                                                {% else %}
+                                                    {# Show Block button #}
+                                                    <button class="btn btn-secondary" title="Block User"> {# Use secondary or warning color #}
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </form>
+                                        {% endif %}
+                                        {# ---> END Block/Unblock Button/Form <--- #}
 
-                                        <!-- Delete Form -->
-                                        <form method="post"
-                                              action="{{ path('app_user_delete', {'id': user.id}) }}"
-                                              onsubmit="return confirm('Are you sure you want to delete this user?');"
-                                              class="d-inline">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                                            <button class="btn btn-danger" title="Delete">
-                                                <i class="fas fa-trash me-1"></i> Delete
-                                            </button>
-                                        </form>
+
+                                        {# Delete Form - Don't show delete button for the currently logged-in admin #}
+                                        {% if app.user != user %}
+                                            <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}"
+                                                  onsubmit="return confirm('DELETE USER \'{{ user.userName|e('js') }}\'? This action cannot be undone!');" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                                <button class="btn btn-danger" title="Delete User"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="5" class="text-center py-4">No users found</td>
+                                <td colspan="6" class="text-center py-4">No users found</td> {# Adjusted colspan #}
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -74,25 +117,5 @@
         </div>
     </div>
 
-    <style>
-        .uniform-actions {
-            display: flex;
-            gap: 0.3rem;
-        }
-        .action-btn {
-            width: auto; /* Allow buttons to be auto-sized */
-            padding: 0.2rem 0.5rem; /* Adjust padding for a more compact button */
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        .action-btn:hover {
-            transform: scale(1.05);
-        }
-        .action-btn-form {
-            margin: 0;
-            line-height: 1;
-        }
-    </style>
+    {# Removed inline style block - keep styles in external CSS #}
 {% endblock %}

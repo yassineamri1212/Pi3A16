@@ -1,15 +1,20 @@
 <?php
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Repository\UserRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'user')]
+#[ORM\Table(name: '`user`')]
+#[UniqueEntity(fields: ['email'], message: 'An account with this email already exists.')]
+#[UniqueEntity(fields: ['userName'], message: 'This username is already taken.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -18,9 +23,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank(message: "Email cannot be empty.")]
+    #[Assert\Email(message: "The email \`{{ value }}\` is not a valid email.")]
+    #[Assert\Length(max: 180)]
     private ?string $email = null;
 
     #[ORM\Column(type: 'string', unique: true)]
+    #[Assert\NotBlank(message: "Username cannot be empty.")]
+    #[Assert\Length(min: 3, max: 50, minMessage: "Username must be at least \`{{ limit }}\` characters long.", maxMessage: "Username cannot be longer than \`{{ limit }}\` characters.")]
     private ?string $userName = null;
 
     #[ORM\Column(type: 'json')]
@@ -31,7 +41,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $plainPassword = null;
 
-    #[ORM\OneToMany(targetEntity: Reduction::class, mappedBy: 'user')]
+    #[ORM\Column(type: Types::BOOLEAN, options: ["default" => false])]
+    private bool $isBlocked = false;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reduction::class)]
     private Collection $reductions;
 
     #[ORM\ManyToMany(targetEntity: \App\Entity\MoyenDeTransport::class)]
@@ -40,134 +53,140 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->reductions = new ArrayCollection();
-        $this->reservedTransports = new ArrayCollection();
+         $this->reductions = new ArrayCollection();
+         $this->reservedTransports = new ArrayCollection();
+         $this->roles = ['ROLE_USER'];
+         $this->isBlocked = false;
     }
 
     public function getId(): ?int
     {
-        return $this->id;
+         return $this->id;
     }
 
     public function getEmail(): ?string
     {
-        return $this->email;
+         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): self
     {
-        $this->email = $email;
-        return $this;
+         $this->email = $email;
+         return $this;
     }
 
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+         return (string) $this->email;
     }
 
-    public function getUsername(): string
+    public function getUserName(): ?string
     {
-        return $this->getUserIdentifier();
+         return $this->userName;
     }
 
-    public function setUserName(string $userName): static
+    public function setUserName(?string $userName): self
     {
-        $this->userName = $userName;
-        return $this;
+         $this->userName = $userName;
+         return $this;
     }
 
     public function getRoles(): array
     {
-        return $this->roles;
+         $roles = $this->roles;
+         $roles[] = 'ROLE_USER';
+         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
-        return $this;
+         $this->roles = $roles;
+         return $this;
     }
 
     public function getPassword(): string
     {
-        return $this->password;
+         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(string $password): self
     {
-        $this->password = $password;
-        return $this;
+         $this->password = $password;
+         return $this;
     }
 
     public function getPlainPassword(): ?string
     {
-        return $this->plainPassword;
+         return $this->plainPassword;
     }
 
-    public function setPlainPassword(?string $plainPassword): static
+    public function setPlainPassword(?string $plainPassword): self
     {
-        $this->plainPassword = $plainPassword;
-        return $this;
+         $this->plainPassword = $plainPassword;
+         return $this;
     }
 
     public function eraseCredentials(): void
     {
-        $this->plainPassword = null;
+         $this->plainPassword = null;
+    }
+
+    public function isBlocked(): bool
+    {
+         return $this->isBlocked;
+    }
+
+    public function setBlocked(bool $isBlocked): self
+    {
+         $this->isBlocked = $isBlocked;
+         return $this;
     }
 
     public function getReductions(): Collection
     {
-        return $this->reductions;
+         return $this->reductions;
     }
 
-    public function addReduction(Reduction $reduction): static
+    public function addReduction($reduction): self
     {
-        if (!$this->reductions->contains($reduction)) {
-            $this->reductions->add($reduction);
-            $reduction->setUser($this);
-        }
-        return $this;
+         if (!$this->reductions->contains($reduction)) {
+             $this->reductions->add($reduction);
+             $reduction->setUser($this);
+         }
+         return $this;
     }
 
-    public function removeReduction(Reduction $reduction): static
+    public function removeReduction($reduction): self
     {
-        if ($this->reductions->removeElement($reduction)) {
-            if ($reduction->getUser() === $this) {
-                $reduction->setUser(null);
-            }
-        }
-        return $this;
+         if ($this->reductions->removeElement($reduction)) {
+              if ($reduction->getUser() === $this) {
+                   $reduction->setUser(null);
+              }
+         }
+         return $this;
     }
 
     public function getReservedTransports(): Collection
     {
-        return $this->reservedTransports;
+         return $this->reservedTransports;
     }
 
-    public function addReservedTransport(\App\Entity\MoyenDeTransport $transport): static
+    public function addReservedTransport(\App\Entity\MoyenDeTransport $transport): self
     {
-        if (!$this->reservedTransports->contains($transport)) {
-            $this->reservedTransports->add($transport);
-        }
-        return $this;
+         if (!$this->reservedTransports->contains($transport)) {
+              $this->reservedTransports->add($transport);
+         }
+         return $this;
     }
 
-    public function removeReservedTransport(\App\Entity\MoyenDeTransport $transport): static
+    public function removeReservedTransport(\App\Entity\MoyenDeTransport $transport): self
     {
-        $this->reservedTransports->removeElement($transport);
-        return $this;
+         $this->reservedTransports->removeElement($transport);
+         return $this;
     }
 
-    /**
-     * Computes a secure unique reservation code based on the user ID, transport ID, and a secret key.
-     *
-     * @param int $transportId
-     * @return string
-     */
     public function getComputedReservationCode(int $transportId): string
     {
-        $secret = 'YourSecretKeyHere'; // Change this secret as needed.
-        $data = ($this->id ?? 0) . $transportId . $secret;
-        $hash = hash('sha256', $data);
-        return strtoupper(substr($hash, 0, 8));
+         return md5((string) $this->getId() . '_' . $transportId);
     }
 }

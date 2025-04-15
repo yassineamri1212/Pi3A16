@@ -1,76 +1,129 @@
 {# File: templates/public/transports.html.twig #}
 {% extends 'public/base.html.twig' %}
 
+{% block public_title %}Transports for {{ event.nom }}{% endblock %} {# Added dynamic title #}
+
 {% block public_content %}
     <div class="container my-5">
-        <h2 class="mb-4 text-center fw-bold text-primary">Transports for event: {{ event.nom }}</h2>
+        {# Changed h2 style to match events page heading #}
+        <h2 class="mb-5 text-center fw-bold text-body-secondary" style="position: relative;">
+            <span style="position: relative; z-index: 1; padding: 0 15px; background: var(--bs-body-bg);">Transports for: {{ event.nom }}</span>
+            <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--bs-primary), transparent); z-index: 0;"></span>
+        </h2>
 
+        {# Display flash messages if any #}
         {% for flashType, messages in app.flashes %}
             {% for message in messages %}
-                <div class="alert alert-{{ flashType }} mb-4 rounded">{{ message }}</div>
+                {# Used specific alert-success/alert-danger for common cases #}
+                <div class="alert alert-{{ flashType == 'success' ? 'success' : (flashType == 'error' ? 'danger' : 'info') }} alert-dismissible fade show mb-4 rounded shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             {% endfor %}
         {% endfor %}
 
         <div class="row g-4">
             {% if transports|length > 0 %}
                 {% for transport in transports %}
-                    <div class="col-md-4">
-                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0">{{ transport.type }}</h5>
+                    <div class="col-md-6 col-lg-4 d-flex align-items-stretch"> {# Adjusted grid and added d-flex #}
+                        {# Use transport-card class for potential specific styling #}
+                        <div class="card transport-card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 d-flex align-items-center">
+                                    {# Choose an icon based on type? (Optional) #}
+                                    {% if 'bus' in transport.type|lower %}
+                                        <i class="fas fa-bus-alt me-2"></i>
+                                    {% elseif 'car' in transport.type|lower or 'van' in transport.type|lower %}
+                                        <i class="fas fa-car me-2"></i>
+                                    {% else %}
+                                        <i class="fas fa-shuttle-van me-2"></i>
+                                    {% endif %}
+                                    {{ transport.type }}
+                                </h5>
+                                <span class="badge bg-light text-primary rounded-pill fs-6">{{ transport.prix }} TND</span>
                             </div>
-                            <div class="card-body">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="fas fa-tag text-muted me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Price</small>
-                                        <div class="fw-bold">{{ transport.prix }}</div>
+                            <div class="card-body d-flex flex-column"> {# Flex column body #}
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-chair text-muted fa-fw me-2"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Available Seats</small>
+                                            <span class="fw-bold">{{ transport.nbrePlaces }}</span>
+                                        </div>
                                     </div>
+                                    {# ---> ADDED DEPARTURE POINT DISPLAY <--- #}
+                                    {% if transport.pointDepart %}
+                                        <div class="d-flex align-items-start"> {# Use align-items-start for potentially long text #}
+                                            <i class="fas fa-map-marker-alt text-danger fa-fw me-2 mt-1"></i> {# Added mt-1 for alignment #}
+                                            <div>
+                                                <small class="text-muted d-block">Departure Point</small>
+                                                <span class="fw-bold">{{ transport.pointDepart }}</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {# ---> END ADDED DEPARTURE POINT DISPLAY <--- #}
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-chair text-muted me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Available Seats</small>
-                                        <div class="fw-bold">{{ transport.nbrePlaces }}</div>
-                                    </div>
+
+                                {# Add some space before button #}
+                                <div class="mt-auto pt-3"> {# Push button to bottom #}
+                                    {# Consider adding check if seats > 0 before showing button #}
+                                    <form action="{{ path('client_transport_reserve', { id: transport.id }) }}" method="post">
+                                        {# Add CSRF token for better security #}
+                                        {# <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ transport.id) }}"> #}
+                                        <button type="submit" class="btn btn-success w-100 rounded-pill" {% if transport.nbrePlaces <= 0 %}disabled{% endif %}> {# Disable if no seats #}
+                                            <i class="fas fa-check-circle me-1"></i> Reserve Seat
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="card-footer bg-white border-top-0">
-                                <form action="{{ path('client_transport_reserve', { id: transport.id }) }}" method="post">
-                                    <button type="submit" class="btn btn-success w-100 rounded-pill">
-                                        <i class="fas fa-check-circle me-1"></i> Reserve
-                                    </button>
-                                </form>
-                            </div>
+                            {# Removed card-footer #}
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
                 <div class="col-12">
-                    <div class="text-center py-5 bg-light rounded-3">
-                        <i class="fas fa-bus-slash text-muted mb-3" style="font-size: 2.5rem;"></i>
-                        <p class="text-muted mb-0">No transports available for this event.</p>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-bus-slash text-body-tertiary mb-3" style="font-size: 2.5rem;"></i>
+                            <h5 class="text-body-secondary">No transports currently available for this event.</h5>
+                            <p class="text-body-secondary mb-0">Please check back later.</p>
+                        </div>
                     </div>
                 </div>
             {% endif %}
         </div>
 
-        <div class="text-center mt-4">
-            <a href="{{ path('client_evenement_index') }}" class="btn btn-outline-primary rounded-pill px-4">
-                <i class="fas fa-arrow-left me-1"></i> Back to events
-            </a>
+        {# Combined Back button and Map section #}
+        <div class="row mt-5">
+            <div class="col-12 text-center mb-4">
+                <a href="{{ path('client_evenement_index') }}" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-1"></i> Back to events
+                </a>
+            </div>
+            {# Map integration #}
+            {% if event.lieu %}
+                <div class="col-12">
+                    <h4 class="text-center text-body-secondary mb-3">Event Location: {{ event.lieu }}</h4>
+                    <div class="ratio ratio-16x9 rounded overflow-hidden shadow"> {# Use Bootstrap ratio helper #}
+                        <iframe src="https://maps.google.com/maps?q={{ event.lieu|url_encode }}&ie=UTF8&iwloc=&output=embed"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade" {# Recommended for iframe embeds #}
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 
+    {# Kept your hover style #}
     <style>
-        .card {
-            transition: transform 0.2s;
+        .transport-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        .card:hover {
+        .transport-card:hover {
             transform: translateY(-5px);
-        }
-        .card-header {
-            padding: 1rem 1.25rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; /* Enhanced shadow on hover */
         }
     </style>
 {% endblock %}

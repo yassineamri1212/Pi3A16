@@ -20,11 +20,11 @@
                         <!-- Login Form -->
                         <form method="post" action="{{ path('app_login') }}">
                             <div class="mb-4">
-                                <label for="inputEmail" class="form-label">Email</label>
+                                <label for="inputUsername" class="form-label">Email</label> {# Changed ID slightly for clarity #}
                                 <input type="email"
                                        value="{{ last_username }}"
-                                       name="email"
-                                       id="inputEmail"
+                                       name="_username" {# <<< CORRECTED: Use default expected name #}
+                                       id="inputUsername" {# Changed ID slightly for clarity #}
                                        class="form-control form-control-lg"
                                        autocomplete="email"
                                        required
@@ -34,7 +34,7 @@
                             <div class="mb-4">
                                 <label for="inputPassword" class="form-label">Password</label>
                                 <input type="password"
-                                       name="password"
+                                       name="_password" {# <<< CORRECTED: Use default expected name #}
                                        id="inputPassword"
                                        class="form-control form-control-lg"
                                        autocomplete="current-password"

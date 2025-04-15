@@ -1,93 +1,110 @@
 <?php
-        // src/Entity/Reponse.php
+namespace App\Entity;
 
-        namespace App\Entity;
+use Doctrine\DBAL\Types\Types; // Added for consistency
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ReponseRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
-        use Doctrine\ORM\Mapping as ORM;
-        use App\Repository\ReponseRepository;
+#[ORM\Entity(repositoryClass: ReponseRepository::class)]
+#[ORM\Table(name: 'reponse')]
+class Reponse
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-        #[ORM\Entity(repositoryClass: ReponseRepository::class)]
-        #[ORM\Table(name: 'reponse')]
-        class Reponse
-        {
-            #[ORM\Id]
-            #[ORM\GeneratedValue]
-            #[ORM\Column(type: 'integer')]
-            private ?int $id = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)] // Use MUTABLE if setting default in constructor
+    #[Assert\NotNull(message: 'The date is required.')] // Usually handled by constructor
+    private ?\DateTimeInterface $date = null;
 
-            #[ORM\Column(type: 'datetime', nullable: false)]
-            private ?\DateTimeInterface $date = null;
+    #[ORM\Column(type: Types::TEXT, nullable: false)]
+    #[Assert\NotBlank(message: 'The response text cannot be empty.')]
+    #[Assert\Length(min: 5, minMessage: 'Response must be at least {{ limit }} characters long.')] // Example minimum length
+    private ?string $reponse = null;
 
-            #[ORM\Column(type: 'text', nullable: false)]
-            private ?string $reponse = null;
+    #[ORM\ManyToOne(targetEntity: Reclamation::class, inversedBy: 'reponses')] // Removed extra '\' from Reclamation::class
+    #[ORM\JoinColumn(name: 'reclamation_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')] // Added column name explicitly
+    #[Assert\NotNull(message: 'The associated reclamation is required.')]
+    private ?Reclamation $reclamation = null; // Corrected target entity type hint
 
-            #[ORM\ManyToOne(targetEntity: \App\Entity\Reclamation::class, inversedBy: 'reponses')]
-            #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-            private ?\App\Entity\Reclamation $reclamation = null;
+    #[ORM\Column(type: Types::INTEGER, nullable: false)] // Assuming this ID refers to the admin user who responded
+    #[Assert\NotNull(message: 'The user identifier is required.')]
+    #[Assert\Positive(message: 'User ID must be a positive number.')]
+    private ?int $utilisateur_id = null; // This should ideally be a ManyToOne relationship to your User entity
 
-            #[ORM\Column(type: 'integer', nullable: false)]
-            private ?int $utilisateur_id = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'The username cannot be empty.')]
+    #[Assert\Length(max: 255)]
+    private ?string $username = null; // Username of the admin who responded
 
-            #[ORM\Column(type: 'string', length: 255, nullable: false)]
-            private ?string $username = null;
+    // --- Constructor to set default date ---
+    public function __construct()
+    {
+        $this->date = new \DateTime();
+    }
 
-            public function getId(): ?int
-            {
-                return $this->id;
-            }
+    // --- Getters and Setters ---
+    // (Setters adjusted slightly to allow null for NotBlank/NotNull validation triggering)
 
-            public function getDate(): ?\DateTimeInterface
-            {
-                return $this->date;
-            }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-            public function setDate(\DateTimeInterface $date): self
-            {
-                $this->date = $date;
-                return $this;
-            }
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
 
-            public function getReponse(): ?string
-            {
-                return $this->reponse;
-            }
+    public function setDate(?\DateTimeInterface $date): self // Allow null? Constructor sets default.
+    {
+        $this->date = $date;
+        return $this;
+    }
 
-            public function setReponse(string $reponse): self
-            {
-                $this->reponse = $reponse;
-                return $this;
-            }
+    public function getReponse(): ?string
+    {
+        return $this->reponse;
+    }
 
-            public function getReclamation(): ?\App\Entity\Reclamation
-            {
-                return $this->reclamation;
-            }
+    public function setReponse(?string $reponse): self // Allow null for NotBlank validation
+    {
+        $this->reponse = $reponse;
+        return $this;
+    }
 
-            public function setReclamation(?\App\Entity\Reclamation $reclamation): self
-            {
-                $this->reclamation = $reclamation;
-                return $this;
-            }
+    public function getReclamation(): ?Reclamation // Corrected return type hint
+    {
+        return $this->reclamation;
+    }
 
-            public function getUtilisateurId(): ?int
-            {
-                return $this->utilisateur_id;
-            }
+    public function setReclamation(?Reclamation $reclamation): self // Corrected parameter type hint
+    {
+        $this->reclamation = $reclamation;
+        return $this;
+    }
 
-            public function setUtilisateurId(int $utilisateur_id): self
-            {
-                $this->utilisateur_id = $utilisateur_id;
-                return $this;
-            }
+    public function getUtilisateurId(): ?int
+    {
+        return $this->utilisateur_id;
+    }
 
-            public function getUsername(): ?string
-            {
-                return $this->username;
-            }
+    public function setUtilisateurId(?int $utilisateur_id): self // Allow null for NotNull validation
+    {
+        $this->utilisateur_id = $utilisateur_id;
+        return $this;
+    }
 
-            public function setUsername(string $username): self
-            {
-                $this->username = $username;
-                return $this;
-            }
-        }
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(?string $username): self // Allow null for NotBlank validation
+    {
+        $this->username = $username;
+        return $this;
+    }
+}

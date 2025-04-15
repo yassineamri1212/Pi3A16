@@ -19,28 +19,33 @@ class Evenement
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'The event name cannot be empty.')]
+    #[Assert\Length(min: 3, max: 255, minMessage: 'The name must be at least {{ limit }} characters long.')]
     private ?string $nom = null;
 
     #[ORM\Column(type: 'text')]
+    #[Assert\NotBlank(message: 'The description cannot be empty.')]
     private ?string $description = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'The location cannot be empty.')]
     private ?string $lieu = null;
 
     #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull(message: 'The event date is required.')]
+    #[Assert\GreaterThan('today', message: 'The event date must be in the future.')]
     private ?\DateTimeInterface $date_evenement = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $image_evenement = null;
 
     #[Vich\UploadableField(mapping: 'event_images', fileNameProperty: 'image_evenement')]
-    #[Assert\File(maxSize: '2M', mimeTypes: ['image/jpeg', 'image/png'])]
+    #[Assert\File(maxSize: '2M', mimeTypes: ['image/jpeg', 'image/png'], mimeTypesMessage: 'Please upload a valid JPEG or PNG image.')]
     private ?File $imageFile = null;
 
     #[ORM\OneToMany(mappedBy: 'evenement', targetEntity: MoyenDeTransport::class, cascade: ['persist', 'remove'])]
     private Collection $moyenDeTransports;
 
-    // New property to track updates when a new file is set.
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
@@ -114,20 +119,17 @@ class Evenement
         return $this->imageFile;
     }
 
-    // src/Entity/Evenement.php
-
     public function setImageFile(?File $imageFile = null): self
     {
         $this->imageFile = $imageFile;
         if (null !== $imageFile) {
-            // Use mutable DateTime instead of DateTimeImmutable
-            $this->updatedAt = new \DateTime(); // <--- CHANGE THIS LINE
+            $this->updatedAt = new \DateTime();
         }
         return $this;
     }
 
     /**
-     * @return Collection<int,MoyenDeTransport>
+     * @return Collection<int, MoyenDeTransport>
      */
     public function getMoyenDeTransports(): Collection
     {

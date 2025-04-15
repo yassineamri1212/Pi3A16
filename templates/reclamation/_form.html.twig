@@ -6,6 +6,7 @@
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0">
                         <i class="fas fa-exclamation-circle me-2"></i>
+                        {# Determine title based on whether the reclamation entity has an ID yet #}
                         {{ form.vars.data.id ? 'Edit Reclamation' : 'New Reclamation' }}
                     </h4>
                 </div>
@@ -13,28 +14,30 @@
                 <div class="card-body p-4">
                     {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
 
-                    {# User Information Section #}
+                    {# User Information Section - Displayed but not editable #}
                     <div class="user-info-section mb-4 p-3 bg-light rounded">
                         <h5 class="text-muted mb-3"><i class="fas fa-user-circle me-2"></i>Your Information</h5>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                    {{ form_label(form.email, 'Your Email', {'label_attr': {'class': 'form-label fw-bold'}}) }}
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        {{ form_widget(form.email, {'attr': {'class': 'form-control bg-white', 'readonly': 'readonly'}}) }}
+                                        {# Use form_widget for consistency, readonly is handled by 'disabled' => true in form type #}
+                                        {{ form_widget(form.email, {'attr': {'class': 'form-control-plaintext px-2'}}) }} {# Use form-control-plaintext #}
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    {{ form_label(form.username, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                    {{ form_label(form.username, 'Your Username/Name', {'label_attr': {'class': 'form-label fw-bold'}}) }}
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        {{ form_widget(form.username, {'attr': {'class': 'form-control bg-white', 'readonly': 'readonly'}}) }}
+                                        {{ form_widget(form.username, {'attr': {'class': 'form-control-plaintext px-2'}}) }} {# Use form-control-plaintext #}
                                     </div>
                                 </div>
                             </div>
+                            {# --- ROLE FIELD REMOVED ---
                             <div class="col-12">
                                 <div class="form-group">
                                     {{ form_label(form.role, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
@@ -44,31 +47,27 @@
                                     </div>
                                 </div>
                             </div>
+                            --- END ROLE FIELD REMOVAL --- #}
                         </div>
                     </div>
 
-                    {# Reclamation Details Section #}
+                    {# Reclamation Details Section - Editable fields #}
                     <div class="reclamation-section">
                         <h5 class="text-muted mb-3"><i class="fas fa-edit me-2"></i>Reclamation Details</h5>
 
-                        <div class="form-group mb-3">
-                            {{ form_label(form.sujet, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-heading"></i></span>
-                                {{ form_widget(form.sujet, {'attr': {'class': 'form-control', 'placeholder': 'Enter subject'}}) }}
-                            </div>
-                            {{ form_errors(form.sujet) }}
-                        </div>
+                        {# Render subject row using form_row for label, widget, errors, help text #}
+                        {{ form_row(form.sujet, {
+                            'label_attr': {'class': 'fw-bold'},
+                            'attr': {'placeholder': 'Enter subject'}
+                        }) }}
 
-                        <div class="form-group mb-3">
-                            {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-align-left"></i></span>
-                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Describe your issue in detail'}}) }}
-                            </div>
-                            {{ form_errors(form.description) }}
-                        </div>
+                        {# Render description row #}
+                        {{ form_row(form.description, {
+                            'label_attr': {'class': 'fw-bold'},
+                            'attr': {'rows': 5, 'placeholder': 'Describe your issue in detail'}
+                        }) }}
 
+                        {# --- DATE FIELD REMOVED from Form Type, so remove from template too ---
                         <div class="form-group mb-4">
                             {{ form_label(form.date, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
                             <div class="input-group">
@@ -77,50 +76,26 @@
                             </div>
                             {{ form_errors(form.date) }}
                         </div>
+                        --- END DATE FIELD REMOVAL --- #}
                     </div>
 
-                    <div class="form-actions d-flex justify-content-between pt-3">
-                        <a href="{{ path('app_reclamation_my') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-1"></i> Cancel
+                    {# Form actions (buttons) #}
+                    <div class="form-actions d-flex justify-content-between pt-3 mt-4 border-top"> {# Added border-top #}
+                        <a href="{{ path('app_reclamation_my') }}" class="btn btn-outline-secondary"> {# Assuming 'app_reclamation_my' is your list route #}
+                            <i class="fas fa-times me-1"></i> Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i> {{ button_label|default('Submit Reclamation') }}
+                            <i class="fas fa-paper-plane me-1"></i> {{ button_label|default('Submit Reclamation') }}
                         </button>
                     </div>
 
+                    {# Render hidden fields (like CSRF token) and close the form tag #}
                     {{ form_end(form) }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                </div> {# End card-body #}
+            </div> {# End card #}
+        </div> {# End col #}
+    </div> {# End row #}
+</div> {# End container #}
 
-<style>
-    .card {
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .card-header {
-        border-bottom: none;
-    }
-
-    .user-info-section {
-        background-color: #f8f9fa;
-        border-left: 4px solid #0d6efd;
-    }
-
-    .form-control[readonly] {
-        background-color: #f8f9fa !important;
-        border-color: #dee2e6;
-    }
-
-    .input-group-text {
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-    }
-
-    .form-label {
-        color: #495057;
-    }
-</style>
+{# --- Removed STYLE block - Better to keep styles in external CSS files --- #}
+{# If you need these specific styles, move them to your app.css or a dedicated admin.css #}

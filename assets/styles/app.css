@@ -3,6 +3,9 @@
 /* =========================================== */
 /* === START: Base Variables & Body Styles === */
 /* =========================================== */
+
+@import '~bootstrap/dist/css/bootstrap.min.css';
+
 :root {
     /* Colors */
     --primary-color: #0d6efd;

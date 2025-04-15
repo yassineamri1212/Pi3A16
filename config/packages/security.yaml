@@ -1,35 +1,70 @@
 # config/packages/security.yaml
-
 security:
-  enable_authenticator_manager: true
+  # ... (password_hashers, providers) ...
 
+  # Ensure your user entity implements PasswordAuthenticatedUserInterface
   password_hashers:
-    App\Entity\User: 'auto'
+    App\Entity\User: 'auto' # Or specify 'bcrypt' etc. if needed
 
   providers:
     app_user_provider:
       entity:
         class: App\Entity\User
-        property: email
+        property: email # Login via email
 
   firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
     main:
       lazy: true
-      provider: app_user_provider
-      form_login:
-        username_parameter: email
-        password_parameter: password
-        login_path: app_login
-        check_path: app_login
-        enable_csrf: true
-        csrf_parameter: _csrf_token
-        csrf_token_id: authenticate
-        success_handler: App\Security\LoginSuccessHandler
+      provider: app_user_provider # Provider for loading users
+
+      # Use your custom authenticator
+      custom_authenticator: App\Security\LoginFormAuthenticator
+      user_checker: App\Security\UserChecker
+
       logout:
         path: app_logout
-        target: app_login
+        target: app_login # Redirect to login after logout is common
 
+      # Optional: enable session persistence
+      # remember_me:
+      #    secret: '%kernel.secret%' # required
+      #    lifetime: 604800 # 1 week in seconds
+      #    path: /
+
+  # --- ACCESS CONTROL RULES ---
+  # Order Matters: More specific rules should come first.
   access_control:
+    # Allow anonymous access to login and register pages
+    # Uncomment and ensure these route paths are correct
+    - { path: ^/login$, roles: PUBLIC_ACCESS } # Use $ for exact match if needed
+    - { path: ^/register$, roles: PUBLIC_ACCESS } # Use $ for exact match if needed
+
+    # Require ROLE_ADMIN for any path starting with /admin
     - { path: ^/admin, roles: ROLE_ADMIN }
-    - { path: ^/login, roles: PUBLIC_ACCESS }
-    - { path: ^/logout, roles: PUBLIC_ACCESS }
+
+    # Require ROLE_USER for paths starting with /profile (or other user areas)
+    - { path: ^/profile, roles: ROLE_USER }
+
+    # IMPORTANT: Allow any authenticated user (ROLE_USER or higher)
+    # to access other parts of the site AFTER the specific rules above.
+    # This covers the root path '/' and any other general logged-in areas.
+    # If your default target after login IS /admin, this might not be strictly needed,
+    # but it's good practice to allow general access for logged-in users.
+    - { path: ^/, roles: ROLE_USER }
+
+  # --- ROLE HIERARCHY ---
+  # Uncomment and define if needed (ensures ADMIN gets USER permissions)
+  role_hierarchy:
+    ROLE_ADMIN: ROLE_USER
+    # ROLE_SUPER_ADMIN: [ROLE_ADMIN] # Example
+
+when@test:
+  security:
+    password_hashers:
+      # Use lower computation cost for tests
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4 # Lowest possible value for bcrypt

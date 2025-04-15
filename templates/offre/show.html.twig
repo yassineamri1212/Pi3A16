@@ -25,7 +25,7 @@
                             <tr>
                                 <th>Parcour (Route)</th>
                                 <td>
-                                    <a href="{{ path('app_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">
+                                    <a href="{{ path('app_admin_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">
                                         {{ offre.parcour.trajet }}
                                     </a>
                                     ({{ offre.parcour.distance|number_format(1,'.',',') }} km, ~{{ offre.parcour.estimationTemps }} min)
