@@ -10,7 +10,7 @@
                         <h1 class="h3 mb-0">Edit Transport</h1>
                     </div>
                     <div class="card-body">
-                        {{ form_start(form) }}
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                         {{ include('admin/moyen_de_transport/_form.html.twig', { 'button_label': 'Update' }) }}
                         {{ form_end(form) }}
                     </div>

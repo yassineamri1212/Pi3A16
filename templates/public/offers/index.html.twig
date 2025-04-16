@@ -130,19 +130,13 @@
 
                             {# Pushes button to bottom #}
                             <div class="mt-auto pt-2">
-                                {# --- BUTTON: Link to a future details page or booking action --- #}
-                                {# For now, just links back to index #}
-                                <a href="{{ path('app_public_offers_index') }}"
+                                {# --- CORRECTED BUTTON LINK --- #}
+                                {# Point to the PUBLIC show route for THIS specific offre #}
+                                <a href="{{ path('app_public_offre_show', {'idOffre': offre.idOffre}) }}"
                                    class="btn btn-primary w-100 rounded-pill">
-                                    <i class="fas fa-info-circle me-1"></i> View Details / Book
+                                    <i class="fas fa-info-circle me-1"></i> View Details / Reserve {# Updated text slightly #}
                                 </a>
-                                {# Example: Login required to book #}
-                                {# {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                                    <a href="#" class="btn btn-success w-100 rounded-pill">Book Now</a>
-                                {% else %}
-                                     <a href="{{ path('app_login', {'redirect_to': app.request.uri}) }}" class="btn btn-secondary w-100 rounded-pill">Login to Book</a>
-                                {% endif %} #}
-                                {# --- END BUTTON --- #}
+                                {# --- END CORRECTION --- #}
                             </div>
                         </div> {# End card-body #}
                     </div> {# End card #}

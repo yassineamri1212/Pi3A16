@@ -9,7 +9,7 @@
 
         <div class="card shadow">
             <div class="card-body">
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
                 {% for field in form %}
                     <div class="mb-3">

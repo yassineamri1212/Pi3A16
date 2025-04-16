@@ -16,10 +16,12 @@
             <div class="card-body">
                 <table class="table">
                     <tbody>
-                    <tr>
-                        <th>ID</th>
-                        <td>{{ parcour.idParcours }}</td>
-                    </tr>
+                    {# REMOVED ID Row:
+                     <tr>
+                         <th>ID</th>
+                         <td>{{ parcour.idParcours }}</td>
+                     </tr>
+                    #}
                     <tr>
                         <th>Trajet (Route)</th>
                         <td>{{ parcour.trajet }}</td>
@@ -35,36 +37,18 @@
                     <tr>
                         <th>Offres Using This Parcour</th>
                         <td>
-                            {% if parcour.offres.empty %}
-                                None
-                            {% else %}
-                                {{ parcour.offres.count }} Offre(s)
-                                {# Optionally list them if needed #}
-                                {#
-                                <ul>
-                                    {% for offre in parcour.offres %}
-                                        <li><a href="{{ path('app_offre_show', {'idOffre': offre.idOffre}) }}">Offre #{{ offre.idOffre }} ({{ offre.dateDepart|date('Y-m-d H:i') }})</a></li>
-                                    {% endfor %}
-                                </ul>
-                                #}
-                            {% endif %}
+                            {% if parcour.offres.empty %}None{% else %}{{ parcour.offres.count }} Offre(s){% endif %}
                         </td>
                     </tr>
                     </tbody>
                 </table>
-
                 <hr>
-
-                <div class="d-flex justify-content-start gap-2"> {# Use gap for spacing #}
-                    <a href="{{ path('app_admin_parcour_edit', {'idParcours': parcour.idParcours}) }}" class="btn btn-warning">
-                        <i class="fas fa-pencil-alt"></i> Edit
-                    </a>
-                    {# Include delete form #}
+                <div class="d-flex justify-content-start gap-2">
+                    {# Links still use ID internally #}
+                    <a href="{{ path('app_admin_parcour_edit', {'idParcours': parcour.idParcours}) }}" class="btn btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>
                     {{ include('parcour/_delete_form.html.twig', { 'parcour': parcour }) }}
                 </div>
-
-            </div> {# End card-body #}
-        </div> {# End card #}
-
-    </div> {# End container-fluid #}
+            </div>
+        </div>
+    </div>
 {% endblock %}

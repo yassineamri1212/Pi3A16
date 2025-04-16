@@ -1,16 +1,13 @@
 # config/packages/security.yaml
 security:
-  # ... (password_hashers, providers) ...
-
-  # Ensure your user entity implements PasswordAuthenticatedUserInterface
   password_hashers:
-    App\Entity\User: 'auto' # Or specify 'bcrypt' etc. if needed
+    App\Entity\User: 'auto'
 
   providers:
     app_user_provider:
       entity:
         class: App\Entity\User
-        property: email # Login via email
+        property: email
 
   firewalls:
     dev:
@@ -18,53 +15,51 @@ security:
       security: false
     main:
       lazy: true
-      provider: app_user_provider # Provider for loading users
-
-      # Use your custom authenticator
+      provider: app_user_provider
       custom_authenticator: App\Security\LoginFormAuthenticator
       user_checker: App\Security\UserChecker
-
       logout:
         path: app_logout
-        target: app_login # Redirect to login after logout is common
-
-      # Optional: enable session persistence
+        target: app_login
       # remember_me:
-      #    secret: '%kernel.secret%' # required
-      #    lifetime: 604800 # 1 week in seconds
-      #    path: /
+      #    secret: '%kernel.secret%'
+      #    lifetime: 604800
 
-  # --- ACCESS CONTROL RULES ---
-  # Order Matters: More specific rules should come first.
+  role_hierarchy:
+    ROLE_ADMIN:       [ROLE_CONDUCTEUR, ROLE_USER]
+    ROLE_CONDUCTEUR:  ROLE_USER
+
+  # Control access for large sections of your site
   access_control:
-    # Allow anonymous access to login and register pages
-    # Uncomment and ensure these route paths are correct
-    - { path: ^/login$, roles: PUBLIC_ACCESS } # Use $ for exact match if needed
-    - { path: ^/register$, roles: PUBLIC_ACCESS } # Use $ for exact match if needed
+    # Public access routes first
+    - { path: ^/login$, roles: PUBLIC_ACCESS }
+    - { path: ^/register$, roles: PUBLIC_ACCESS }
 
-    # Require ROLE_ADMIN for any path starting with /admin
+    # --- CORRECTED ORDER ---
+    # Allow Conducteur (and Admin via hierarchy) access to Parcour management FIRST
+    - { path: ^/admin/parcour, roles: ROLE_CONDUCTEUR }
+
+    # THEN, restrict the rest of /admin to only Admins
     - { path: ^/admin, roles: ROLE_ADMIN }
+    # --- END CORRECTION ---
 
-    # Require ROLE_USER for paths starting with /profile (or other user areas)
+    # Secure the Conducteur-specific area
+    - { path: ^/conducteur, roles: ROLE_CONDUCTEUR }
+
+    # Secure other specific user areas
     - { path: ^/profile, roles: ROLE_USER }
+    - { path: ^/reserve/, roles: ROLE_USER }
+    - { path: ^/my-reservations$, roles: ROLE_USER } # If you create this route
 
-    # IMPORTANT: Allow any authenticated user (ROLE_USER or higher)
-    # to access other parts of the site AFTER the specific rules above.
-    # This covers the root path '/' and any other general logged-in areas.
-    # If your default target after login IS /admin, this might not be strictly needed,
-    # but it's good practice to allow general access for logged-in users.
+    # Default access for any logged-in user (covers /home etc.)
     - { path: ^/, roles: ROLE_USER }
 
-  # --- ROLE HIERARCHY ---
-  # Uncomment and define if needed (ensures ADMIN gets USER permissions)
-  role_hierarchy:
-    ROLE_ADMIN: ROLE_USER
-    # ROLE_SUPER_ADMIN: [ROLE_ADMIN] # Example
-
+# Configuration specific to the test environment
 when@test:
   security:
     password_hashers:
-      # Use lower computation cost for tests
       Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
         algorithm: auto
-        cost: 4 # Lowest possible value for bcrypt
+        cost: 4
+        time_cost: 3
+        memory_cost: 10

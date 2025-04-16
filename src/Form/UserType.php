@@ -48,7 +48,9 @@
                                    'label' => 'Roles',
                                    'choices' => [
                                         'Standard User' => 'ROLE_USER',
-                                        'Administrator' => 'ROLE_ADMIN'
+                                       'Conducteur (Driver)' => 'ROLE_CONDUCTEUR', // <<< ADD THIS OPTION
+
+                                       'Administrator' => 'ROLE_ADMIN'
                                    ],
                                    'multiple' => true,
                                    'expanded' => true,

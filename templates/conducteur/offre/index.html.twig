@@ -1,0 +1,76 @@
+{% extends 'conducteur/base.html.twig' %}
+{% block conducteur_title %}My Offres{% endblock %}
+
+{% block conducteur_content %}
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">My Offres</h1>
+            <a href="{{ path('app_conducteur_offre_new') }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Create New Offre
+            </a>
+        </div>
+
+        {# Search Form (unchanged) #}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_conducteur_offre_index') }}">
+                    {% if pagination.params.sort is defined %}<input type="hidden" name="sort" value="{{ pagination.params.sort }}">{% endif %}
+                    {% if pagination.params.direction is defined %}<input type="hidden" name="direction" value="{{ pagination.params.direction }}">{% endif %}
+                    <div class="input-group">
+                        <input type="search" name="q" class="form-control" placeholder="Search my offers..." value="{{ searchTerm }}">
+                        <button class="btn btn-outline-secondary" type="submit" title="Search"><i class="fas fa-search"></i></button>
+                        {% if searchTerm %}<a href="{{ path('app_conducteur_offre_index', { sort: pagination.params.sort|default(null), direction: pagination.params.direction|default(null) }) }}" class="btn btn-outline-danger" title="Clear Search"><i class="fas fa-times"></i></a>{% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr> {# Removed ID Header #}
+                            <th>Photo</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Parcour (Route)', 'p.trajet') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Departure', 'o.dateDepart') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Price', 'o.prix') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Seats', 'o.nombrePlaces') }}</th>
+                            <th>Reservations</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Fuel', 'o.typeFuel') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'A/C', 'o.climatisee') }}</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for offre in pagination %}
+                            <tr> {# Removed ID Cell #}
+                                <td> {% if offre.photo %}<img src="{{ vich_uploader_asset(offre, 'photoFile') | imagine_filter('admin_thumb') }}" alt="Photo for Offre #{{ offre.idOffre }}" style="max-height: 40px; max-width: 60px; object-fit: cover;" loading="lazy">{% else %}<span class="text-muted small">No photo</span>{% endif %}</td>
+                                <td> <a href="{{ path('app_admin_parcour_show', {'idParcours': offre.parcour.idParcours}) }}" title="{{ offre.parcour.trajet }}">{{ offre.parcour.trajet }}</a></td>
+                                <td>{{ offre.dateDepart ? offre.dateDepart|date('Y-m-d H:i') : 'N/A' }}</td>
+                                <td>{{ offre.prix|number_format(2, '.', ',') }} TND</td>
+                                <td class="text-center">{{ offre.nombrePlaces }}</td>
+                                <td class="text-center"><a href="{{ path('app_conducteur_offre_reservations', {'idOffre': offre.idOffre}) }}" class="badge bg-info text-decoration-none">{{ offre.reservations.count }}</a> / {{ offre.nombrePlaces }}</td>
+                                <td>{{ offre.typeFuel|capitalize }}</td>
+                                <td class="text-center"> {% if offre.climatisee %}<i class="fas fa-check text-success" title="Yes"></i>{% else %}<i class="fas fa-times text-danger" title="No"></i>{% endif %}</td>
+                                <td class="text-end">
+                                    {# Links use ID internally #}
+                                    <a href="{{ path('app_conducteur_offre_show', {'idOffre': offre.idOffre}) }}" class="btn btn-info btn-sm" title="View Details"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ path('app_conducteur_offre_edit', {'idOffre': offre.idOffre}) }}" class="btn btn-warning btn-sm" title="Edit Offre"><i class="fas fa-pencil-alt"></i></a>
+                                    {{ include('conducteur/offre/_delete_form.html.twig', { 'offre': offre }) }}
+                                </td>
+                            </tr>
+                        {% else %}
+                            {# CORRECTED Colspan (was 10, now 9) #}
+                            <tr><td colspan="9" class="text-center">You haven't created any offres yet.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-center">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

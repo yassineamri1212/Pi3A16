@@ -2,23 +2,23 @@
 liip_imagine:
   # configure resolvers
   resolvers:
-    # setup the default resolver
     default:
-      # use the default web path resolver
-      web_path: ~
+      web_path: ~ # Default web path resolver
 
   # your filter sets are defined here
   filter_sets:
-    cache: ~ # Default cache resolver
+    cache: ~ # Default cache configuration
 
-    # --- Admin Filters (Already Added) ---
+    # Existing filter for admin/conducteur lists
     admin_thumb:
       quality: 75
       filters:
         thumbnail:
-          size:          [60, 40] # Width, Height
-          mode:          outbound # Crop if necessary
+          size:          [60, 40]
+          mode:          outbound # Crop if needed
           allow_upscale: true
+
+    # Existing filter for admin/conducteur show pages
     admin_large_thumb:
       quality: 80
       filters:
@@ -27,20 +27,28 @@ liip_imagine:
           mode:          inset # Fit within dimensions
           allow_upscale: false
 
-    # --- NEW Frontend Filter ---
-    offer_list_thumb: # This name MUST match the filter used in your frontend Twig template
-      quality: 80 # Adjust quality as needed
+    # Existing filter for public list page (if you added it)
+    offer_list_thumb:
+      quality: 75
       filters:
         thumbnail:
-          # Define appropriate dimensions for your frontend list view
-          # Example: A slightly larger thumbnail than the admin list
-          size:          [150, 100] # Width, Height (Adjust these!)
-          # 'outbound' crops the image to fill the exact dimensions
-          # 'inset' fits the image within the dimensions, preserving aspect ratio
-          mode:          outbound # Or 'inset' depending on desired look
-          allow_upscale: false # Usually false for frontend to avoid pixelation
+          size:          [350, 200] # Example size for list card top
+          mode:          outbound
+          allow_upscale: true
 
-  # --- Twig Configuration (Already Added) ---
+    # --- NEW: Filter for the public offer detail page ---
+    public_offer_large:
+      quality: 85 # Slightly higher quality for detail view
+      filters:
+        thumbnail:
+          # Adjust size as needed for your detail page layout
+          size:          [700, 450]
+          # 'inset' mode fits the image within these dimensions without cropping, maintaining aspect ratio.
+          # Use 'outbound' if you want it cropped to exactly these dimensions.
+          mode:          inset
+          allow_upscale: false # Don't make small images blurry by scaling up
+    # --- END NEW FILTER SET ---
+
+  # Twig integration mode
   twig:
-    # Use the modern, lazy-loaded Twig integration mode
     mode: lazy

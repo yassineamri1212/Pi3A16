@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Offre;
 use App\Repository\OffreRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -9,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+// Class name matches the file name PublicOfferController.php
 class PublicOfferController extends AbstractController
 {
     #[Route('/carpool-offers', name: 'app_public_offers_index', methods: ['GET'])]
@@ -18,32 +20,47 @@ class PublicOfferController extends AbstractController
         PaginatorInterface $paginator
     ): Response
     {
-        // Get search/sort parameters from the request query string
-        $searchTerm = $request->query->get('q'); // Use 'q' for search
-        $sort = $request->query->get('sort', 'o.dateDepart'); // Default sort by departure date (Ascending)
+        $searchTerm = $request->query->get('q');
+        $sort = $request->query->get('sort', 'o.dateDepart');
         $direction = $request->query->get('direction', 'ASC');
 
-        // Use the NEW repository method to get the QueryBuilder for *public* offers
-        $queryBuilder = $offreRepository->findPublicOffersQueryBuilder($searchTerm, $sort, $direction);
+        $queryBuilder = $offreRepository->findBySearchQueryBuilder($searchTerm, $sort, $direction);
 
-        // Paginate the results
+        $queryBuilder
+            ->andWhere('o.dateDepart >= :now')
+            ->setParameter('now', new \DateTimeImmutable());
+
         $pagination = $paginator->paginate(
-            $queryBuilder, // QueryBuilder instance
-            $request->query->getInt('page', 1), // Page number
-            9 // Items per page (e.g., 9 for a 3-column layout)
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            9
         );
 
-        // Render the public listing template
+        // --- CORRECTED TEMPLATE PATH ---
+        // Point to the actual location: templates/public/offers/index.html.twig
         return $this->render('public/offers/index.html.twig', [
             'pagination' => $pagination,
             'searchTerm' => $searchTerm,
-            'currentSort' => $sort,       // Pass sort/direction for search form state
-            'currentDirection' => $direction,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
+        // --- END CORRECTION ---
     }
 
-    // Optional: Add a route for showing a single offer details page later
-    // #[Route('/carpool-offers/{idOffre}', name: 'app_public_offers_show', requirements: ['idOffre' => '\d+'], methods: ['GET'])]
-    // public function show(Offre $offre): Response { ... render a details template ... }
+    #[Route('/carpool-offers/{idOffre}', name: 'app_public_offre_show', requirements: ['idOffre' => '\d+'], methods: ['GET'])]
+    public function show(Offre $offre): Response
+    {
+        if ($offre->getDateDepart() < new \DateTimeImmutable()) {
+            $this->addFlash('warning', 'This carpool offer has already departed.');
+            return $this->redirectToRoute('app_public_offers_index');
+        }
 
+        // --- CORRECTED TEMPLATE PATH ---
+        // Point to the actual location: templates/public/offers/show.html.twig
+        // NOTE: You still need to CREATE this 'show.html.twig' file inside 'templates/public/offers/'
+        return $this->render('public/offers/show.html.twig', [
+            'offre' => $offre,
+        ]);
+        // --- END CORRECTION ---
+    }
 }

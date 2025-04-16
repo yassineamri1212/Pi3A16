@@ -1,18 +1,18 @@
 {# File: templates/admin/_sidebar.html.twig #}
-{# Expects 'current_route' variable to be passed from the including template #}
 {% set current_route = current_route|default('') %}
 
-<aside class="admin-sidebar"> {# Styled by app.css #}
+<aside class="admin-sidebar">
     <h4>Admin Panel</h4>
     <ul class="nav flex-column">
 
-        {# --- Standard Admin Links --- #}
+        {# Standard Admin Links #}
         <li class="nav-item">
             <a href="{{ path('admin_dashboard') }}"
                class="nav-link{{ current_route == 'admin_dashboard' ? ' active' : '' }}">
                 <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
             </a>
         </li>
+        {# ... other event, transport links ... #}
         <li class="nav-item">
             <a href="{{ path('admin_evenement_index') }}"
                class="nav-link{{ current_route starts with 'admin_evenement_' ? ' active' : '' }}">
@@ -26,17 +26,18 @@
             </a>
         </li>
 
-        {# --- User Link --- #}
+
+        {# User Management Link #}
         <li class="nav-item">
             <a href="{{ path('app_user_index') }}"
                class="nav-link{{ current_route starts with 'app_user_' ? ' active' : '' }}">
                 <i class="fas fa-users"></i> <span>Manage Users</span>
             </a>
         </li>
-        {# --- END User Link --- #}
 
-        {# --- Links for New/Corrected Gestions --- #}
+        {# --- CORRECTED: Admin links for Offre/Parcour --- #}
         <li class="nav-item">
+            {# Link to ADMIN Parcour Management #}
             <a href="{{ path('app_admin_parcour_index') }}"
                class="nav-link{{ current_route starts with 'app_admin_parcour_' ? ' active' : '' }}">
                 <i class="fas fa-route"></i>
@@ -44,13 +45,16 @@
             </a>
         </li>
         <li class="nav-item">
-            {# <<< ENSURE THIS PATH IS CORRECT >>> #}
+            {# Link to ADMIN Offre View #}
             <a href="{{ path('app_offre_index') }}"
                class="nav-link{{ current_route starts with 'app_offre_' ? ' active' : '' }}">
                 <i class="fas fa-car-side"></i>
-                <span>Manage Offres</span>
+                <span>View All Offres</span> {# Changed text #}
             </a>
         </li>
+        {# --- END CORRECTION --- #}
+
+        {# ... other admin links (deliveries, packages, forum, reclamations) ... #}
         <li class="nav-item">
             <a href="{{ path('app_admin_livraison_index') }}"
                class="nav-link{{ current_route starts with 'app_admin_livraison_' ? ' active' : '' }}">
@@ -65,8 +69,20 @@
                 <span>Manage Packages</span>
             </a>
         </li>
-
-        {# --- Other Admin Links --- #}
+        <li class="nav-item">
+            <a href="{{ path('app_post_index') }}"
+               class="nav-link{{ current_route starts with 'app_post_' ? ' active' : '' }}">
+                <i class="fas fa-comments"></i>
+                <span>Manage Posts</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('app_commentaire_index') }}"
+               class="nav-link{{ current_route starts with 'app_commentaire_' ? ' active' : '' }}">
+                <i class="fas fa-reply"></i>
+                <span>Manage Comments</span>
+            </a>
+        </li>
         <li class="nav-item">
             <a href="{{ path('admin_reclamations_index') }}"
                class="nav-link{{ current_route starts with 'admin_reclamations_' ? ' active' : '' }}">
@@ -74,7 +90,7 @@
             </a>
         </li>
 
-        {# --- Logout --- #}
+        {# Logout Link #}
         <li class="nav-item mt-auto">
             <a href="{{ path('app_logout') }}" class="nav-link text-danger">
                 <i class="fas fa-sign-out-alt"></i> <span>Logout</span>

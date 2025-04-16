@@ -1,0 +1,20 @@
+{% extends 'conducteur/base.html.twig' %} {# Correct base #}
+{% block conducteur_title %}Create New Offre{% endblock %} {# Correct block #}
+
+{% block conducteur_content %} {# Correct block #}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Create New Offre</h1>
+        <div class="card shadow">
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form) }}
+                <div class="mt-4">
+                    <button class="btn btn-success"><i class="fas fa-save"></i> Save Offre</button>
+                    {# Link back to CONDUCTEUR index #}
+                    <a href="{{ path('app_conducteur_offre_index') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to My Offres</a>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

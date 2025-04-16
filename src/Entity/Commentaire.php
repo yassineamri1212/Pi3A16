@@ -2,113 +2,90 @@
 
 namespace App\Entity;
 
+use App\Repository\CommentaireRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
-use App\Repository\CommentaireRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
-#[ORM\Table(name: 'commentaire')]
+#[ORM\Table(name: 'forum_commentaire')] // Use a specific table name
+#[ORM\HasLifecycleCallbacks] // Needed for automatic timestamps
 class Commentaire
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $idCommentaire = null;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    public function getIdCommentaire(): ?int
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Comment content cannot be empty.")]
+    #[Assert\Length(min: 3, minMessage: "Comment must be at least {{ limit }} characters.")]
+    private ?string $content = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)] // Many comments can belong to one User
+    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: false)]
+    private ?User $author = null;
+
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'commentaires')] // Many comments belong to one Post
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id', nullable: false)] // Owning side
+    private ?Post $post = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
     {
-        return $this->idCommentaire;
+        $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function setIdCommentaire(int $idCommentaire): self
+    public function getId(): ?int
     {
-        $this->idCommentaire = $idCommentaire;
+        return $this->id;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): static
+    {
+        $this->content = $content;
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $idReservation = null;
-
-    public function getIdReservation(): ?int
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->idReservation;
+        return $this->createdAt;
+    }
+    // No setter for createdAt
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
     }
 
-    public function setIdReservation(int $idReservation): self
+    public function setAuthor(?User $author): static
     {
-        $this->idReservation = $idReservation;
+        $this->author = $author;
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $idVoyage = null;
-
-    public function getIdVoyage(): ?int
+    public function getPost(): ?Post
     {
-        return $this->idVoyage;
+        return $this->post;
     }
 
-    public function setIdVoyage(int $idVoyage): self
+    public function setPost(?Post $post): static
     {
-        $this->idVoyage = $idVoyage;
+        $this->post = $post;
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $idUser = null;
-
-    public function getIdUser(): ?int
+    public function __toString(): string
     {
-        return $this->idUser;
+        // Return first 50 chars of content as string representation
+        return substr($this->content ?? '', 0, 50) . (strlen($this->content ?? '') > 50 ? '...' : '');
     }
-
-    public function setIdUser(int $idUser): self
-    {
-        $this->idUser = $idUser;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $statut = null;
-
-    public function getStatut(): ?string
-    {
-        return $this->statut;
-    }
-
-    public function setStatut(string $statut): self
-    {
-        $this->statut = $statut;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $date_reservation = null;
-
-    public function getDate_reservation(): ?\DateTimeInterface
-    {
-        return $this->date_reservation;
-    }
-
-    public function setDate_reservation(\DateTimeInterface $date_reservation): self
-    {
-        $this->date_reservation = $date_reservation;
-        return $this;
-    }
-
-    public function getDateReservation(): ?\DateTimeInterface
-    {
-        return $this->date_reservation;
-    }
-
-    public function setDateReservation(\DateTimeInterface $date_reservation): static
-    {
-        $this->date_reservation = $date_reservation;
-
-        return $this;
-    }
-
 }

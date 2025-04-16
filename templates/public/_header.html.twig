@@ -1,94 +1,94 @@
 {# File: templates/public/_header.html.twig #}
-
-{# Styles should be in app.css, ensure no <style> block here #}
-
 <header id="main-header" class="bg-primary text-white py-3 shadow-sm sticky-top-initial">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <!-- Logo -->
             <a href="{{ path('app_home') }}" class="text-white text-decoration-none">
                 <h1 class="h3 mb-0 fw-bold">GoMobility</h1>
             </a>
-
-            <!-- Right side controls (Desktop Nav + Toggles) -->
-            <div class="d-flex align-items-center"> {# Wrap desktop nav and toggles #}
-
-                <!-- Desktop Navigation -->
-                {# d-none d-lg-block hides on mobile/tablet, shows on large screens and up #}
-                <nav class="d-none d-lg-block me-2" id="main-navbar"> {# Added margin-end (me-2) #}
+            <div class="d-flex align-items-center">
+                <nav class="d-none d-lg-block me-2" id="main-navbar">
                     <ul class="list-unstyled d-flex align-items-center gap-4 mb-0 main-nav-ul">
                         {# Standard Navigation Links #}
                         <li><a href="{{ path('app_home') }}" class="nav-link fw-semibold">Home</a></li>
+                        {# <<< Ensure this route 'app_public_offers_index' exists for public offer list >>> #}
                         <li><a href="{{ path('app_public_offers_index') }}" class="nav-link fw-semibold">Carpool Offers</a></li>
+                        {# ... other links ... #}
                         <li><a href="{{ path('app_public_deliveries_index') }}" class="nav-link fw-semibold">Deliveries</a></li>
+                        <li><a href="{{ path('app_forum_index') }}" class="nav-link fw-semibold">Forum</a></li>
                         <li><a href="{{ path('client_evenement_index') }}" class="nav-link fw-semibold">Events</a></li>
-                        <li><a href="{{ path('client_reserved_trips') }}" class="nav-link fw-semibold">My Reservations</a></li>
+                        {# <li><a href="{{ path('client_reserved_trips') }}" class="nav-link fw-semibold">My Reservations</a></li> #}
+                        {# <<< Link to a future 'My Reservations' page >>> #}
                         <li>
-                            <a href="{{ path('app_reclamation_my') }}" class="nav-link fw-semibold">
-                                Pass Reclamation
-                            </a>
+                            <a href="{{ path('app_reclamation_my') }}" class="nav-link fw-semibold">Pass Reclamation</a>
                         </li>
 
                         {# --- START: Profile Dropdown / Login/Register Links --- #}
-                        {# Check if a user is fully authenticated #}
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                             <li class="nav-item dropdown">
-                                {# Dropdown Trigger Link #}
                                 <a class="nav-link dropdown-toggle fw-semibold d-flex align-items-center" href="#" id="profileDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-circle me-1 fs-5"></i> {# Slightly larger icon #}
-                                    {# Display username or email - ensure app.user has the method #}
-                                    <span class="d-none d-xl-inline"> {# Hide username on smaller large screens #}
+                                    <i class="fas fa-user-circle me-1 fs-5"></i>
+                                    <span class="d-none d-xl-inline">
                                         {{ app.user.userName ? app.user.userName : app.user.userIdentifier }}
                                     </span>
                                 </a>
-
-                                {# Dropdown Menu Content #}
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="profileDropdownMenuLink"> {# Styling adjustments #}
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="profileDropdownMenuLink">
                                     <li><h6 class="dropdown-header">Signed in as {{ app.user.userName ? app.user.userName : app.user.userIdentifier }}</h6></li>
                                     <li><hr class="dropdown-divider"></li>
+                                    {# --- Link to Edit Profile --- #}
                                     <li>
-                                        <a class="dropdown-item" href="{{ path('app_profile_edit') }}"> {# Use new profile route #}
+                                        <a class="dropdown-item" href="{{ path('app_profile_edit') }}">
                                             <i class="fas fa-user-edit fa-fw me-2 text-muted"></i>Edit Profile
                                         </a>
                                     </li>
-                                    {# Add other relevant user links here if needed #}
+                                    {# --- Link to My Reservations (if route exists) --- #}
+                                    {# <li>
+                                         <a class="dropdown-item" href="{{ path('app_my_reservations') }}">
+                                             <i class="fas fa-clipboard-list fa-fw me-2 text-muted"></i>My Reservations
+                                         </a>
+                                     </li> #}
+
+                                    {# --- Conditionally show Conducteur Area link --- #}
+                                    {% if is_granted('ROLE_CONDUCTEUR') %}
+                                        <li>
+                                            <a class="dropdown-item" href="{{ path('app_conducteur_dashboard') }}">
+                                                <i class="fas fa-steering-wheel fa-fw me-2 text-muted"></i>Conducteur Area
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {# --- End Conducteur Area link --- #}
+
+                                    {# --- Conditionally show Admin Area link --- #}
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <li>
+                                            <a class="dropdown-item" href="{{ path('admin_dashboard') }}"> {# Adjust path if needed #}
+                                                <i class="fas fa-user-shield fa-fw me-2 text-muted"></i>Admin Area
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {# --- End Admin Area link --- #}
+
                                     <li><hr class="dropdown-divider"></li>
+                                    {# --- Logout Link --- #}
                                     <li>
-                                        <a class="dropdown-item text-danger" href="{{ path('app_logout') }}"> {# Use correct logout route #}
+                                        <a class="dropdown-item text-danger" href="{{ path('app_logout') }}">
                                             <i class="fas fa-sign-out-alt fa-fw me-2"></i>Logout
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-
                         {% else %}
-                            {# User is NOT logged in - Show Login/Register buttons #}
                             <li class="nav-item">
                                 <a href="{{ path('app_register') }}" class="btn btn-outline-light btn-sm px-3 me-2 fw-semibold">Sign Up</a>
                                 <a href="{{ path('app_login') }}" class="btn btn-light btn-sm px-3 login-btn fw-semibold">Login</a>
                             </li>
                         {% endif %}
                         {# --- END: Profile Dropdown / Login/Register Links --- #}
-
                     </ul>
-                </nav> {# End Desktop Navigation #}
-
-                <!-- Dark Mode Toggle Button -->
-                <button id="dark-mode-toggle" class="btn btn-outline-light btn-sm ms-lg-2" title="Toggle Dark Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-
-                <!-- Mobile Nav Toggle Button (Hidden on large screens) -->
-                <button class="navbar-toggler d-lg-none ms-2" type="button" id="mobile-menu-toggle" aria-controls="main-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-bars text-white"></i>
-                </button>
-
-            </div> {# End Right side controls #}
-        </div> {# End main flex container #}
-
-        <!-- Collapsible container for Mobile Nav -->
-        <div class="navbar-collapse-mobile d-lg-none" id="main-navbar-collapse">
-            {# Ensure your mobile menu JS correctly duplicates the items, including the new dropdown structure #}
+                </nav>
+                <button id="dark-mode-toggle" class="btn btn-outline-light btn-sm ms-lg-2" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
+                <button class="navbar-toggler d-lg-none ms-2" type="button" id="mobile-menu-toggle" aria-controls="main-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation"><i class="fas fa-bars text-white"></i></button>
+            </div>
         </div>
-    </div> {# End container #}
+        <div class="navbar-collapse-mobile d-lg-none" id="main-navbar-collapse"></div>
+    </div>
 </header>

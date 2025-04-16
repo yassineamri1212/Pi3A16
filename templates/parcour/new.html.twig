@@ -9,7 +9,7 @@
         <div class="card shadow">
             <div class="card-body">
                 {# Render the form using Bootstrap 5 theme (should be default in newer Symfony) #}
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
                 {# Render form fields - form_widget(form) renders all unrendered fields #}
                 {# Or render row-by-row for more control: {{ form_row(form.trajet) }} etc. #}

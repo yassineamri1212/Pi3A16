@@ -51,142 +51,90 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'user_transport_reservations')]
     private Collection $reservedTransports;
 
+    // --- Relation to Offres created by this User (Conducteur) ---
+    #[ORM\OneToMany(mappedBy: 'conducteur', targetEntity: Offre::class)]
+    private Collection $createdOffres;
+
+    // --- Relation to ReservationOffers made by this User (Passenger) ---
+    // <<< CORRECTED: targetEntity is ReservationOffer >>>
+    #[ORM\OneToMany(mappedBy: 'passenger', targetEntity: ReservationOffer::class, orphanRemoval: true)]
+    private Collection $reservationsAsPassenger;
+
     public function __construct()
     {
-         $this->reductions = new ArrayCollection();
-         $this->reservedTransports = new ArrayCollection();
-         $this->roles = ['ROLE_USER'];
-         $this->isBlocked = false;
+        $this->reductions = new ArrayCollection();
+        $this->reservedTransports = new ArrayCollection();
+        $this->createdOffres = new ArrayCollection();
+        $this->reservationsAsPassenger = new ArrayCollection();
+        $this->roles = ['ROLE_USER']; // Default role
+        $this->isBlocked = false;
     }
 
-    public function getId(): ?int
+    // --- Getters/Setters (Unchanged from your version) ---
+    public function getId(): ?int { return $this->id; }
+    public function getEmail(): ?string { return $this->email; }
+    public function setEmail(?string $email): static { $this->email = $email; return $this; }
+    public function getUserIdentifier(): string { return (string) $this->email; }
+    public function getUserName(): ?string { return $this->userName; }
+    public function setUserName(?string $userName): static { $this->userName = $userName; return $this; }
+    public function getPassword(): string { return $this->password; }
+    public function setPassword(string $password): static { $this->password = $password; return $this; }
+    public function getPlainPassword(): ?string { return $this->plainPassword; }
+    public function setPlainPassword(?string $plainPassword): static { $this->plainPassword = $plainPassword; return $this; }
+    public function eraseCredentials(): void { $this->plainPassword = null; }
+    public function isBlocked(): bool { return $this->isBlocked; }
+    public function setBlocked(bool $isBlocked): static { $this->isBlocked = $isBlocked; return $this; }
+    public function getReductions(): Collection { return $this->reductions; }
+    public function getReservedTransports(): Collection { return $this->reservedTransports; }
+    public function getRoles(): array { $roles = $this->roles; $roles[] = 'ROLE_USER'; return array_unique($roles); }
+    public function setRoles(array $roles): static { $this->roles = array_values(array_filter($roles)); return $this; }
+    public function addReservedTransport(\App\Entity\MoyenDeTransport $transport): static { if (!$this->reservedTransports->contains($transport)) { $this->reservedTransports->add($transport); } return $this; }
+    public function removeReservedTransport(\App\Entity\MoyenDeTransport $transport): static { $this->reservedTransports->removeElement($transport); return $this; }
+    public function addReduction(Reduction $reduction): static { if (!$this->reductions->contains($reduction)) { $this->reductions->add($reduction); $reduction->setUser($this); } return $this; }
+    public function removeReduction(Reduction $reduction): static { if ($this->reductions->removeElement($reduction)) { if ($reduction->getUser() === $this) { $reduction->setUser(null); } } return $this; }
+
+    // --- Methods for createdOffres (Unchanged) ---
+    /** @return Collection<int, Offre> */
+    public function getCreatedOffres(): Collection { return $this->createdOffres; }
+    public function addCreatedOffre(Offre $offre): static { if (!$this->createdOffres->contains($offre)) { $this->createdOffres->add($offre); $offre->setConducteur($this); } return $this; }
+    public function removeCreatedOffre(Offre $offre): static { if ($this->createdOffres->removeElement($offre)) { if ($offre->getConducteur() === $this) { $offre->setConducteur(null); } } return $this; }
+
+    // --- Methods for reservationsAsPassenger ---
+    /**
+     * <<< CORRECTED: Return type hint for ReservationOffer >>>
+     * @return Collection<int, ReservationOffer>
+     */
+    public function getReservationsAsPassenger(): Collection
     {
-         return $this->id;
+        return $this->reservationsAsPassenger;
     }
 
-    public function getEmail(): ?string
+    // <<< CORRECTED: Type hint for ReservationOffer >>>
+    public function addReservationsAsPassenger(ReservationOffer $reservation): static
     {
-         return $this->email;
+        if (!$this->reservationsAsPassenger->contains($reservation)) {
+            $this->reservationsAsPassenger->add($reservation);
+            $reservation->setPassenger($this);
+        }
+        return $this;
     }
 
-    public function setEmail(?string $email): self
+    // <<< CORRECTED: Type hint for ReservationOffer >>>
+    public function removeReservationsAsPassenger(ReservationOffer $reservation): static
     {
-         $this->email = $email;
-         return $this;
+        if ($this->reservationsAsPassenger->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getPassenger() === $this) {
+                $reservation->setPassenger(null);
+            }
+        }
+        return $this;
     }
+    // --- END CORRECTION ---
 
-    public function getUserIdentifier(): string
-    {
-         return (string) $this->email;
-    }
-
-    public function getUserName(): ?string
-    {
-         return $this->userName;
-    }
-
-    public function setUserName(?string $userName): self
-    {
-         $this->userName = $userName;
-         return $this;
-    }
-
-    public function getRoles(): array
-    {
-         $roles = $this->roles;
-         $roles[] = 'ROLE_USER';
-         return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-         $this->roles = $roles;
-         return $this;
-    }
-
-    public function getPassword(): string
-    {
-         return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-         $this->password = $password;
-         return $this;
-    }
-
-    public function getPlainPassword(): ?string
-    {
-         return $this->plainPassword;
-    }
-
-    public function setPlainPassword(?string $plainPassword): self
-    {
-         $this->plainPassword = $plainPassword;
-         return $this;
-    }
-
-    public function eraseCredentials(): void
-    {
-         $this->plainPassword = null;
-    }
-
-    public function isBlocked(): bool
-    {
-         return $this->isBlocked;
-    }
-
-    public function setBlocked(bool $isBlocked): self
-    {
-         $this->isBlocked = $isBlocked;
-         return $this;
-    }
-
-    public function getReductions(): Collection
-    {
-         return $this->reductions;
-    }
-
-    public function addReduction($reduction): self
-    {
-         if (!$this->reductions->contains($reduction)) {
-             $this->reductions->add($reduction);
-             $reduction->setUser($this);
-         }
-         return $this;
-    }
-
-    public function removeReduction($reduction): self
-    {
-         if ($this->reductions->removeElement($reduction)) {
-              if ($reduction->getUser() === $this) {
-                   $reduction->setUser(null);
-              }
-         }
-         return $this;
-    }
-
-    public function getReservedTransports(): Collection
-    {
-         return $this->reservedTransports;
-    }
-
-    public function addReservedTransport(\App\Entity\MoyenDeTransport $transport): self
-    {
-         if (!$this->reservedTransports->contains($transport)) {
-              $this->reservedTransports->add($transport);
-         }
-         return $this;
-    }
-
-    public function removeReservedTransport(\App\Entity\MoyenDeTransport $transport): self
-    {
-         $this->reservedTransports->removeElement($transport);
-         return $this;
-    }
-
+    // Keep existing reservation code method if needed
     public function getComputedReservationCode(int $transportId): string
     {
-         return md5((string) $this->getId() . '_' . $transportId);
+        return md5((string) $this->getId() . '_' . $transportId);
     }
 }

@@ -1,0 +1,45 @@
+{% extends 'conducteur/base.html.twig' %}
+{% block conducteur_title %}My Offre Details{% endblock %}
+
+{% block conducteur_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">My Offre Details</h1> {# Removed ID from title #}
+
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <h5 class="mb-0">Offre from {{ offre.parcour.trajet }}</h5>
+                <a href="{{ path('app_conducteur_offre_index') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to My Offres
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table">
+                            <tbody> {# Removed ID Row #}
+                            <tr><th>Parcour (Route)</th><td><a href="{{ path('app_admin_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">{{ offre.parcour.trajet }}</a> ({{ offre.parcour.distance|number_format(1,'.',',') }} km, ~{{ offre.parcour.estimationTemps }} min)</td></tr>
+                            <tr><th>Departure Date/Time</th><td>{{ offre.dateDepart ? offre.dateDepart|date('l, F j, Y \\a\\t H:i') : 'N/A' }}</td></tr>
+                            <tr><th>Price per Seat</th><td>{{ offre.prix|number_format(3, '.', ',') }} TND</td></tr>
+                            <tr><th>Total Seats</th><td>{{ offre.nombrePlaces }}</td></tr>
+                            <tr><th>Reserved Seats</th><td>{{ offre.reservations.count }}</td></tr>
+                            <tr><th>Remaining Seats</th><td>{{ offre.getRemainingPlaces() }}</td></tr>
+                            <tr><th>Fuel Type</th><td>{{ offre.typeFuel|capitalize }}</td></tr>
+                            <tr><th>Air Conditioned</th><td>{{ offre.climatisee ? 'Yes' : 'No' }}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-4"> {# Photo unchanged #}
+                        {% if offre.photo %}<label class="form-label">Photo:</label><br><a href="{{ vich_uploader_asset(offre, 'photoFile') }}" target="_blank"><img src="{{ vich_uploader_asset(offre, 'photoFile') | imagine_filter('admin_large_thumb') }}" alt="Offre Photo" class="img-fluid rounded shadow-sm"></a>{% else %}<div class="text-center text-muted border rounded p-4"><i class="fas fa-image fa-3x mb-2"></i><br>No photo uploaded.</div>{% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-start gap-2 flex-wrap">
+                    {# Links use ID internally #}
+                    <a href="{{ path('app_conducteur_offre_edit', {'idOffre': offre.idOffre}) }}" class="btn btn-warning"><i class="fas fa-pencil-alt"></i> Edit Offre</a>
+                    <a href="{{ path('app_conducteur_offre_reservations', {'idOffre': offre.idOffre}) }}" class="btn btn-info"><i class="fas fa-users"></i> View Reservations ({{ offre.reservations.count }})</a>
+                    {{ include('conducteur/offre/_delete_form.html.twig', { 'offre': offre }) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
