@@ -12,29 +12,22 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/persistence": "3.4",
-        "endroid/qr-code": "^5.1",
         "guzzlehttp/guzzle": "^7.9",
-        "knplabs/knp-paginator-bundle": "^6.7",
-        "liip/imagine-bundle": "^2.13",
         "symfony/asset": "6.4.*",
         "symfony/console": "^6.4",
         "symfony/dotenv": "^6.4",
         "symfony/flex": "^2.5",
         "symfony/form": "6.4.*",
         "symfony/framework-bundle": "^6.4",
-        "symfony/mailer": "6.4.*",
         "symfony/routing": "^6.4",
         "symfony/runtime": "^6.4",
         "symfony/security-bundle": "6.4.*",
         "symfony/security-csrf": "6.4.*",
-        "symfony/stimulus-bundle": "^2.24",
         "symfony/twig-bundle": "^6.4",
         "symfony/validator": "6.4.*",
         "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "^6.4",
-        "twig/extra-bundle": "*",
-        "twig/string-extra": "^3.20",
-        "vich/uploader-bundle": "^2.6"
+        "vich/uploader-bundle": "^2.5"
     },
     "config": {
         "allow-plugins": {
@@ -86,8 +79,6 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
-        "symfony/maker-bundle": "*",
-        "symfony/stopwatch": "6.4.*",
-        "symfony/web-profiler-bundle": "6.4.*"
+        "symfony/maker-bundle": "*"
     }
 }
