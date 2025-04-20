@@ -5,6 +5,7 @@
 /* =========================================== */
 
 @import '~bootstrap/dist/css/bootstrap.min.css';
+@import '~@fortawesome/fontawesome-free/css/all.min.css'; /* Import FontAwesome here */
 
 :root {
     /* Colors */
@@ -65,11 +66,19 @@
     --bs-border-color: var(--grey-300);
     --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
     --bs-border-radius: var(--border-radius);
+    --bs-border-radius-lg: var(--border-radius-lg); /* Added lg */
     --bs-box-shadow: var(--box-shadow);
+    --bs-box-shadow-lg: var(--box-shadow-lg); /* Added lg */
     --bs-body-font-family: var(--font-family-sans-serif);
     --bs-body-font-size: 1rem;
     --bs-body-font-weight: 400;
     --bs-body-line-height: 1.5;
+    /* Bootstrap 5 specific variables (needed for overrides) */
+    --bs-light-bg-subtle: #fcfcfd;
+    --bs-emphasis-color: #000;
+    --bs-danger-bg-subtle: #f8d7da;
+    --bs-danger-text-emphasis: #58151c;
+    --bs-danger-border-subtle: #f1aeb5;
 
     /* Custom Variables */
     --sidebar-bg: var(--white-color);
@@ -117,6 +126,19 @@ body {
     overflow-x: hidden;
 }
 
+/* Remove default padding/margin from body if using flex layout */
+body.d-flex {
+    padding: 0;
+    margin: 0;
+}
+
+/* Apply flex layout only to public body */
+body:not(.admin-active).d-flex {
+    display: flex !important; /* Override potential conflicts */
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 /* ======================================== */
 /* === START: Dark Mode Styles === */
 /* ======================================== */
@@ -128,13 +150,19 @@ body {
     --bs-tertiary-color: rgba(222, 226, 230, 0.5);
     --bs-tertiary-bg: var(--grey-800, #343a40);
     --bs-emphasis-color: var(--bs-white, #fff);
-    --bs-heading-color: inherit;
+    --bs-heading-color: var(--bs-white, #fff); /* Headings should be white too */
     --bs-link-color: var(--primary-color, #0d6efd);
     --bs-link-hover-color: #4dabf7;
     --bs-border-color: var(--grey-700, #495057);
     --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
     --bs-primary: var(--primary-color);
     --bs-danger: var(--danger-color);
+    /* BS dark specific variables */
+    --bs-light-bg-subtle: #343a40;
+    --bs-danger-bg-subtle: #41151a;
+    --bs-danger-text-emphasis: #f1aeb5;
+    --bs-danger-border-subtle: #72242b;
+    /* Custom dark theme variables */
     --sidebar-bg: var(--grey-800);
     --sidebar-text: var(--grey-500);
     --sidebar-icon-color: var(--grey-500);
@@ -161,7 +189,7 @@ body {
     --form-control-focus-border: #6b99d3;
     --form-control-focus-shadow: rgba(13, 110, 253, 0.25);
 
-    /* Explicit Overrides */
+    /* Explicit Overrides for dark mode */
     color: var(--bs-body-color);
     background-color: var(--bs-body-bg);
     main, .admin-content, .container, .container-fluid { background-color: transparent; color: inherit; }
@@ -189,10 +217,10 @@ body {
     thead, .table thead th { color: var(--bs-emphasis-color); border-color: var(--bs-border-color); }
     tbody tr:hover, .table-hover > tbody > tr:hover > * { background-color: var(--table-hover-bg); color: var(--bs-emphasis-color); }
     .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(255, 255, 255, 0.04); color: var(--bs-body-color); }
-    .pagination .page-item.active .page-link { background-color: var(--bs-primary); border-color: var(--bs-primary); color: var(--bs-white); }
-    .pagination .page-link { background-color: var(--grey-800); border-color: var(--grey-700); color: var(--primary-color); }
-    .pagination .page-link:hover { background-color: var(--grey-700); color: #4dabf7; }
-    .pagination .page-item.disabled .page-link { color: var(--grey-600); background-color: transparent; border-color: var(--grey-700); }
+    /* .pagination .page-item.active .page-link { background-color: var(--bs-primary); border-color: var(--bs-primary); color: var(--bs-white); } */ /* Handled by new section */
+    /* .pagination .page-link { background-color: var(--grey-800); border-color: var(--grey-700); color: var(--primary-color); } */ /* Handled by new section */
+    /* .pagination .page-link:hover { background-color: var(--grey-700); color: #4dabf7; } */ /* Handled by new section */
+    /* .pagination .page-item.disabled .page-link { color: var(--grey-600); background-color: transparent; border-color: var(--grey-700); } */ /* Handled by new section */
     .btn-light { background-color: var(--bs-secondary-bg); border-color: var(--bs-secondary-bg); color: var(--bs-emphasis-color); }
     .btn-light:hover { background-color: var(--grey-700); border-color: var(--grey-700); color: var(--bs-white); }
     .btn-outline-secondary { color: var(--bs-secondary-color); border-color: var(--bs-secondary-color); }
@@ -201,7 +229,7 @@ body {
     .btn-outline-light:hover { color: var(--bs-dark); background-color: var(--bs-light); border-color: var(--bs-light); }
     .stats-section { background-color: var(--bs-secondary-bg); }
     .transport-types-section { background-color: var(--bs-body-bg); }
-    .transport-type-card { color: var(--bs-white); }
+    .transport-type-card { color: var(--bs-white); background-color: var(--grey-700); }
     .transport-type-card p { color: rgba(255,255,255,0.85); }
     .features-section { background-color: var(--bs-secondary-bg); }
     .feature-content p { color: var(--bs-secondary-color); }
@@ -220,7 +248,7 @@ body {
 /* ================================================= */
 /* === START: Existing Admin Layout Styles === */
 /* ================================================= */
-.admin-layout { display: flex; min-height: 100vh; }
+.admin-layout { display: flex; min-height: 100vh; background-color: var(--content-bg); /* Ensure background covers whole area */ }
 .admin-sidebar { width: 260px; background-color: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border-color); display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease; overflow-x: hidden; position: sticky; top: 0; height: 100vh; }
 .admin-sidebar h4 { color: var(--sidebar-header-color); padding: 1.5rem 1rem 1rem; margin: 0; font-size: 1.2rem; font-weight: 600; white-space: nowrap; transition: opacity 0.2s ease, height 0.3s ease, padding 0.3s ease, margin 0.3s ease; }
 .admin-sidebar .nav { padding: 0 0.75rem; flex-grow: 1; overflow-y: auto; }
@@ -242,36 +270,30 @@ body {
 .admin-sidebar.collapsed .nav-link { justify-content: center; padding: 0.75rem 0; }
 .admin-sidebar.collapsed .nav-link i { margin-right: 0; font-size: 1.1rem; }
 .admin-sidebar.collapsed .nav-link span { opacity: 0; position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; pointer-events: none; transition: opacity 0.1s ease; }
-.admin-content { flex-grow: 1; padding: 2rem; }
-.admin-content h1, .admin-content h2, .admin-content h3, .admin-content h4 { margin-bottom: 1rem; font-weight: 500; }
-.admin-content p { margin-bottom: 1rem; }
-.admin-controls { display: flex; justify-content: flex-end; align-items: center; padding: 0.75rem 2rem; background-color: var(--card-bg, var(--bs-body-bg)); border-bottom: 1px solid var(--bs-border-color); margin: -2rem -2rem 1.5rem -2rem; position: sticky; top: 0; z-index: 1020; box-shadow: var(--bs-box-shadow); transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
-.admin-controls button { background-color: var(--button-bg); color: var(--button-text); border: 1px solid transparent; padding: 0.375rem 0.75rem; font-size: 0.9rem; border-radius: var(--bs-border-radius); cursor: pointer; margin-left: 0.5rem; line-height: 1.5; transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
-.admin-controls button:hover { background-color: var(--button-hover-bg); }
-.admin-controls button:focus { outline: 0; box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.5); }
+.admin-content { flex-grow: 1; padding: 0; /* Remove padding, handled by header/footer */ background-color: var(--content-bg); /* Added background */ }
+.admin-content .container-fluid { padding: 2rem; } /* Add padding back to content containers */
+.admin-content h1, .admin-content h2, .admin-content h3, .admin-content h4 { margin-bottom: 1rem; font-weight: 500; color: var(--content-text); /* Inherit content text color */ }
+.admin-content p { margin-bottom: 1rem; color: var(--content-text); /* Inherit */ }
+.admin-controls { display: flex; justify-content: flex-end; /* Changed to end */ align-items: center; padding: 0.75rem 2rem; background-color: var(--card-bg); /* Use card background */ border-bottom: 1px solid var(--bs-border-color); /* Use standard border */ /* Removed margin, padding handles spacing */ position: sticky; top: 0; z-index: 1020; box-shadow: var(--bs-box-shadow-sm); /* Use smaller shadow */ transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+.admin-controls button { /* Use Bootstrap classes btn btn-outline-secondary btn-sm where possible */ line-height: 1.5; margin-left: 0.5rem; /* Keep margin for spacing */ }
 .admin-content-card { background-color: var(--card-bg); border: 1px solid var(--card-border-color); border-radius: var(--bs-border-radius); margin-bottom: 1.5rem; box-shadow: var(--bs-box-shadow); transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
 .admin-content-card-header { padding: 0.75rem 1.25rem; margin-bottom: 0; background-color: var(--card-header-bg); border-bottom: 1px solid var(--card-border-color); border-top-left-radius: var(--bs-border-radius); border-top-right-radius: var(--bs-border-radius); font-weight: 600; }
-.admin-content-card-header h2, .admin-content-card-header h3, .admin-content-card-header h4 { margin: 0; font-size: 1.1rem; }
+.admin-content-card-header h2, .admin-content-card-header h3, .admin-content-card-header h4 { margin: 0; font-size: 1.1rem; color: var(--content-text); /* Inherit */ }
 .admin-content-card-body { padding: 1.25rem; }
 .dashboard-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; }
 .dashboard-grid > .admin-content-card { flex: 1 1 250px; min-width: 200px; }
 .admin-table { width: 100%; margin-bottom: 1rem; vertical-align: top; border-color: var(--bs-border-color); border-collapse: collapse; font-size: 0.9rem; }
 .admin-table thead { border-bottom: 2px solid var(--bs-border-color); background-color: var(--card-header-bg); }
-.admin-table th { font-weight: 600; padding: 0.75rem; text-align: left; }
-.admin-table td { padding: 0.75rem; border-bottom: 1px solid var(--bs-border-color); text-align: left; }
+.admin-table th { font-weight: 600; padding: 0.75rem; text-align: left; color: var(--content-text); /* Inherit */ }
+.admin-table td { padding: 0.75rem; border-bottom: 1px solid var(--bs-border-color); text-align: left; color: var(--content-text); /* Inherit */ }
 .admin-table tbody tr:last-child td { border-bottom: none; }
-.admin-table tbody tr:hover { background-color: var(--table-hover-bg); }
+/* .admin-table tbody tr:hover { background-color: var(--table-hover-bg); } */ /* Use Bootstrap .table-hover instead */
 .admin-table .actions a { margin-right: 0.5rem; text-decoration: none; }
 .admin-table .actions a:last-child { margin-right: 0; }
-.admin-button { display: inline-block; font-weight: 400; line-height: 1.5; color: var(--button-text); text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; user-select: none; background-color: var(--button-bg); border: 1px solid transparent; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: var(--bs-border-radius); transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
-.admin-button:hover { color: var(--button-text); background-color: var(--button-hover-bg); text-decoration: none; }
-.admin-button-danger { background-color: var(--danger-color); }
-.admin-button-danger:hover { background-color: var(--danger-color-darker); }
-.admin-button-success { background-color: var(--success-color); }
-.form-group { margin-bottom: 1rem; }
-.form-label { display: inline-block; margin-bottom: 0.5rem; font-weight: 500; }
-.form-control { display: block; width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: var(--form-control-text); background-color: var(--form-control-bg); background-clip: padding-box; border: 1px solid var(--form-control-border); appearance: none; border-radius: var(--bs-border-radius); transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
-.form-control:focus { color: var(--form-control-text); background-color: var(--form-control-bg); border-color: var(--form-control-focus-border); outline: 0; box-shadow: 0 0 0 0.25rem var(--form-control-focus-shadow); }
+/* Use Bootstrap button classes directly in templates instead */
+.form-group { margin-bottom: 1rem; } /* Keep for structure if needed */
+.form-label { display: inline-block; margin-bottom: 0.5rem; font-weight: 500; color: var(--content-text); /* Inherit */ }
+/* Use Bootstrap .form-control classes directly in templates */
 
 /* =============================================== */
 /* === END: Existing Admin Layout Styles === */
@@ -281,8 +303,10 @@ body {
 /* =========================================== */
 /* === START: Lively Public Header Styles === */
 /* =========================================== */
-#main-header { transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; z-index: 1030; }
-#main-header.header-scrolled { position: fixed; top: 0; left: 0; right: 0; padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; background-color: rgba(var(--bs-primary-rgb), 0.95) !important; backdrop-filter: blur(5px); box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.15) !important; }
+#main-header { transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; z-index: 1030; padding-top: 1rem; padding-bottom: 1rem; background-color: transparent; position: absolute; top: 0; left: 0; right: 0; } /* Start transparent */
+#main-header.header-scrolled { position: fixed; padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; background-color: rgba(var(--bs-primary-rgb), 0.95) !important; /* Semi-transparent primary */ backdrop-filter: blur(5px); box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.15) !important; }
+.navbar-brand img { max-height: 40px; transition: max-height 0.3s ease; }
+#main-header.header-scrolled .navbar-brand img { max-height: 30px; }
 .navbar-toggler { border: none; font-size: 1.25rem; padding: 0.25rem 0.5rem; color: var(--bs-white); }
 .navbar-toggler:focus { box-shadow: none; }
 .navbar-toggler i { color: inherit; vertical-align: middle; transition: transform 0.3s ease; }
@@ -299,13 +323,19 @@ body {
 .main-nav-ul-mobile .logout-btn:hover { background-color: var(--danger-color-darker); border-color: var(--danger-color-darker); }
 .main-nav-ul-mobile .login-btn { background-color: var(--bs-light); border-color: var(--bs-light); color: var(--bs-primary); }
 .main-nav-ul-mobile .login-btn:hover { background-color: var(--grey-200); border-color: var(--grey-200); }
-#main-navbar .nav-link { position: relative; transition: color 0.2s ease-in-out; color: var(--bs-white) !important; }
+#main-navbar .nav-link { position: relative; transition: color 0.2s ease-in-out, text-shadow 0.2s ease; color: var(--bs-white) !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); font-weight: 500; padding-left: 0.8rem; padding-right: 0.8rem; }
+#main-header.header-scrolled #main-navbar .nav-link { text-shadow: none; } /* Remove shadow when scrolled */
 #main-navbar .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 50%; transform: translateX(-50%); background-color: var(--bs-white); opacity: 0.7; transition: width 0.3s ease-in-out; }
 #main-navbar .nav-link:hover { color: var(--bs-white) !important; text-decoration: none !important; }
 #main-navbar .nav-link:hover::after, #main-navbar .nav-link.active::after { width: 60%; }
-.logout-btn:hover { background-color: var(--danger-color-darker); border-color: var(--danger-color-darker); }
-.login-btn { background-color: #f8f9fa; color: var(--bs-primary); border: 1px solid #f8f9fa; }
-.login-btn:hover { background-color: #e2e6ea; border-color: #dae0e5; color: var(--bs-primary); }
+#main-navbar .btn { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+#main-navbar .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.logout-btn { background-color: transparent; border-color: var(--bs-danger); color: var(--bs-danger); }
+.logout-btn:hover { background-color: var(--bs-danger); border-color: var(--bs-danger); color: var(--bs-white); }
+#main-header.header-scrolled .logout-btn { border-color: var(--bs-white); color: var(--bs-white); }
+#main-header.header-scrolled .logout-btn:hover { background-color: var(--bs-danger); border-color: var(--bs-danger); }
+.login-btn { background-color: var(--bs-light); color: var(--bs-primary); border: 1px solid var(--bs-light); }
+.login-btn:hover { background-color: var(--grey-200); border-color: var(--grey-200); color: var(--bs-primary); }
 /* =========================================== */
 /* === END: Lively Public Header Styles === */
 /* =========================================== */
@@ -329,7 +359,7 @@ body {
 .delay-400ms { transition-delay: 400ms !important; }
 .delay-500ms { transition-delay: 500ms !important; }
 .delay-600ms { transition-delay: 600ms !important; }
-.hero-section { position: relative; overflow: hidden; min-height: 60vh; max-height: 700px; display: flex; align-items: center; justify-content: center; color: var(--gomobility-white); }
+.hero-section { position: relative; overflow: hidden; min-height: 60vh; max-height: 700px; display: flex; align-items: center; justify-content: center; color: var(--gomobility-white); padding-top: 80px; /* Add padding to avoid overlap with fixed header */}
 .hero-video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
 .hero-video-wrapper video, .hero-video-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1; }
@@ -378,12 +408,345 @@ body {
 .event-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
 .event-card .event-card-img { transition: transform 0.4s ease; }
 .event-card:hover .event-card-img { transform: scale(1.05); }
-.pagination .page-item.active .page-link { background-color: var(--bs-primary); border-color: var(--bs-primary); color: var(--bs-white); }
-.pagination .page-link { color: var(--bs-primary); }
-.pagination .page-link:hover { background-color: var(--grey-200); }
-.pagination .page-item.disabled .page-link { color: var(--grey-500); background-color: transparent; border-color: var(--bs-border-color); }
+/* .pagination .page-item.active .page-link { background-color: var(--bs-primary); border-color: var(--bs-primary); color: var(--bs-white); } */ /* Handled by new section */
+/* .pagination .page-link { color: var(--bs-primary); } */ /* Handled by new section */
+/* .pagination .page-link:hover { background-color: var(--grey-200); } */ /* Handled by new section */
+/* .pagination .page-item.disabled .page-link { color: var(--grey-500); background-color: transparent; border-color: var(--bs-border-color); } */ /* Handled by new section */
 .description-clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: calc(var(--bs-body-line-height) * var(--bs-body-font-size) * 3); }
-
+/* --- Styles for Latest Offers/Deliveries --- */
+.card-img-top-wrapper { position: relative; } /* Ensure proper image sizing/positioning */
+.object-fit-cover { object-fit: cover; }
 /* ====================================================== */
 /* === END: Styles Moved from homepage/events page === */
 /* ====================================================== */
+/* --- START: Embedded Chatbot Styles --- */
+/* ==================================== */
+
+/* Embedded Chatbot Container */
+/* Placed within the normal page flow, e.g., on homepage */
+.chatbot-container {
+    /* Define width and max-width */
+    width: 100%; /* Take full width of its parent column/container */
+    max-width: 700px; /* Set a max-width for larger screens */
+    margin: 3rem auto; /* Center horizontally and add vertical spacing */
+
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg); /* Use large radius */
+    box-shadow: var(--bs-box-shadow); /* Standard shadow */
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Contained look */
+    height: 70vh; /* Define a fixed height */
+    max-height: 600px; /* Limit height */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+/* Chatbot Header */
+.chatbot-header {
+    background-color: var(--bs-light-bg-subtle, #fcfcfd);
+    padding: 0.8rem 1.1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    color: var(--bs-emphasis-color, #000);
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    flex-shrink: 0; /* Prevent header shrinking */
+    /* Remove close button specific styles if not needed */
+    /* display: flex; */
+    /* justify-content: space-between; */
+    /* align-items: center; */
+}
+[data-bs-theme="dark"] .chatbot-header {
+    background-color: var(--bs-secondary-bg, #343a40);
+    color: var(--bs-light, #f8f9fa);
+}
+/* Remove close button styles if header doesn't have one */
+/* .chatbot-close-button { ... } */
+
+/* Message Area */
+.chatbot-messages {
+    flex-grow: 1; /* Take remaining vertical space */
+    padding: 1.2rem 1rem;
+    overflow-y: auto; /* Enable scrolling */
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    background-color: var(--bs-body-bg);
+    transition: background-color 0.2s ease-in-out;
+    /* Custom Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--grey-400) var(--bs-body-bg);
+}
+.chatbot-messages::-webkit-scrollbar { width: 6px; }
+.chatbot-messages::-webkit-scrollbar-track { background: var(--bs-body-bg); }
+.chatbot-messages::-webkit-scrollbar-thumb { background-color: var(--grey-400); border-radius: 10px; border: 1px solid var(--bs-body-bg); }
+[data-bs-theme="dark"] .chatbot-messages { scrollbar-color: var(--grey-600) var(--bs-body-bg); }
+[data-bs-theme="dark"] .chatbot-messages::-webkit-scrollbar-thumb { background-color: var(--grey-600); border-color: var(--bs-body-bg); }
+
+/* Individual Messages (Keep refined styles) */
+.message {
+    padding: 0.7rem 1.1rem;
+    border-radius: 18px;
+    max-width: 80%;
+    word-wrap: break-word;
+    line-height: 1.5;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    font-size: 0.95rem;
+}
+.message p { margin: 0; white-space: pre-wrap; }
+.message.user {
+    background-color: var(--bs-primary);
+    color: white;
+    border-bottom-right-radius: 5px;
+    align-self: flex-end;
+    margin-left: auto;
+}
+.message.bot {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    border-bottom-left-radius: 5px;
+    align-self: flex-start;
+    margin-right: auto;
+}
+[data-bs-theme="dark"] .message.bot {
+    background-color: var(--grey-700);
+    color: var(--bs-body-color);
+}
+.message.error {
+    background-color: var(--bs-danger-bg-subtle);
+    color: var(--bs-danger-text-emphasis);
+    border: 1px solid var(--bs-danger-border-subtle);
+    border-radius: var(--bs-border-radius);
+    align-self: flex-start;
+    max-width: 95%;
+    padding: 0.75rem 1rem;
+    box-shadow: none;
+    font-size: 0.9rem;
+}
+
+/* Loading Indicator Style (Keep refined styles) */
+.message.bot.loading {
+    background-color: var(--bs-secondary-bg);
+    padding: 0.7rem 1.1rem;
+    min-height: 38px;
+}
+[data-bs-theme="dark"] .message.bot.loading {
+    background-color: var(--grey-700);
+}
+.message.bot.loading p { display: none; }
+.message.bot.loading::after { /* Spinner */
+    content: "";
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--grey-400);
+    border-top-color: var(--bs-primary);
+    border-radius: 50%;
+    animation: chatbot-spinner 0.8s linear infinite;
+}
+[data-bs-theme="dark"] .message.bot.loading::after {
+    border-color: var(--grey-600);
+    border-top-color: var(--bs-primary);
+}
+@keyframes chatbot-spinner { to { transform: rotate(360deg); } }
+
+/* Input Area */
+.chatbot-input-area {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--bs-border-color);
+    padding: 0.8rem 1rem;
+    background-color: var(--bs-tertiary-bg); /* Use tertiary for input area bg */
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    flex-shrink: 0; /* Prevent input area shrinking */
+    /* Remove shadow if desired for embedded */
+    /* box-shadow: 0 -2px 5px rgba(0,0,0,0.05); */
+}
+[data-bs-theme="dark"] .chatbot-input-area {
+    background-color: var(--bs-secondary-bg);
+}
+
+/* Input Field */
+#chatbot-input {
+    flex-grow: 1;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 20px;
+    padding: 0.65rem 1.2rem;
+    margin-right: 0.75rem;
+    outline: none;
+    background-color: var(--form-control-bg);
+    color: var(--form-control-text);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+#chatbot-input:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.2);
+}
+#chatbot-input::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 0.8;
+}
+
+/* Send Button */
+#chatbot-send-btn {
+    background-color: var(--bs-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    padding: 0;
+}
+#chatbot-send-btn:hover {
+    background-color: var(--primary-color-darker);
+    transform: scale(1.05);
+}
+#chatbot-send-btn:active {
+    transform: scale(0.95);
+}
+#chatbot-send-btn:disabled {
+    background-color: var(--grey-500);
+    cursor: not-allowed;
+    transform: scale(1);
+}
+#chatbot-send-btn i {
+    font-size: 1rem;
+    line-height: 1;
+    margin-left: 2px;
+}
+/* --- END: Embedded Chatbot Styles --- */
+
+
+/* ==================================== */
+/* === START: Enhanced Pagination Styles === */
+/* ==================================== */
+
+/* General pagination container - ensure centering if not handled by parent */
+.pagination {
+    /* Default Bootstrap usually centers this, but confirm if needed */
+    /* justify-content: center; */
+    margin-top: 1.5rem; /* Add some top margin */
+    margin-bottom: 1rem; /* Add some bottom margin */
+    padding-left: 0; /* Remove default ul padding */
+    list-style: none; /* Ensure no list bullets */
+}
+
+/* Individual pagination items (li) */
+.pagination .page-item {
+    margin-left: 0.2rem; /* Add small space between items */
+    margin-right: 0.2rem;
+}
+
+/* Links/Spans within pagination items */
+.pagination .page-link {
+    position: relative; /* Needed for z-index */
+    display: block; /* Needed for padding */
+    padding: 0.5rem 0.9rem; /* Slightly adjust padding */
+    font-weight: 500;
+    color: var(--bs-primary); /* Link color */
+    background-color: var(--bs-white); /* Background for light mode */
+    border: 1px solid var(--bs-border-color); /* Use defined border color */
+    border-radius: var(--bs-border-radius); /* Consistent border radius */
+    box-shadow: var(--bs-box-shadow-sm); /* Subtle shadow */
+    transition: all 0.2s ease-in-out; /* Smooth transitions */
+    text-decoration: none; /* Remove underline */
+}
+
+/* Hover effect for non-disabled, non-active items */
+.pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    z-index: 2; /* Bring slightly forward on hover */
+    background-color: var(--grey-100); /* Light grey background on hover */
+    color: var(--primary-color-darker); /* Darker primary color on hover */
+    border-color: var(--grey-300);
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: var(--bs-box-shadow); /* Slightly larger shadow */
+}
+
+/* Active page style */
+.pagination .page-item.active .page-link {
+    z-index: 3; /* Ensure active is above others */
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-white);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.4); /* Shadow matching primary */
+}
+/* Optional: Slightly darken active item on hover */
+.pagination .page-item.active .page-link:hover {
+    background-color: var(--primary-color-darker);
+    border-color: var(--primary-color-darker);
+    transform: none; /* No lift for active item */
+    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.4); /* Keep shadow */
+}
+
+/* Disabled page style */
+.pagination .page-item.disabled .page-link {
+    color: var(--grey-500);
+    background-color: var(--grey-100); /* Slightly different background */
+    border-color: var(--bs-border-color);
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none; /* Ensure not clickable */
+    box-shadow: none; /* No shadow for disabled */
+}
+
+/* Specific styles for prev/next/first/last text (often not needed with icons) */
+/*
+.pagination .page-item.prev .page-link,
+.pagination .page-item.next .page-link,
+.pagination .page-item.first .page-link,
+.pagination .page-item.last .page-link {
+    font-weight: bold;
+}
+*/
+
+/* --- Dark Mode Overrides for Pagination --- */
+[data-bs-theme="dark"] .pagination .page-link {
+    background-color: var(--grey-800); /* Use existing dark variable */
+    border-color: var(--grey-700); /* Use existing dark variable */
+    color: var(--bs-link-color); /* Use dark link color */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Dark shadow */
+}
+
+[data-bs-theme="dark"] .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    background-color: var(--grey-700); /* Use existing dark hover variable */
+    color: var(--bs-link-hover-color); /* Use existing dark hover variable */
+    border-color: var(--grey-600);
+    transform: translateY(-2px); /* Keep lift */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
+
+[data-bs-theme="dark"] .pagination .page-item.active .page-link {
+    background-color: var(--bs-primary); /* Keep primary */
+    border-color: var(--bs-primary); /* Keep primary */
+    color: var(--bs-white); /* Keep white */
+    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.3); /* Adjust shadow */
+}
+[data-bs-theme="dark"] .pagination .page-item.active .page-link:hover {
+    background-color: var(--primary-color-darker);
+    border-color: var(--primary-color-darker);
+    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.3); /* Keep shadow */
+}
+
+[data-bs-theme="dark"] .pagination .page-item.disabled .page-link {
+    color: var(--grey-600); /* Keep existing dark variable */
+    background-color: var(--grey-800); /* Match non-hover link background */
+    border-color: var(--grey-700); /* Keep existing dark variable */
+    opacity: 0.5;
+    box-shadow: none;
+}
+
+/* ================================== */
+/* === END: Enhanced Pagination Styles === */
+/* ================================== */

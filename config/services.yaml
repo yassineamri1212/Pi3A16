@@ -1,21 +1,45 @@
+# config/services.yaml
 parameters:
+  # Your existing parameter for OpenWeatherMap
   openweather_api_key: '%env(OPENWEATHER_API_KEY)%'
+
+  # --- ADD THIS LINE for Gemini ---
+  gemini_api_key: '%env(GEMINI_API_KEY)%'
+  # --- END ADD ---
 
 services:
   # Default configuration for services
   _defaults:
     autowire: true
     autoconfigure: true
+    # --- Your working global bind for $apiKey ---
     bind:
       string $apiKey: '%openweather_api_key%'
+    # --- END bind ---
 
+  # --- Your working explicit configuration for WeatherService ---
+  # This ensures WeatherService gets the correct key, overriding the global bind if needed (though likely redundant here)
   App\Service\WeatherService:
     arguments:
       $apiKey: '%openweather_api_key%'
+  # --- END WeatherService ---
 
+  # --- Default service loading for classes in src/ ---
   App\:
     resource: '../src/'
     exclude:
       - '../src/DependencyInjection/'
       - '../src/Entity/'
       - '../src/Kernel.php'
+
+  # --- Default configuration for controllers ---
+  # Add this block if it was missing, ensures controllers are services
+  App\Controller\:
+    resource: '../src/Controller/'
+    tags: ['controller.service_arguments']
+
+  # NO explicit definition needed for GeminiChatService,
+  # as its constructor uses ParameterBagInterface which autowiring handles.
+
+  # NO explicit definition needed for ChatbotController,
+  # as its constructor uses type-hints for GeminiChatService and LoggerInterface which autowiring handles.

@@ -18,7 +18,6 @@
                     <table class="table table-striped table-hover">
                         <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Type</th>
                             <th>Price</th>
                             {# ---> ADDED HEADER <--- #}
@@ -33,7 +32,6 @@
                         {# NOTE: The loop variable comes from your controller, assuming 'moyen_de_transports' #}
                         {% for transport in moyen_de_transports %}
                             <tr>
-                                <td>{{ transport.id }}</td>
                                 <td>{{ transport.type }}</td>
                                 <td>{{ transport.prix }} TND</td>
                                 {# ---> ADDED CELL <--- #}

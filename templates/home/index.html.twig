@@ -189,7 +189,6 @@
         {% endif %}
         {# --- END: LATEST DELIVERIES SECTION --- #}
 
-
         <!-- Testimonials -->
         <section class="testimonials-section py-5">
             <div class="container">
@@ -220,10 +219,40 @@
         </section>
 
     </div> {# End Container fluid #}
+
+    {# --- START: Chatbot Container (Added Here) --- #}
+    {# ============================================ #}
+    <div id="chatbot-container" class="chatbot-container">
+        {# Header #}
+        <div class="chatbot-header">
+            GoMobility Assistant
+        </div>
+
+        {# Message Display Area #}
+        <div id="chatbot-messages" class="chatbot-messages">
+            {# Initial bot message #}
+            <div class="message bot">
+                <p>Hello! How can I help you with GoMobility today?</p>
+            </div>
+            {# Chat messages will be added here dynamically by JS #}
+        </div>
+
+        {# Input Area #}
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Type your message..." autocomplete="off">
+            <button id="chatbot-send-btn" aria-label="Send Message">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i> {# Requires Font Awesome #}
+            </button>
+        </div>
+    </div>
+    {# ========================================== #}
+    {# --- END: Chatbot Container --- #}
+
 {% endblock %} {# End public_content block #}
 
-{# --- Your Existing Homepage JavaScript Block --- #}
+{# --- Keep your existing homepage JavaScript block --- #}
 {% block public_javascripts %}
+    {# Your existing script for IntersectionObserver & Counters #}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

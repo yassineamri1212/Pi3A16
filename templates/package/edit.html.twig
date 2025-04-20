@@ -11,7 +11,7 @@
                 {# Ensure form theme is loaded #}
                 {# {% form_theme form 'bootstrap_5_layout.html.twig' %} #}
 
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                 {{ form_widget(form) }} {# Renders all fields including 'livraison' #}
                 <div class="mt-4 d-flex justify-content-between align-items-center">
                     <div>

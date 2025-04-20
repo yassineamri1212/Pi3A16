@@ -19,7 +19,6 @@
                     <table class="table table-striped table-hover table-sm"> {# Use table-sm for denser list #}
                         <thead>
                         <tr>
-                            <th>{{ knp_pagination_sortable(pagination, 'ID', 'p.id') }}</th>
                             <th>{{ knp_pagination_sortable(pagination, 'Weight (g)', 'p.weightPackage') }}</th>
                             <th>{{ knp_pagination_sortable(pagination, 'Description', 'p.descriptionPackage') }}</th>
                             <th>{{ knp_pagination_sortable(pagination, 'Delivery ID', 'l.id') }}</th> {# Sort by related ID #}
@@ -29,7 +28,6 @@
                         <tbody>
                         {% for package in pagination %} {# Loop through pagination object #}
                             <tr>
-                                <td>{{ package.id }}</td>
                                 <td>{{ package.weightPackage }} g</td>
                                 <td>{{ package.descriptionPackage|slice(0, 50) }}{{ package.descriptionPackage|length > 50 ? '...' : '' }}</td> {# Use slice instead of truncate #}
                                 <td>

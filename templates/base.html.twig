@@ -1,21 +1,25 @@
-{# File: templates/base.html.twig (Ensure this change is present) #}
+{# File: templates/base.html.twig #}
 <!DOCTYPE html>
 {# Add data-bs-theme attribute - JS will toggle between 'light' and 'dark' #}
 <html lang="en" data-bs-theme="light"> {# Default to light #}
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}My Symfony App{% endblock %}</title>
+        <title>{% block title %}GoMobility{% endblock %}</title> {# Default title change #}
 
         {% block stylesheets %}
                 {{ encore_entry_link_tags('app') }}
         {% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100">
+{# Add d-flex flex-column min-vh-100 if you want footer pushed down #}
+<body {% if app.request.attributes.get('_route') starts with 'admin_' %}class="admin-active"{% else %}class="d-flex flex-column min-vh-100"{% endif %}>
 
 {% block body %}
         {# Content from child templates will be rendered here #}
+        {# e.g., templates/public/base.html.twig or templates/admin/base.html.twig #}
 {% endblock %}
+
+{# --- REMOVED FLOATING CHATBOT HTML FROM HERE --- #}
 
 {% block javascripts %}
         {{ encore_entry_script_tags('app') }}

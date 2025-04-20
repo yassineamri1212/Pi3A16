@@ -34,6 +34,8 @@ security:
     # Public access routes first
     - { path: ^/login$, roles: PUBLIC_ACCESS }
     - { path: ^/register$, roles: PUBLIC_ACCESS }
+    - { path: ^/home$, roles: PUBLIC_ACCESS }
+    - { path: ^/$, roles: PUBLIC_ACCESS }
 
     # --- CORRECTED ORDER ---
     # Allow Conducteur (and Admin via hierarchy) access to Parcour management FIRST

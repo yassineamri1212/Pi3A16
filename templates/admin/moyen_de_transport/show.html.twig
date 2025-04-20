@@ -1,16 +1,20 @@
-{% extends 'admin/base.html.twig' %}
+{% extends 'admin/base.html.twig' %} {# Or your specific admin base #}
 
 {% block title %}Transport Details{% endblock %}
 
 {% block admin_content %}
     <div class="container-fluid">
-        <div class="card shadow rounded-3">
-            <div class="card-header bg-white border-bottom">
+        {# --- Transport Info Card --- #}
+        <div class="card shadow rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                 <h1 class="h3 mb-0 fw-bold text-primary">Transport Details</h1>
+                <a href="{{ path('admin_moyen_de_transport_index') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to list
+                </a>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
-                    <!-- Details -->
+                    <!-- Details Column -->
                     <div class="col-lg-8">
                         <div class="row">
                             <div class="col-md-6">
@@ -19,21 +23,23 @@
                                     <dd class="col-sm-7">{{ transport.id }}</dd>
 
                                     <dt class="col-sm-5 text-muted">Type:</dt>
-                                    <dd class="col-sm-7">{{ transport.type }}</dd>
+                                    <dd class="col-sm-7">{{ transport.type | default('N/A') }}</dd>
 
                                     <dt class="col-sm-5 text-muted">Price:</dt>
-                                    <dd class="col-sm-7">{{ transport.prix }} TND</dd>
+                                    <dd class="col-sm-7">{{ transport.prix | default('N/A') }} TND</dd>
 
-                                    {# ---> ADDED DEPARTURE POINT <--- #}
                                     <dt class="col-sm-5 text-muted">Departure Point:</dt>
-                                    <dd class="col-sm-7">{{ transport.pointDepart|default('Not specified') }}</dd>
-                                    {# ---> END ADDED DEPARTURE POINT <--- #}
+                                    <dd class="col-sm-7">{{ transport.pointDepart | default('Not specified') }}</dd>
                                 </dl>
                             </div>
                             <div class="col-md-6">
                                 <dl class="row">
-                                    <dt class="col-sm-5 text-muted">Total Seats:</dt> {# Renamed from Seats Left for clarity #}
-                                    <dd class="col-sm-7">{{ transport.nbrePlaces }}</dd>
+                                    {# *** ASSUMPTION: Use getCapacite() for total *** #}
+                                    <dt class="col-sm-5 text-muted">Total Capacity:</dt>
+                                    <dd class="col-sm-7">{{ totalCapacity }}</dd>
+
+                                    <dt class="col-sm-5 text-muted">Seats Reserved:</dt>
+                                    <dd class="col-sm-7">{{ reservedCount }}</dd>
 
                                     <dt class="col-sm-5 text-muted">Associated Event:</dt>
                                     <dd class="col-sm-7">
@@ -50,14 +56,12 @@
                         </div>
                     </div>
 
-                    <!-- Capacity Statistics -->
+                    <!-- Capacity Statistics Column -->
                     <div class="col-lg-4 mt-4 mt-lg-0 d-flex justify-content-center align-items-center">
-                        {# Check if these variables exist before trying to display stats #}
-                        {# You might need to pass reservedCount and totalCapacity from controller if they aren't properties #}
-                        {% if reservedCount is defined and totalCapacity is defined and totalCapacity > 0 %}
+                        {% if totalCapacity is defined and totalCapacity > 0 and reservedCount is defined %}
                             {% set fullPercentage = (reservedCount / totalCapacity * 100)|round(0) %}
                             <div class="text-center">
-                                <h5 class="text-secondary mb-4">Capacity</h5>
+                                <h5 class="text-secondary mb-4">Capacity Utilisation</h5>
                                 <div class="circular-progress position-relative mx-auto mb-2" style="--percentage: {{ fullPercentage }};">
                                     <svg viewBox="0 0 36 36" class="circular-chart">
                                         <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
@@ -74,41 +78,63 @@
                         {% endif %}
                     </div>
                 </div>
+            </div> {# End card-body #}
+        </div> {# End Transport Info Card #}
 
-                {# Kept the rest of your template structure for reserved users #}
+
+        {# --- Reserved Users Card --- #}
+        <div class="card shadow rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-bold text-primary">Reserved Users</h5>
+            </div>
+            <div class="card-body p-0"> {# Remove padding for table full width #}
+                {# *** CHANGE check variable to 'users' *** #}
                 {% if users is not empty %}
-                    {# ... display users ... #}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0"> {# mb-0 removes bottom margin #}
+                            <thead class="table-light">
+                            <tr>
+                                {# *** ADDED Calculated Code column *** #}
+                                <th>Reservation Code</th>
+                                <th>User ID</th>
+                                <th>User Name</th>
+                                <th>Email</th>
+                                {# Add other relevant columns #}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {# *** CHANGE loop variable to 'user' *** #}
+                            {% for user in users %}
+                                <tr>
+                                    {# *** CALCULATE and display the code *** #}
+                                    {# Pass the current transport's ID to the method #}
+                                    <td><code>{{ user.getComputedReservationCode(transport.id) }}</code></td>
+
+                                    <td>{{ user.id }}</td>
+                                    {# *** ASSUMPTION: Use getFirstname()/getLastname() on User object *** #}
+                                    <td>{{ user.firstname | default('N/A') }} {{ user.lastname | default('N/A') }}</td>
+                                    <td>{{ user.email | default('N/A') }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 {% else %}
-                    <div class="alert alert-light mt-4 border" role="alert">
-                        No users have reserved this transport.
+                    <div class="alert alert-light m-3 border" role="alert"> {# Add margin back #}
+                        <i class="fas fa-info-circle me-2"></i> No users have reserved this transport yet.
                     </div>
                 {% endif %}
-            </div>
+            </div> {# End card-body #}
 
-            <div class="card-footer bg-white d-flex justify-content-between border-top">
-                <a href="{{ path('admin_moyen_de_transport_index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Back to list
+            <div class="card-footer bg-white d-flex justify-content-end border-top">
+                {# Keep only edit button here? Or maybe link to add reservation? #}
+                <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-outline-warning">
+                    <i class="fas fa-edit me-1"></i> Edit Transport Details
                 </a>
-                <div class="btn-group">
-                    <a href="{{ path('admin_moyen_de_transport_edit', {'id': transport.id}) }}" class="btn btn-outline-warning">
-                        <i class="fas fa-edit me-1"></i> Edit
-                    </a>
-                    {# Assuming you have a _delete_form partial or similar #}
-                    {# {{ include('admin/moyen_de_transport/_delete_form.html.twig') }} #}
-                    {# Or use the form structure you had #}
-                    <form method="post" action="{{ path('admin_moyen_de_transport_delete', {'id': transport.id}) }}"
-                          onsubmit="return confirm('Are you sure you want to delete this transport?');"
-                          class="d-inline">
-                        <input type="hidden" name="_method" value="DELETE"> {# Make sure this is correct for your route #}
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transport.id) }}">
-                        <button class="btn btn-outline-danger">
-                            <i class="fas fa-trash me-1"></i> Delete
-                        </button>
-                    </form>
-                </div>
+                {# Delete button was moved/is usually handled separately #}
             </div>
-        </div>
-    </div>
+        </div> {# End Reservations Card #}
+    </div> {# End container-fluid #}
 
     {# Kept your styles block #}
     <style>
@@ -116,5 +142,6 @@
         .circle-bg { fill: none; stroke: #eee; stroke-width: 3.8; }
         .circle { fill: none; stroke: #17a2b8; stroke-width: 3.8; stroke-linecap: round; transition: stroke-dasharray 0.6s ease; }
         .percentage-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); font-size: 1.2rem; color: #333; }
+        code { font-family: monospace; background-color: #f1f1f1; padding: 0.1em 0.4em; border-radius: 3px; }
     </style>
 {% endblock %}

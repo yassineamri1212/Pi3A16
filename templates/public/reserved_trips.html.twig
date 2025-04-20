@@ -3,8 +3,9 @@
 
 {% block public_content %}
     <div class="container my-5">
+        {# SECTION 1: Event Transportation #}
         <h2 class="mb-4 text-center fw-bold" style="color: #2c3e50; position: relative;">
-            <span style="position: relative; z-index: 1; padding: 0 15px; background: white;">My Reserved Trips</span>
+            <span style="position: relative; z-index: 1; padding: 0 15px; background: white;">My Reserved Event Trips</span>
             <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #3498db, transparent); z-index: 0;"></span>
         </h2>
 
@@ -60,10 +61,82 @@
                 <div class="mb-4">
                     <i class="fas fa-calendar-times" style="font-size: 4rem; color: #7f8c8d;"></i>
                 </div>
-                <h4 class="fw-bold mb-3" style="color: #2c3e50;">No Reserved Trips</h4>
-                <p class="text-muted mb-4" style="color: #7f8c8d;">You haven't reserved any transportation yet.</p>
+                <h4 class="fw-bold mb-3" style="color: #2c3e50;">No Reserved Event Trips</h4>
+                <p class="text-muted mb-4" style="color: #7f8c8d;">You haven't reserved any event transportation yet.</p>
                 <a href="{{ path('client_evenement_index') }}" class="btn px-4" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 8px;">
-                    <i class="fas fa-bus me-1"></i> Browse Available Transports
+                    <i class="fas fa-bus me-1"></i> Browse Available Events
+                </a>
+            </div>
+        {% endif %}
+
+        {# SECTION 2: Reserved Carpool Offers #}
+        <h2 class="mb-4 mt-5 text-center fw-bold" style="color: #2c3e50; position: relative;">
+            <span style="position: relative; z-index: 1; padding: 0 15px; background: white;">My Reserved Carpools</span>
+            <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #e67e22, transparent); z-index: 0;"></span>
+        </h2>
+
+        {% if reservedOffers|length > 0 %}
+            <div class="row g-4">
+                {% for reservation in reservedOffers %}
+                    {% set offer = reservation.offre %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 overflow-hidden" style="border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                            <div class="card-header" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white; border-bottom: none;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 fw-bold">CARPOOL</h5>
+                                    <span class="badge rounded-pill" style="background: rgba(255,255,255,0.2);">
+                                        <i class="fas fa-car me-1"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body" style="background: #f8f9fa;">
+                                <div class="mb-3">
+                                    <h6 class="fw-bold" style="color: #2c3e50;">
+                                        <i class="fas fa-route me-2" style="color: #e67e22;"></i>
+                                        Trip: {{ offer.parcour.trajet }}
+                                    </h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-calendar-alt me-2" style="color: #e74c3c; width: 20px;"></i>
+                                        <span class="text-muted">Date: {{ offer.dateDepart|date('F j, Y H:i') }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-money-bill-wave me-2" style="color: #27ae60; width: 20px;"></i>
+                                        <span class="text-muted">Price: {{ offer.prix }} TND</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-tie me-2" style="color: #9b59b6; width: 20px;"></i>
+                                        <span class="text-muted">Driver: {{ offer.conducteur.userName }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer bg-transparent" style="border-top: 1px dashed #ddd;">
+                                <div class="d-grid gap-2">
+                                    <form action="{{ path('client_offer_cancel', { id: reservation.id }) }}" method="post">
+                                        <button type="submit" class="btn btn-sm w-100" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px;">
+                                            <i class="fas fa-times-circle me-1"></i> Cancel Reservation
+                                        </button>
+                                    </form>
+                                    {# Adjust this path to your offers detail route #}
+                                    <a href="{{ path('app_public_offers_index') }}" class="btn btn-outline-primary btn-sm" style="border-radius: 8px;">
+                                        <i class="fas fa-info-circle me-1"></i> Browse More Offers
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px; padding: 40px; margin-top: 30px;">
+                <div class="mb-4">
+                    <i class="fas fa-car-alt" style="font-size: 4rem; color: #7f8c8d;"></i>
+                </div>
+                <h4 class="fw-bold mb-3" style="color: #2c3e50;">No Reserved Carpools</h4>
+                <p class="text-muted mb-4" style="color: #7f8c8d;">You haven't reserved any carpools yet.</p>
+                <a href="{{ path('app_public_offers_index') }}" class="btn px-4" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white; border-radius: 8px;">
+                    <i class="fas fa-car me-1"></i> Browse Available Carpools
                 </a>
             </div>
         {% endif %}
