@@ -8,7 +8,8 @@
 
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-center bg-white">
-                <h5 class="mb-0">{{ parcour.trajet }}</h5>
+                {# === UPDATED Header Title === #}
+                <h5 class="mb-0">{{ parcour.name|default(parcour.pickup ~ ' to ' ~ parcour.destination) }}</h5>
                 <a href="{{ path('app_admin_parcour_index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Back to list
                 </a>
@@ -16,23 +17,37 @@
             <div class="card-body">
                 <table class="table">
                     <tbody>
-                    {# REMOVED ID Row:
-                     <tr>
-                         <th>ID</th>
-                         <td>{{ parcour.idParcours }}</td>
-                     </tr>
-                    #}
+                    {# REMOVED ID Row #}
+
+                    {# === ADDED/UPDATED Rows === #}
                     <tr>
-                        <th>Trajet (Route)</th>
-                        <td>{{ parcour.trajet }}</td>
+                        <th>Name</th>
+                        <td>{{ parcour.name|default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Pickup Location</th>
+                        <td>{{ parcour.pickup }}</td>
+                    </tr>
+                    <tr>
+                        <th>Pickup Coordinates</th>
+                        <td>Lat: {{ parcour.latitudePickup|default('N/A') }}, Lng: {{ parcour.longitudePickup|default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Destination Location</th>
+                        <td>{{ parcour.destination }}</td>
+                    </tr>
+                    <tr>
+                        <th>Destination Coordinates</th>
+                        <td>Lat: {{ parcour.latitudeDestination|default('N/A') }}, Lng: {{ parcour.longitudeDestination|default('N/A') }}</td>
                     </tr>
                     <tr>
                         <th>Distance</th>
-                        <td>{{ parcour.distance|number_format(1, '.', ',') }} km</td>
+                        <td>{{ parcour.distance ? (parcour.distance|number_format(1, '.', ',')) ~ ' km' : 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>Estimated Time</th>
-                        <td>{{ parcour.estimationTemps }} minutes</td>
+                        {# Changed from estimationTemps #}
+                        <td>{{ parcour.time ? parcour.time ~ ' minutes' : 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>Offres Using This Parcour</th>
@@ -40,15 +55,20 @@
                             {% if parcour.offres.empty %}None{% else %}{{ parcour.offres.count }} Offre(s){% endif %}
                         </td>
                     </tr>
+                    {# === END ADDED/UPDATED Rows === #}
                     </tbody>
                 </table>
+
                 <hr>
+
                 <div class="d-flex justify-content-start gap-2">
-                    {# Links still use ID internally #}
+                    {# Links still use ID internally - No changes needed #}
                     <a href="{{ path('app_admin_parcour_edit', {'idParcours': parcour.idParcours}) }}" class="btn btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>
                     {{ include('parcour/_delete_form.html.twig', { 'parcour': parcour }) }}
                 </div>
-            </div>
-        </div>
-    </div>
+
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
 {% endblock %}

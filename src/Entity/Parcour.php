@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ParcourRepository::class)]
-#[ORM\Table(name: 'parcours')] // Changed table name to plural 'parcours' as is common practice
+#[ORM\Table(name: 'parcours')]
 class Parcour
 {
     #[ORM\Id]
@@ -18,102 +18,183 @@ class Parcour
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $idParcours = null;
 
+    // --- NEW FIELDS ---
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "The route description (trajet) cannot be empty.")]
-    #[Assert\Length(max: 255, maxMessage: "The route description cannot be longer than {{ limit }} characters.")]
-    private ?string $trajet = null;
+    #[Assert\NotBlank(message: "Parcour name cannot be empty.")]
+    #[Assert\Length(max: 255)]
+    private ?string $name = null; // Equivalent to Java 'name'
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Assert\NotBlank(message: "Distance cannot be empty.")]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Pickup location cannot be empty.")]
+    #[Assert\Length(max: 255)]
+    private ?string $pickup = null; // Equivalent to Java 'pickup'
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Destination location cannot be empty.")]
+    #[Assert\Length(max: 255)]
+    private ?string $destination = null; // Equivalent to Java 'destination'
+
+    #[ORM\Column(type: Types::FLOAT, nullable: true)] // Use FLOAT for coordinates, allow null initially
+    #[Assert\Range(min: -90, max: 90, notInRangeMessage: 'Latitude must be between -90 and 90.')]
+    private ?float $latitudePickup = null; // Equivalent to Java 'latPickup'
+
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    #[Assert\Range(min: -180, max: 180, notInRangeMessage: 'Longitude must be between -180 and 180.')]
+    private ?float $longitudePickup = null; // Equivalent to Java 'lngPickup'
+
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    #[Assert\Range(min: -90, max: 90, notInRangeMessage: 'Latitude must be between -90 and 90.')]
+    private ?float $latitudeDestination = null; // Equivalent to Java 'latDest'
+
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    #[Assert\Range(min: -180, max: 180, notInRangeMessage: 'Longitude must be between -180 and 180.')]
+    private ?float $longitudeDestination = null; // Equivalent to Java 'lngDest'
+    // --- END NEW FIELDS ---
+
+
+    // --- EXISTING/MODIFIED FIELDS ---
+    // Keeping DECIMAL for potential non-integer distance (e.g., 10.5 km)
+    // The Java version used int, adjust your interpretation if needed.
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)] // Made nullable temporarily? Or Assert NotBlank?
     #[Assert\PositiveOrZero(message: "Distance must be zero or a positive number.")]
-    private ?string $distance = null; // Doctrine handles DECIMAL as string
+    private ?string $distance = null; // Equivalent to Java 'distance', stored as string
 
-    #[ORM\Column(type: Types::INTEGER)]
-    #[Assert\NotBlank(message: "Estimated time cannot be empty.")]
-    #[Assert\Positive(message: "Estimated time must be a positive number of minutes.")]
-    private ?int $estimationTemps = null; // Assuming value is in minutes
+    #[ORM\Column(type: Types::INTEGER, nullable: true)] // Renamed from estimationTemps, made nullable temporarily? Or Assert NotBlank?
+    #[Assert\Positive(message: "Estimated time must be a positive number.")]
+    private ?int $time = null; // Equivalent to Java 'time' (assuming minutes)
+    // --- END EXISTING/MODIFIED FIELDS ---
 
-    /**
-     * One Parcour can be associated with many Offres.
-     * 'cascade: ['persist']' means if you persist a Parcour, associated new Offres might also be persisted (optional).
-     * 'orphanRemoval: true' means if an Offre is removed from this Parcour's collection, it gets deleted from DB (use cautiously).
-     */
+
+    // --- REMOVED FIELD ---
+    // private ?string $trajet = null; // This is replaced by name, pickup, destination
+    // --- END REMOVED FIELD ---
+
+
+    // --- RELATIONSHIP (Unchanged) ---
     #[ORM\OneToMany(mappedBy: 'parcour', targetEntity: Offre::class, cascade: ['persist'])]
     private Collection $offres;
+    // --- END RELATIONSHIP ---
+
 
     public function __construct()
     {
         $this->offres = new ArrayCollection();
     }
 
+    // --- GETTERS AND SETTERS ---
+
     public function getIdParcours(): ?int
     {
         return $this->idParcours;
     }
 
-    // No setter for ID
-
-    public function getTrajet(): ?string
+    public function getName(): ?string
     {
-        return $this->trajet;
+        return $this->name;
     }
 
-    public function setTrajet(string $trajet): static
+    public function setName(string $name): static
     {
-        $this->trajet = $trajet;
+        $this->name = $name;
         return $this;
     }
 
-    /**
-     * Gets the distance as stored (string).
-     */
+    public function getPickup(): ?string
+    {
+        return $this->pickup;
+    }
+
+    public function setPickup(string $pickup): static
+    {
+        $this->pickup = $pickup;
+        return $this;
+    }
+
+    public function getDestination(): ?string
+    {
+        return $this->destination;
+    }
+
+    public function setDestination(string $destination): static
+    {
+        $this->destination = $destination;
+        return $this;
+    }
+
+    public function getLatitudePickup(): ?float
+    {
+        return $this->latitudePickup;
+    }
+
+    public function setLatitudePickup(?float $latitudePickup): static
+    {
+        $this->latitudePickup = $latitudePickup;
+        return $this;
+    }
+
+    public function getLongitudePickup(): ?float
+    {
+        return $this->longitudePickup;
+    }
+
+    public function setLongitudePickup(?float $longitudePickup): static
+    {
+        $this->longitudePickup = $longitudePickup;
+        return $this;
+    }
+
+    public function getLatitudeDestination(): ?float
+    {
+        return $this->latitudeDestination;
+    }
+
+    public function setLatitudeDestination(?float $latitudeDestination): static
+    {
+        $this->latitudeDestination = $latitudeDestination;
+        return $this;
+    }
+
+    public function getLongitudeDestination(): ?float
+    {
+        return $this->longitudeDestination;
+    }
+
+    public function setLongitudeDestination(?float $longitudeDestination): static
+    {
+        $this->longitudeDestination = $longitudeDestination;
+        return $this;
+    }
+
     public function getDistance(): ?string
     {
         return $this->distance;
     }
 
-    /**
-     * Sets the distance (expects a string representation of the decimal).
-     */
-    public function setDistance(string $distance): static
+    public function setDistance(?string $distance): static
     {
-        // Basic check if it looks like a valid non-negative number string
-        if (!is_numeric($distance) || (float)$distance < 0) {
-            throw new \InvalidArgumentException("Distance must be a non-negative numeric value.");
-        }
         $this->distance = $distance;
         return $this;
     }
 
-    /**
-     * Helper method to get distance as a float for calculations or display formatting.
-     */
     public function getDistanceAsFloat(): ?float
     {
         return $this->distance === null ? null : (float)$this->distance;
     }
 
-    /**
-     * Helper method to set distance from a float value.
-     */
-    public function setDistanceFromFloat(float $distance): static
+    public function setDistanceAsFloat(?float $distance): static
     {
-        if ($distance < 0) {
-            throw new \InvalidArgumentException("Distance cannot be negative.");
-        }
-        $this->distance = (string)$distance;
+        $this->distance = $distance === null ? null : (string)$distance;
         return $this;
     }
 
-
-    public function getEstimationTemps(): ?int
+    public function getTime(): ?int // Renamed from getEstimationTemps
     {
-        return $this->estimationTemps;
+        return $this->time;
     }
 
-    public function setEstimationTemps(int $estimationTemps): static
+    public function setTime(?int $time): static // Renamed from setEstimationTemps
     {
-        $this->estimationTemps = $estimationTemps;
+        $this->time = $time;
         return $this;
     }
 
@@ -129,7 +210,7 @@ class Parcour
     {
         if (!$this->offres->contains($offre)) {
             $this->offres->add($offre);
-            $offre->setParcour($this); // Set the owning side
+            $offre->setParcour($this);
         }
         return $this;
     }
@@ -145,11 +226,9 @@ class Parcour
         return $this;
     }
 
-    /**
-     * String representation used in things like dropdowns.
-     */
     public function __toString(): string
     {
-        return $this->trajet ?? 'New Parcour';
+        // Use the new name, or fallback to pickup/destination
+        return $this->name ?? ($this->pickup && $this->destination ? sprintf('%s to %s', $this->pickup, $this->destination) : 'New Parcour');
     }
 }

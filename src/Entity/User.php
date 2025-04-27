@@ -1,6 +1,8 @@
 <?php
 namespace App\Entity;
 
+// *** REMOVED Types::DATETIME_IMMUTABLE if no longer needed by other fields ***
+// *** Kept Types::STRING, Types::BOOLEAN, Types::INTEGER, Types::JSON ***
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use App\Repository\UserRepository;
+use App\Repository\UserRepository; // Ensure this is correct
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -39,10 +41,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private ?string $password = null;
 
+    // This property is typically used temporarily by forms, not mapped to DB
     private ?string $plainPassword = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ["default" => false])]
     private bool $isBlocked = false;
+
+    // --- REMOVED Password Reset Fields ---
+    // private ?string $resetToken = null; // REMOVED
+    // private ?\DateTimeImmutable $resetTokenExpiresAt = null; // REMOVED
+    // --- END REMOVED FIELDS ---
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reduction::class)]
     private Collection $reductions;
@@ -51,12 +59,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'user_transport_reservations')]
     private Collection $reservedTransports;
 
-    // --- Relation to Offres created by this User (Conducteur) ---
     #[ORM\OneToMany(mappedBy: 'conducteur', targetEntity: Offre::class)]
     private Collection $createdOffres;
 
-    // --- Relation to ReservationOffers made by this User (Passenger) ---
-    // <<< CORRECTED: targetEntity is ReservationOffer >>>
     #[ORM\OneToMany(mappedBy: 'passenger', targetEntity: ReservationOffer::class, orphanRemoval: true)]
     private Collection $reservationsAsPassenger;
 
@@ -66,11 +71,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reservedTransports = new ArrayCollection();
         $this->createdOffres = new ArrayCollection();
         $this->reservationsAsPassenger = new ArrayCollection();
-        $this->roles = ['ROLE_USER']; // Default role
+        $this->roles = ['ROLE_USER'];
         $this->isBlocked = false;
     }
 
-    // --- Getters/Setters (Unchanged from your version) ---
+    // --- Existing Getters/Setters (Unchanged) ---
     public function getId(): ?int { return $this->id; }
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(?string $email): static { $this->email = $email; return $this; }
@@ -92,49 +97,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeReservedTransport(\App\Entity\MoyenDeTransport $transport): static { $this->reservedTransports->removeElement($transport); return $this; }
     public function addReduction(Reduction $reduction): static { if (!$this->reductions->contains($reduction)) { $this->reductions->add($reduction); $reduction->setUser($this); } return $this; }
     public function removeReduction(Reduction $reduction): static { if ($this->reductions->removeElement($reduction)) { if ($reduction->getUser() === $this) { $reduction->setUser(null); } } return $this; }
-
-    // --- Methods for createdOffres (Unchanged) ---
     /** @return Collection<int, Offre> */
     public function getCreatedOffres(): Collection { return $this->createdOffres; }
     public function addCreatedOffre(Offre $offre): static { if (!$this->createdOffres->contains($offre)) { $this->createdOffres->add($offre); $offre->setConducteur($this); } return $this; }
     public function removeCreatedOffre(Offre $offre): static { if ($this->createdOffres->removeElement($offre)) { if ($offre->getConducteur() === $this) { $offre->setConducteur(null); } } return $this; }
+    /** @return Collection<int, ReservationOffer> */
+    public function getReservationsAsPassenger(): Collection { return $this->reservationsAsPassenger; }
+    public function addReservationsAsPassenger(ReservationOffer $reservation): static { if (!$this->reservationsAsPassenger->contains($reservation)) { $this->reservationsAsPassenger->add($reservation); $reservation->setPassenger($this); } return $this; }
+    public function removeReservationsAsPassenger(ReservationOffer $reservation): static { if ($this->reservationsAsPassenger->removeElement($reservation)) { if ($reservation->getPassenger() === $this) { $reservation->setPassenger(null); } } return $this; }
+    public function getComputedReservationCode(int $transportId): string { return md5((string) $this->getId() . '_' . $transportId); }
 
-    // --- Methods for reservationsAsPassenger ---
-    /**
-     * <<< CORRECTED: Return type hint for ReservationOffer >>>
-     * @return Collection<int, ReservationOffer>
-     */
-    public function getReservationsAsPassenger(): Collection
-    {
-        return $this->reservationsAsPassenger;
-    }
-
-    // <<< CORRECTED: Type hint for ReservationOffer >>>
-    public function addReservationsAsPassenger(ReservationOffer $reservation): static
-    {
-        if (!$this->reservationsAsPassenger->contains($reservation)) {
-            $this->reservationsAsPassenger->add($reservation);
-            $reservation->setPassenger($this);
-        }
-        return $this;
-    }
-
-    // <<< CORRECTED: Type hint for ReservationOffer >>>
-    public function removeReservationsAsPassenger(ReservationOffer $reservation): static
-    {
-        if ($this->reservationsAsPassenger->removeElement($reservation)) {
-            // set the owning side to null (unless already changed)
-            if ($reservation->getPassenger() === $this) {
-                $reservation->setPassenger(null);
-            }
-        }
-        return $this;
-    }
-    // --- END CORRECTION ---
-
-    // Keep existing reservation code method if needed
-    public function getComputedReservationCode(int $transportId): string
-    {
-        return md5((string) $this->getId() . '_' . $transportId);
-    }
+    // --- REMOVED Password Reset Getters/Setters ---
+    // public function getResetToken(): ?string ... // REMOVED
+    // public function setResetToken(?string $resetToken): static ... // REMOVED
+    // public function getResetTokenExpiresAt(): ?\DateTimeImmutable ... // REMOVED
+    // public function setResetTokenExpiresAt(?\DateTimeImmutable $resetTokenExpiresAt): static ... // REMOVED
+    // public function isPasswordResetTokenValid(?\DateTimeImmutable $now = null): bool ... // REMOVED
+    // --- END REMOVED ---
 }

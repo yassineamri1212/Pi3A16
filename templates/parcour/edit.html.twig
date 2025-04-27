@@ -3,30 +3,71 @@
 {% block admin_title %}Edit Parcour{% endblock %}
 
 {% block admin_content %}
-    <div class="container-fluid">
-        <h1 class="h3 mb-4">Edit Parcour "{{ parcour.trajet }}"</h1>
+<div class="container-fluid">
+    {# === UPDATED Page Title === #}
+    <h1 class="h3 mb-4">Edit Parcour: {{ parcour.name|default(parcour.pickup ~ ' to ' ~ parcour.destination)|truncate(50) }}</h1>
 
-        <div class="card shadow">
-            <div class="card-body">
-                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-                {{ form_widget(form) }} {# Render all fields #}
+    <div class="card shadow">
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-                <div class="mt-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-save"></i> {{ button_label|default('Update Parcour') }}
-                        </button>
-                        <a href="{{ path('app_admin_parcour_index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to list
-                        </a>
-                    </div>
-                    {# Place delete form here on edit page #}
-                    {{ include('parcour/_delete_form.html.twig', { 'parcour': parcour, 'button_label': 'Delete', 'button_class': 'btn btn-danger' }) }}
+            {# === ADDED Map Placeholder === #}
+            <div class="mb-3"> {# Optional: Add margin below map #}
+                <label class="form-label">Select Pickup & Destination on Map:</label>
+                <div id="map-picker" style="height: 400px; width: 100%; border: 1px solid #ccc; border-radius: 4px;">
+                    {# Map will be initialized here by JavaScript, potentially showing existing points #}
+                    <p class="text-center text-muted p-5">Loading map...</p>
                 </div>
+            </div>
+            {# === END Map Placeholder === #}
 
-                {{ form_end(form) }}
-            </div> {# End card-body #}
-        </div> {# End card #}
+            {{ form_widget(form) }} {# Render all fields #}
 
-    </div> {# End container-fluid #}
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-save"></i> {{ button_label|default('Update Parcour') }}
+                    </button>
+                    <a href="{{ path('app_admin_parcour_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to list
+                    </a>
+                </div>
+                {# Delete form placement unchanged #}
+                {{ include('parcour/_delete_form.html.twig', { 'parcour': parcour, 'button_label': 'Delete', 'button_class': 'btn btn-danger' }) }}
+            </div>
+
+            {{ form_end(form) }}
+        </div> {# End card-body #}
+    </div> {# End card #}
+
+</div> {# End container-fluid #}
+
+{# === ADDED Potential Block for Map JS === #}
+{% block javascripts %}
+    {{ parent() }}
+    {# Example: Include Leaflet library if not already global #}
+    {# <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/> #}
+    {# <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> #}
+
+    {# Your custom JS file for map interaction #}
+    {# <script src="{{ asset('assets/js/admin_map_picker.js') }}"></script> #}
+
+    {# Or inline JS for testing #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Placeholder for your Map Initialization & Form Interaction JS ---
+            console.log('Parcour edit form loaded. Initialize map here.');
+            // Example: Get existing coordinates from form fields to center map/place markers
+            const latPickup = document.getElementById('{{ form.latitudePickup.vars.id }}').value;
+            const lngPickup = document.getElementById('{{ form.longitudePickup.vars.id }}').value;
+            // ... get destination coords ...
+            console.log('Existing pickup:', latPickup, lngPickup);
+            // Example: Initialize map centered on existing points or default location
+            // Example: Add markers for existing points
+            // Example: Allow user to drag markers or click map to update points
+            // Example: Update hidden form fields (lat/lng/distance/time) based on map interaction
+            // --- End Placeholder ---
+        });
+    </script>
 {% endblock %}
+{# === END Added Block === #}

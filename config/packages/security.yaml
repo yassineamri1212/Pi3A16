@@ -13,6 +13,13 @@ security:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
+
+    api:
+      pattern: ^/api/
+      stateless: true
+      # No specific authenticators yet for this firewall
+      security: true # Keep security component active for access_control
+
     main:
       lazy: true
       provider: app_user_provider
@@ -21,42 +28,46 @@ security:
       logout:
         path: app_logout
         target: app_login
-      # remember_me:
-      #    secret: '%kernel.secret%'
-      #    lifetime: 604800
+      # remember_me: ...
 
   role_hierarchy:
-    ROLE_ADMIN:       [ROLE_CONDUCTEUR, ROLE_USER]
-    ROLE_CONDUCTEUR:  ROLE_USER
+    ROLE_ADMIN: [ROLE_CONDUCTEUR, ROLE_USER]
+    ROLE_CONDUCTEUR: ROLE_USER
 
-  # Control access for large sections of your site
   access_control:
-    # Public access routes first
+    # --- Publicly accessible pages handled by 'main' firewall ---
     - { path: ^/login$, roles: PUBLIC_ACCESS }
     - { path: ^/register$, roles: PUBLIC_ACCESS }
-    - { path: ^/home$, roles: PUBLIC_ACCESS }
-    - { path: ^/$, roles: PUBLIC_ACCESS }
+    - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
+    - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+    # - { path: ^/home$, roles: PUBLIC_ACCESS } # Uncomment if home should be public
+    # - { path: ^/$, roles: PUBLIC_ACCESS } # Uncomment if root should be public
 
-    # --- CORRECTED ORDER ---
-    # Allow Conducteur (and Admin via hierarchy) access to Parcour management FIRST
+    # --- Access control for the API firewall ---
+    # These rules apply specifically to requests matching the 'api' firewall pattern (^/api/)
+    - { path: ^/api/password/request-reset, roles: PUBLIC_ACCESS, methods: [POST] }
+    - { path: ^/api/password/reset, roles: PUBLIC_ACCESS, methods: [POST] }
+    # --- ADDED/MOVED Rule for Chatbot API ---
+    - { path: ^/api/chatbot/message, roles: PUBLIC_ACCESS, methods: [POST] } # Allow anyone to POST here
+    # --- END ADDED/MOVED Rule ---
+
+    # Example: Secure other future API endpoints (uncomment/adjust when needed)
+    # - { path: ^/api/profile, roles: IS_AUTHENTICATED_FULLY }
+    # - { path: ^/api/admin, roles: ROLE_ADMIN }
+
+    # --- Access control for the 'main' firewall ---
     - { path: ^/admin/parcour, roles: ROLE_CONDUCTEUR }
-
-    # THEN, restrict the rest of /admin to only Admins
     - { path: ^/admin, roles: ROLE_ADMIN }
-    # --- END CORRECTION ---
-
-    # Secure the Conducteur-specific area
     - { path: ^/conducteur, roles: ROLE_CONDUCTEUR }
-
-    # Secure other specific user areas
     - { path: ^/profile, roles: ROLE_USER }
     - { path: ^/reserve/, roles: ROLE_USER }
-    - { path: ^/my-reservations$, roles: ROLE_USER } # If you create this route
+    - { path: ^/my-reservations$, roles: ROLE_USER }
 
-    # Default access for any logged-in user (covers /home etc.)
+    # --- Catch-all for 'main' firewall ---
+    # Requires login for all other pages handled by the main firewall
     - { path: ^/, roles: ROLE_USER }
 
-# Configuration specific to the test environment
+# Test environment config remains the same...
 when@test:
   security:
     password_hashers:

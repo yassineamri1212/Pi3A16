@@ -1,0 +1,94 @@
+{% extends 'public/base.html.twig' %}
+
+            {% block public_title %}{{ post.title }} - Forum{% endblock %}
+
+            {% block public_content %}
+            <div class="container my-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9"> {# Wider column for content #}
+
+                        {# Post Content Section #}
+                        <article class="card shadow-sm border-0 mb-4">
+                            <div class="card-body p-4">
+                                <h1 class="h3 card-title mb-3">{{ post.title }}</h1>
+                                <p class="card-subtitle mb-3 text-muted small">
+                                    Started by <strong>{{ post.author ? post.author.userName : 'N/A' }}</strong>
+                                    on {{ post.createdAt ? post.createdAt|date('F j, Y H:i') : '' }}
+                                    {# Display update info only if available #}
+                                    {% if post.updatedAt %}
+                                        • Last updated: {{ post.updatedAt|date('F j, Y H:i') }}
+                                    {% endif %}
+                                </p>
+                                <hr>
+                                <div class="post-content-display mt-4 mb-4">
+                                    {{ post.content|nl2br }}
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light d-flex justify-content-between align-items-center py-2">
+                                <a href="{{ path('app_forum_index') }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to Forum
+                                </a>
+                                <div>
+                                    {{ include('forum/_post_actions.html.twig', { 'post': post }) }}
+                                </div>
+                            </div>
+                        </article>
+
+                        {# Comments Section #}
+                        <section id="comments" class="mt-5">
+                            <h2 class="h4 mb-4">Comments ({{ commentaires.count }})</h2>
+
+                            {% if commentaires is not empty %}
+                                {% for comment in commentaires %}
+                                    <div class="d-flex mb-4">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 border rounded p-3 bg-light shadow-sm">
+                                            <h6 class="mt-0 mb-1 small fw-bold">
+                                                {{ comment.author ? comment.author.userName : 'N/A' }}
+                                                <span class="text-muted fw-normal ms-2">• {{ comment.createdAt ? comment.createdAt|date('M j, Y H:i') : '' }}</span>
+                                            </h6>
+                                            {{ comment.content|nl2br }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">Be the first to comment!</p>
+                            {% endif %}
+
+                            <hr class="my-4">
+
+                            {# Add Comment Form #}
+                            {% if is_granted('ROLE_USER') %}
+                                <h3 class="h5 mb-3">Leave a Comment</h3>
+                                {% if commentForm is defined %}
+                                    {{ form_start(commentForm, {
+                                        'action': path('app_forum_comment_add', {'postId': post.id}),
+                                        'method': 'POST',
+                                        'attr': {
+                                            'class': 'needs-validation',
+                                            'novalidate': 'novalidate'
+                                        }
+                                    }) }}
+                                    {{ form_row(commentForm.content, {
+                                        'label': false,
+                                        'attr': {'placeholder': 'Write your comment here...', 'rows': 4}
+                                    }) }}
+                                    <button type="submit" class="btn btn-primary mt-2">
+                                        <i class="fas fa-paper-plane me-1"></i> Submit Comment
+                                    </button>
+                                    {{ form_end(commentForm) }}
+                                {% else %}
+                                    <p class="text-danger small">Comment form could not be loaded.</p>
+                                {% endif %}
+                            {% else %}
+                                <p>Please <a href="{{ path('app_login', {'_target_path': app.request.uri}) }}">log in</a> or <a href="{{ path('app_register') }}">register</a> to leave a comment.</p>
+                            {% endif %}
+                        </section>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}

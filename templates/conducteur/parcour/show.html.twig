@@ -1,0 +1,73 @@
+{% extends 'conducteur/base.html.twig' %} {# Use Conducteur base #}
+
+{% block conducteur_title %}Parcour Details{% endblock %} {# Use Conducteur block #}
+
+{% block conducteur_content %} {# Use Conducteur block #}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Parcour Details</h1>
+
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                {# === UPDATED Header Title === #}
+                <h5 class="mb-0">{{ parcour.name|default(parcour.pickup ~ ' to ' ~ parcour.destination) }}</h5>
+                {# Use CONDUCTEUR index route #}
+                <a href="{{ path('app_conducteur_parcour_index') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to list
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tbody>
+                    {# === ADDED/UPDATED Rows === #}
+                    <tr>
+                        <th>Name</th>
+                        <td>{{ parcour.name|default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Pickup Location</th>
+                        <td>{{ parcour.pickup }}</td>
+                    </tr>
+                    <tr>
+                        <th>Pickup Coordinates</th>
+                        <td>Lat: {{ parcour.latitudePickup|default('N/A') }}, Lng: {{ parcour.longitudePickup|default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Destination Location</th>
+                        <td>{{ parcour.destination }}</td>
+                    </tr>
+                    <tr>
+                        <th>Destination Coordinates</th>
+                        <td>Lat: {{ parcour.latitudeDestination|default('N/A') }}, Lng: {{ parcour.longitudeDestination|default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Distance</th>
+                        <td>{{ parcour.distance ? (parcour.distance|number_format(1, '.', ',')) ~ ' km' : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Estimated Time</th>
+                        <td>{{ parcour.time ? parcour.time ~ ' minutes' : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Offres Using This Parcour</th>
+                        <td>
+                            {% if parcour.offres.empty %}None{% else %}{{ parcour.offres.count }} Offre(s){% endif %}
+                        </td>
+                    </tr>
+                    {# === END ADDED/UPDATED Rows === #}
+                    </tbody>
+                </table>
+
+                <hr>
+
+                <div class="d-flex justify-content-start gap-2">
+                    {# Use CONDUCTEUR routes #}
+                    <a href="{{ path('app_conducteur_parcour_edit', {'idParcours': parcour.idParcours}) }}" class="btn btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>
+                    {# Use CONDUCTEUR delete form partial #}
+                    {{ include('conducteur/parcour/_delete_form.html.twig', { 'parcour': parcour }) }}
+                </div>
+
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

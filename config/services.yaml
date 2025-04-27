@@ -1,30 +1,24 @@
 # config/services.yaml
 parameters:
-  # Your existing parameter for OpenWeatherMap
+  # Define parameters linked to environment variables.
+  # Ensure these variables exist and have values in your .env / .env.local files.
   openweather_api_key: '%env(OPENWEATHER_API_KEY)%'
-
-  # --- ADD THIS LINE for Gemini ---
   gemini_api_key: '%env(GEMINI_API_KEY)%'
-  # --- END ADD ---
+  # --- ADD Parameters for Password Reset ---
+  env(FRONTEND_RESET_URL): '%env(FRONTEND_RESET_URL)%' # Read from .env
+  env(APP_MAILER_SENDER): '%env(APP_MAILER_SENDER)%'     # Read from .env
+  env(APP_MAILER_SENDER_NAME): '%env(APP_MAILER_SENDER_NAME)%' # Read from .env
+  # --- END ADD Parameters ---
 
 services:
-  # Default configuration for services
+  # Default configuration for services in this file
   _defaults:
-    autowire: true
-    autoconfigure: true
-    # --- Your working global bind for $apiKey ---
-    bind:
-      string $apiKey: '%openweather_api_key%'
-    # --- END bind ---
+    autowire: true      # Enable autowiring by default.
+    autoconfigure: true # Enable autoconfiguration (tags, etc.) by default.
+    # bind: # REMOVED Global bind for apiKey as it's explicitly defined below
+    #   string $apiKey: '%openweather_api_key%'
 
-  # --- Your working explicit configuration for WeatherService ---
-  # This ensures WeatherService gets the correct key, overriding the global bind if needed (though likely redundant here)
-  App\Service\WeatherService:
-    arguments:
-      $apiKey: '%openweather_api_key%'
-  # --- END WeatherService ---
-
-  # --- Default service loading for classes in src/ ---
+  # Default service loading for classes in src/
   App\:
     resource: '../src/'
     exclude:
@@ -32,14 +26,33 @@ services:
       - '../src/Entity/'
       - '../src/Kernel.php'
 
-  # --- Default configuration for controllers ---
-  # Add this block if it was missing, ensures controllers are services
+  # Default configuration for controllers
   App\Controller\:
     resource: '../src/Controller/'
     tags: ['controller.service_arguments']
 
-  # NO explicit definition needed for GeminiChatService,
-  # as its constructor uses ParameterBagInterface which autowiring handles.
+  # --- EXPLICIT SERVICE DEFINITIONS ---
 
-  # NO explicit definition needed for ChatbotController,
-  # as its constructor uses type-hints for GeminiChatService and LoggerInterface which autowiring handles.
+  # Explicit configuration for WeatherService
+  App\Service\WeatherService:
+    arguments:
+      $apiKey: '%openweather_api_key%' # Use the defined parameter
+
+  # --- ADD Explicit definition for PasswordResetController ---
+  App\Controller\Api\PasswordResetController:
+    arguments:
+      # Inject standard Symfony services using their IDs
+      $entityManager: '@doctrine.orm.entity_manager'
+      $userRepository: '@App\Repository\UserRepository'
+      $mailer: '@mailer.mailer'
+      $passwordHasher: '@security.user_password_hasher'
+      $validator: '@validator'
+      $logger: '@logger'
+      # Inject parameters defined above (which read from .env)
+      $appMailerSender: '%env(APP_MAILER_SENDER)%'
+      $appMailerSenderName: '%env(APP_MAILER_SENDER_NAME)%'
+      $frontendResetUrl: '%env(FRONTEND_RESET_URL)%'
+    tags: ['controller.service_arguments'] # Required tag for controllers defined explicitly here
+  # --- END ADD Definition ---
+
+  # Your Chatbot/Gemini services likely rely on autowiring, which is fine.

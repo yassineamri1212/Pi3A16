@@ -1,0 +1,43 @@
+{# File: templates/conducteur/base.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Conducteur Area - {% block conducteur_title %}{% endblock %}{% endblock %}
+
+{% block javascripts %}{{ parent() }}{% endblock %}
+{% block stylesheets %}{{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="conducteur-layout admin-layout"> {# Reuse admin layout class or create new #}
+
+        {# Include Conducteur Sidebar #}
+        {% include 'conducteur/_sidebar.html.twig' with {'current_route': app.request.attributes.get('_route')} %}
+
+        <main class="conducteur-content admin-content"> {# Reuse admin content class or create new #}
+
+            {# Reuse Admin Controls or create specific ones #}
+            <div class="admin-controls">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button id="dark-mode-toggle" class="btn btn-outline-secondary btn-sm" title="Toggle Dark Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            {# Flash Messages #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {# Content Block for Conducteur Pages #}
+            {% block conducteur_content %}{% endblock %}
+
+        </main>
+
+    </div>
+{% endblock %}

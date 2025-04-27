@@ -1,0 +1,37 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Create New Forum Post{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid my-4">
+
+        <div class="card shadow rounded-3">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h4 mb-0">Create New Forum Post</h1>
+            </div>
+            <div class="card-body p-4">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form) }} {# Renders title and content fields #}
+
+                <div class="mt-4"> {# Spacing before buttons #}
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i> Create Post
+                    </button>
+                    <a href="{{ path('app_post_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Post List
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+
+            </div> {# End card-body #}
+            {# Optional: Add card footer if needed #}
+            {# <div class="card-footer bg-light d-flex justify-content-start">
+             <a href="{{ path('app_post_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Post List
+            </a>
+        </div> #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

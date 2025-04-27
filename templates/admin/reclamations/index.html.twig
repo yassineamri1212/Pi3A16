@@ -9,7 +9,6 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
                         <th>User</th>
                         <th>Subject</th>
                         <th>Date</th>
@@ -20,7 +19,6 @@
                     <tbody>
                     {% for reclamation in reclamations %}
                         <tr>
-                            <td>{{ reclamation.id }}</td>
                             <td>{{ reclamation.nom }} {{ reclamation.prenom }}</td>
                             <td>{{ reclamation.sujet }}</td>
                             <td>{{ reclamation.date|date('Y-m-d H:i') }}</td>

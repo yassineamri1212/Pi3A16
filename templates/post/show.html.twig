@@ -1,0 +1,93 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Post Details{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid my-4">
+
+        {# Post Details Card #}
+        <div class="card shadow rounded-3 mb-4">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center"> {# Info header #}
+                <h1 class="h4 mb-0">Post: {{ post.title }}</h1>
+                <a href="{{ path('app_post_index') }}" class="btn btn-sm btn-outline-light"> {# Light outline button #}
+                    <i class="fas fa-arrow-left me-1"></i> Back to Post List
+                </a>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small mb-2">
+                    By: <strong>{{ post.author ? post.author.userName : 'N/A' }}</strong>
+                    on {{ post.createdAt ? post.createdAt|date('F j, Y H:i') : '' }}
+                    {% if post.updatedAt %}
+                        (Last updated: {{ post.updatedAt|date('F j, Y H:i') }})
+                    {% endif %}
+                </p>
+                <hr>
+                {# Use nl2br to respect line breaks in the content #}
+                <div class="post-content"> {# Optional: Add specific class for styling #}
+                    {{ post.content|nl2br }}
+                </div>
+            </div>
+            <div class="card-footer bg-light d-flex justify-content-start gap-2"> {# Use gap for spacing #}
+                <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit me-1"></i> Edit Post
+                </a>
+                {{ include('post/_delete_form.html.twig', { 'post': post, 'button_label': 'Delete Post', 'button_class': 'btn btn-danger btn-sm' }) }}
+            </div>
+        </div>
+
+        {# Comments Section Card #}
+        <div class="card shadow rounded-3">
+            <div class="card-header bg-white">
+                <h2 class="h5 mb-0">Comments ({{ post.commentaires.count }})</h2>
+            </div>
+            <div class="card-body p-4">
+
+                {# List Existing Comments #}
+                {% if post.commentaires is not empty %}
+                    {% for comment in post.commentaires %}
+                        <div class="mb-3 border-bottom pb-3">
+                            <p class="mb-1"> {{ comment.content|nl2br }} </p>
+                            <p class="text-muted small mb-0">
+                                By: <strong>{{ comment.author ? comment.author.userName : 'N/A' }}</strong>
+                                at {{ comment.createdAt ? comment.createdAt|date('Y-m-d H:i') : '' }}
+                                {# Add links to manage this specific comment #}
+                                <span class="ms-2">
+                                  {# Link to the Comment Edit page #}
+                                  <a href="{{ path('app_commentaire_edit', {'id': comment.id }) }}" class="link-secondary text-decoration-none" title="Edit Comment"><i class="fas fa-pencil-alt fa-xs"></i></a>
+                                  {# Include Comment Delete Form #}
+                                    {{ include('commentaire/_delete_form.html.twig', { 'commentaire': comment, 'button_label': '', 'button_class': 'btn btn-link btn-sm text-danger p-0 align-baseline', 'button_icon': 'fas fa-trash fa-xs' }) }}
+                              </span>
+                            </p>
+                        </div>
+                    {% else %} {# Use 'else' with the main 'for' loop #}
+                        <p class="text-center text-muted">No comments yet.</p>
+                    {% endfor %} {# End the main 'for comment' loop #}
+                {% else %} {# This handles the case where the collection is empty initially #}
+                    <p class="text-center text-muted">No comments yet.</p>
+                {% endif %}
+
+
+                <hr class="my-4">
+
+                {# Add New Comment Form #}
+                <h3 class="h6 mb-3">Add a New Comment</h3>
+                {# Check if the commentForm variable exists (passed from controller) #}
+                {% if commentForm is defined %}
+                    {# Render the form, ensuring action/method are set (done in Controller now) #}
+                    {{ form_start(commentForm) }}
+                    {# Only render the content field - author/post are set automatically #}
+                    {{ form_row(commentForm.content) }}
+                    <button type="submit" class="btn btn-success btn-sm mt-2">
+                        <i class="fas fa-plus me-1"></i> Add Comment
+                    </button>
+                    {{ form_end(commentForm) }}
+                {% else %}
+                    {# Display an error if the form variable wasn't passed #}
+                    <p class="text-danger small">Comment form could not be loaded.</p>
+                {% endif %}
+
+            </div> {# End card-body #}
+        </div> {# End Comments card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

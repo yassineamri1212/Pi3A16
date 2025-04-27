@@ -13,9 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-// ---> ADD THIS LINE IF MISSING <---
 use Vich\UploaderBundle\Form\Type\VichImageType;
-// ---> END ADD <---
 
 class OffreType extends AbstractType
 {
@@ -24,7 +22,8 @@ class OffreType extends AbstractType
         $builder
             ->add('parcour', EntityType::class, [
                 'class' => Parcour::class,
-                'choice_label' => 'trajet',
+                // --- REMOVED 'choice_label' => 'trajet', ---
+                // By removing choice_label, it will use Parcour::__toString() for the dropdown text
                 'placeholder' => '--- Select a Parcour ---',
                 'attr' => ['class' => 'form-select']
             ])
@@ -33,18 +32,16 @@ class OffreType extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'form-check-input']
             ])
-            // --- THIS IS THE CORRECT WAY TO ADD THE IMAGE UPLOAD FIELD ---
-            ->add('photoFile', VichImageType::class, [ // Use VichImageType and the 'photoFile' property
+            ->add('photoFile', VichImageType::class, [
                 'label' => 'Photo (Image file, Optional)',
-                'required' => false,        // Allow creating/editing without uploading/re-uploading
-                'allow_delete' => true,     // Show checkbox to delete existing image
-                'delete_label' => 'Remove current photo?', // Customize delete label
-                'download_uri' => false,    // Don't show a download link
-                'image_uri' => true,        // Show preview of the existing image (on edit)
-                'asset_helper' => true,     // Use Symfony's asset() function
-                'attr' => ['class' => 'form-control'] // Apply Bootstrap styling
+                'required' => false,
+                'allow_delete' => true,
+                'delete_label' => 'Remove current photo?',
+                'download_uri' => false,
+                'image_uri' => true,
+                'asset_helper' => true,
+                'attr' => ['class' => 'form-control']
             ])
-            // --- END IMAGE FIELD ---
             ->add('typeFuel', ChoiceType::class, [
                 'label' => 'Fuel Type',
                 'choices' => [
@@ -68,7 +65,7 @@ class OffreType extends AbstractType
                 'scale' => 2, // Allow decimals
                 'attr' => [
                     'class' => 'form-control',
-                    'step' => '0.100', // Step in TND (100 millimes)
+                    'step' => '0.100', // Step in TND
                     'min' => 0
                 ]
             ])

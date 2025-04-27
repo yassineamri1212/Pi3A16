@@ -1,0 +1,22 @@
+{# templates/forum/_post_actions.html.twig #}
+{# Expects 'post' entity variable #}
+{# Renders Edit/Delete buttons if the current user has permission #}
+
+{# Edit Button (Show if user is author OR admin) #}
+{% if is_granted('ROLE_ADMIN') or (is_granted('IS_AUTHENTICATED_FULLY') and app.user == post.author) %}
+    <a href="{{ path('app_forum_post_edit', {'id': post.id}) }}" class="btn btn-warning btn-sm me-1" title="Edit Post">
+        <i class="fas fa-pencil-alt fa-fw"></i> <span class="d-none d-md-inline">Edit</span> {# Show text on larger screens #}
+    </a>
+{% endif %}
+
+{# Delete Button (Show if user is author OR admin) #}
+{% if is_granted('ROLE_ADMIN') or (is_granted('IS_AUTHENTICATED_FULLY') and app.user == post.author) %}
+    <form method="post" action="{{ path('app_forum_post_delete', {'id': post.id}) }}"
+          onsubmit="return confirm('Are you sure you want to delete this post and its comments?');"
+          style="display: inline-block;">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_forum_post' ~ post.id) }}">
+        <button class="btn btn-danger btn-sm" title="Delete Post">
+            <i class="fas fa-trash fa-fw"></i> <span class="d-none d-md-inline">Delete</span>
+        </button>
+    </form>
+{% endif %}

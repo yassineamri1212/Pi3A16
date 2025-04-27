@@ -1,70 +1,187 @@
 {% extends 'admin/base.html.twig' %}
 
+{% block admin_title %}Dashboard Overview{% endblock %}
+
 {% block admin_content %}
     <div class="container-fluid">
-        <h1 class="h3 mb-4">Dashboard Overview</h1>
+        <h1 class="h3 mb-4 text-gray-800">Dashboard Overview</h1> {# Added text color class #}
 
+        {# Row for Counter Cards - Using SB Admin 2 style example classes #}
         <div class="row">
+
             <!-- Total Events Card -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Total Events</h5>
-                        <p class="display-4">{{ events|length }}</p>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total Events</div>
+                                {# Use the count variable from controller #}
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalEventsCount|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Upcoming Events Card -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Upcoming Events</h5>
-                        <p class="display-4">{{ events|filter(event => event.dateEvenement > "now")|length }}</p>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Upcoming Events</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ upcomingEventsCount|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Today's Events Card -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Today's Events</h5>
-                        <p class="display-4">{{ events|filter(event => event.dateEvenement|date("Y-m-d") == "now"|date("Y-m-d"))|length }}</p>
+            <!-- Total Users Card -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Total Users</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalUsersCount|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Latest Events Table -->
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">Latest Events</h5>
+            <!-- Pending Reclamations Card -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Pending Reclamations</div>
+                                {# Ensure pendingReclamationsCount variable exists #}
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pendingReclamationsCount|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-envelope-open-text fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for event in events|slice(0, 5) %}
-                        <tr>
-                            <td>{{ event.nom }}</td>
-                            <td>{{ event.dateEvenement|date('Y-m-d') }}</td>
-                            <td>
-                                <a href="{{ path('admin_evenement_show', {'id': event.id}) }}" class="btn btn-sm btn-primary">
-                                    View
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+        </div> {# End Counter Cards Row #}
+
+
+        {# Row for Tables / Lists #}
+        <div class="row">
+
+            {# Column for Latest Events #}
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Latest Events Added</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if latestEvents is empty %}
+                            <p class="text-center text-muted small py-3">No recent events found.</p>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {# Use the latestEvents variable passed from controller #}
+                                    {% for event in latestEvents %}
+                                        <tr>
+                                            <td>{{ event.nom }}</td>
+                                            <td>{{ event.dateEvenement ? event.dateEvenement|date('Y-m-d') : 'N/A' }}</td>
+                                            <td>
+                                                {# --- REMOVED Route Check --- #}
+                                                {# Assuming the route 'admin_evenement_show' exists #}
+                                                <a href="{{ path('admin_evenement_show', {'id': event.id}) }}" class="btn btn-xs btn-outline-primary" title="View Event">
+                                                    <i class="fas fa-eye fa-xs"></i>
+                                                </a>
+                                                {# --- END REMOVED Check --- #}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div> {# End Latest Events Column #}
+
+
+            {# --- NEW Column for User Offer Reservation Stats --- #}
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-info">Top Offer Reserving Users</h6>
+                        {# Display date range if available #}
+                        {% if statsStartDate and statsEndDate %}
+                            <small class="text-muted">{{ statsStartDate|date('M j') }} - {{ statsEndDate|date('M j, Y') }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% if topOfferReservingUsers is empty %}
+                            <p class="text-center text-muted small py-3">No carpooling offer reservations found for this period.</p>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th>User</th>
+                                        <th class="text-center">Reservations</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for userData in topOfferReservingUsers %}
+                                        <tr>
+                                            <td class="text-center">{{ loop.index }}</td>
+                                            <td>{{ userData.userIdentifier }}</td>
+                                            <td class="text-center">{{ userData.reservationCount }}</td>
+                                            <td>
+                                                {# --- REMOVED Route Check --- #}
+                                                {# Assuming the route 'app_user_show' exists #}
+                                                <a href="{{ path('app_user_show', {'id': userData.userId}) }}" class="btn btn-xs btn-outline-info" title="View User">
+                                                    <i class="fas fa-user fa-xs"></i>
+                                                </a>
+                                                {# --- END REMOVED Check --- #}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div> {# End User Stats Column #}
+            {# --- END NEW Column --- #}
+
+        </div> {# End Tables Row #}
+
+    </div> {# End container-fluid #}
 {% endblock %}

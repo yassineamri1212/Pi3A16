@@ -1,0 +1,41 @@
+{# templates/security/check_email.html.twig #}
+{% extends 'base.html.twig' %} {# Or your frontend base template #}
+
+{% block title %}Password Reset Email Sent{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body text-center">
+                        <h1 class="card-title mb-4">Check Your Email</h1>
+
+                        {# Display flash messages if needed #}
+                        {% for flash_success in app.flashes('success') %}
+                            <div class="alert alert-success" role="alert">{{ flash_success }}</div>
+                        {% endfor %}
+
+                        <p class="lead">
+                            If an account matching your email exists, an email has been sent that contains a link you can use to reset your password.
+                        </p>
+
+                        {# Display token expiration time from the bundle #}
+                        {% if resetToken is defined %}
+                            {# The trans filter requires symfony/translation and translator setup for other languages #}
+                            {# Falls back to English message key if no translation found #}
+                            <p>This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+                        {% endif %}
+
+                        <p class="text-muted mt-4">
+                            If you don't receive an email please check your spam folder or
+                            <a href="{{ path('app_forgot_password_request') }}">try sending the request again</a>.
+                        </p>
+                        <hr>
+                        <a href="{{ path('app_login') }}" class="btn btn-secondary">Back to Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

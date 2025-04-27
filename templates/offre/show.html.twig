@@ -1,0 +1,74 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Offre Details{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Offre Details</h1> {# Removed ID from title #}
+
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                {# === UPDATED Header Title === #}
+                <h5 class="mb-0">Offre by {{ offre.conducteur.userName }} ({{ offre.parcour.name|default(offre.parcour.pickup ~ ' to ' ~ offre.parcour.destination) }})</h5>
+                <a href="{{ path('app_offre_index') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to All Offres
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table">
+                            <tbody>
+                            {# REMOVED ID Row #}
+                            <tr><th>Driver</th><td>{{ offre.conducteur.userName }} ({{ offre.conducteur.email }})</td></tr>
+                            {# === UPDATED Parcour Row === #}
+                            <tr>
+                                <th>Parcour</th>
+                                <td>
+                                    <a href="{{ path('app_admin_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">
+                                        {{ offre.parcour.name|default(offre.parcour.pickup ~ ' to ' ~ offre.parcour.destination) }}
+                                    </a>
+                                    <br>
+                                    <small class="text-muted">
+                                        Dist: {{ offre.parcour.distance ? (offre.parcour.distance|number_format(1,'.',',')) ~ ' km' : 'N/A' }},
+                                        Time: {{ offre.parcour.time ? '~' ~ offre.parcour.time ~ ' min' : 'N/A' }} {# Changed from estimationTemps #}
+                                    </small>
+                                </td>
+                            </tr>
+                            {# === END Parcour Row === #}
+                            <tr><th>Departure Date/Time</th><td>{{ offre.dateDepart ? offre.dateDepart|date('l, F j, Y \\a\\t H:i') : 'N/A' }}</td></tr>
+                            <tr><th>Price per Seat</th><td>{{ offre.prix|number_format(3, '.', ',') }} TND</td></tr>
+                            <tr><th>Total Seats</th><td>{{ offre.nombrePlaces }}</td></tr>
+                            <tr><th>Reserved Seats</th><td>{{ offre.reservations.count }}</td></tr>
+                            <tr><th>Remaining Seats</th><td>{{ offre.getRemainingPlaces() }}</td></tr>
+                            <tr><th>Fuel Type</th><td>{{ offre.typeFuel|capitalize }}</td></tr>
+                            <tr><th>Air Conditioned</th><td>{{ offre.climatisee ? 'Yes' : 'No' }}</td></tr>
+                            </tbody>
+                        </table>
+
+                        {# Reservations List (unchanged) #}
+                        <hr>
+                        <h5>Reservations</h5>
+                        {% if offre.reservations is not empty %}
+                            <ul class="list-group list-group-flush">
+                                {% for reservation in offre.reservations %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-user me-2"></i>{{ reservation.passenger.userName }} ({{ reservation.passenger.email }})</span>
+                                        <span class="badge bg-{% if reservation.status == 'confirmed' %}success{% else %}warning{% endif %}">{{ reservation.status|capitalize }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No reservations yet.</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4"> {# Photo display unchanged #}
+                        {% if offre.photo %}<label class="form-label">Photo:</label><br><a href="{{ vich_uploader_asset(offre, 'photoFile') }}" target="_blank"><img src="{{ vich_uploader_asset(offre, 'photoFile') | imagine_filter('admin_large_thumb') }}" alt="Offre Photo" class="img-fluid rounded shadow-sm"></a>{% else %}<div class="text-center text-muted border rounded p-4"><i class="fas fa-image fa-3x mb-2"></i><br>No photo uploaded.</div>{% endif %}
+                    </div>
+                </div>
+                <hr>
+                {# No Edit/Delete buttons for Admin view - kept as is #}
+            </div>
+        </div>
+    </div>
+{% endblock %}

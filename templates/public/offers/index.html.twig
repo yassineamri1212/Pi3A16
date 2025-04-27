@@ -1,51 +1,43 @@
-
 {# templates/public/offers/index.html.twig #}
-{% extends 'public/base.html.twig' %} {# Extends your public base layout #}
+{% extends 'public/base.html.twig' %} {# Use PUBLIC base layout #}
 
 {% block public_title %}Find a Ride - Carpool Offers{% endblock %}
 
 {% block public_content %}
     <div class="container my-5">
-        {# Page Title - Adapt style from events page #}
+        {# Page Title #}
         <h2 class="mb-4 text-center fw-bold text-body-secondary" style="position: relative;">
             <span style="position: relative; z-index: 1; padding: 0 15px; background: var(--bs-body-bg);">Available Carpool Offers</span>
-            <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--bs-success), transparent); z-index: 0;"></span> {# Use success color? #}
+            <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--bs-success), transparent); z-index: 0;"></span>
         </h2>
 
-        {# Search and Filter Bar - Adapt from events page #}
+        {# Search and Filter Bar #}
         <div class="card shadow-sm mb-4">
             <div class="card-body">
+                {# Assuming the route name 'app_public_offers_index' exists #}
                 <form method="get" action="{{ path('app_public_offers_index') }}">
-                    {# Keep existing sort/page parameters when searching #}
                     {% if sort is defined %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
                     {% if direction is defined %}<input type="hidden" name="direction" value="{{ direction }}">{% endif %}
 
-                    <div class="row g-3 align-items-end"> {# Use align-items-end for button alignment #}
+                    <div class="row g-3 align-items-end">
                         <div class="col-md-8">
                             <label for="offer-search" class="form-label fw-semibold">Search Offers</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                {# Use the searchTerm variable passed from the (yet to be defined/found) public controller #}
                                 <input type="text" id="offer-search" name="q" value="{{ searchTerm|default('') }}"
-                                       placeholder="Search by route, fuel type..."
+                                       placeholder="Search by destination, pickup, route name..."
                                        class="form-control">
                             </div>
                         </div>
-                        {# Add more filters later (e.g., date, start/end location) #}
-                        {#
                         <div class="col-md-4">
-                           <label for="offer-date" class="form-label fw-semibold">Date</label>
-                           <input type="date" id="offer-date" name="date" class="form-control">
-                        </div>
-                        #}
-                        <div class="col-md-4">
-                            {# The label is visually hidden but good for accessibility #}
                             <label for="submit-search" class="visually-hidden">Apply Search</label>
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end"> {# Buttons alignment #}
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="submit" id="submit-search" class="btn btn-primary">
                                     <i class="fas fa-filter me-1"></i> Search Rides
                                 </button>
-                                {# Add reset link if filters applied #}
                                 {% if searchTerm %}
+                                    {# Reset link, assuming 'app_public_offers_index' route #}
                                     <a href="{{ path('app_public_offers_index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-times me-1"></i> Reset
                                     </a>
@@ -57,63 +49,54 @@
             </div>
         </div> {# End search card #}
 
-        {# Sorting Links (Optional) #}
-        {# You can add links similar to knp_pagination_sortable if needed #}
-        {# <div class="text-end mb-2">
-            Sort by:
-            <a href="{{ path('app_public_offers_index', app.request.query.all|merge({sort: 'o.dateDepart', direction: direction == 'ASC' ? 'DESC' : 'ASC'})) }}">Date</a> |
-            <a href="{{ path('app_public_offers_index', app.request.query.all|merge({sort: 'o.prix', direction: direction == 'ASC' ? 'DESC' : 'ASC'})) }}">Price</a>
-         </div> #}
-
-
         {# Offers Grid #}
         <div class="row g-4">
+            {# Assuming 'pagination' variable is passed from the public controller #}
             {% for offre in pagination %}
-                <div class="col-lg-4 col-md-6 d-flex align-items-stretch"> {# Use d-flex for equal height cards #}
-                    {# --- Reusable Card Structure (Copy/Adapt from homepage added section) --- #}
-                    <div class="card w-100 border-0 shadow-sm rounded-3 overflow-hidden h-100 offer-card"> {# Added offer-card class #}
+                <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                    <div class="card w-100 border-0 shadow-sm rounded-3 overflow-hidden h-100 offer-card">
                         {% if offre.photo %}
                             <div class="card-img-top-wrapper overflow-hidden" style="height: 200px;">
-                                {# Make sure 'offer_list_thumb' filter exists in liip_imagine.yaml #}
-                                {# Define it like admin_thumb but maybe larger #}
+                                {# Ensure 'offer_list_thumb' LiipImagine filter exists #}
                                 <img src="{{ vich_uploader_asset(offre, 'photoFile') | imagine_filter('offer_list_thumb') }}"
-                                     class="img-fluid w-100 h-100 object-fit-cover offer-card-img" {# Added class #}
-                                     alt="Photo for {{ offre.parcour.trajet }}">
-                                {# Fallback if no LiipImagine: #}
-                                {# <img src="{{ vich_uploader_asset(offre, 'photoFile') }}"
                                      class="img-fluid w-100 h-100 object-fit-cover offer-card-img"
-                                     alt="Photo for {{ offre.parcour.trajet }}"> #}
+                                        {# === UPDATED ALT TEXT === #}
+                                     alt="Photo for {{ offre.parcour.name|default(offre.parcour.pickup ~ ' to ' ~ offre.parcour.destination) }}">
                             </div>
                         {% else %}
                             <div class="card-img-top-wrapper d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
-                                {# Placeholder icon #}
                                 <i class="fas fa-car-side text-body-tertiary" style="font-size: 3rem;"></i>
                             </div>
                         {% endif %}
-                        <div class="card-body d-flex flex-column"> {# Use flex column for layout #}
-                            <h5 class="card-title fw-bold text-primary mb-2">{{ offre.parcour.trajet }}</h5>
+                        <div class="card-body d-flex flex-column">
+                            {# === UPDATED CARD TITLE === #}
+                            <h5 class="card-title fw-bold text-primary mb-2">
+                                {{ offre.parcour.pickup }} <i class="fas fa-long-arrow-alt-right mx-1"></i> {{ offre.parcour.destination }}
+                                {% if offre.parcour.name %}<small class="d-block text-muted fw-normal">({{ offre.parcour.name }})</small>{% endif %}
+                            </h5>
 
-                            <div class="mb-3 fs-sm text-body-secondary d-flex flex-column gap-1"> {# Column layout for details #}
+                            <div class="mb-3 fs-sm text-body-secondary d-flex flex-column gap-1">
                                 <div title="Departure">
                                     <i class="fas fa-calendar-alt text-info me-1 fa-fw"></i>
-                                    {# Format date for better readability #}
                                     {{ offre.dateDepart|date('D, M j, Y \\a\\t H:i') }}
                                 </div>
+                                {# === UPDATED TIME/DISTANCE DISPLAY === #}
                                 <div title="Estimated Duration">
                                     <i class="fas fa-clock text-secondary me-1 fa-fw"></i>
-                                    ~{{ offre.parcour.estimationTemps }} min drive
+                                    {{ offre.parcour.time ? '~' ~ offre.parcour.time ~ ' min drive' : 'Duration not set' }}
                                 </div>
                                 <div title="Distance">
                                     <i class="fas fa-road text-secondary me-1 fa-fw"></i>
-                                    {{ offre.parcour.distance|number_format(1, '.', ',') }} km
+                                    {{ offre.parcour.distance ? (offre.parcour.distance|number_format(1, '.', ',')) ~ ' km' : 'Distance not set' }}
                                 </div>
+                                {# === END UPDATED TIME/DISTANCE === #}
                                 <div title="Price per Seat">
                                     <i class="fas fa-dollar-sign text-success me-1 fa-fw"></i>
                                     {{ offre.prix|number_format(2, '.', ',') }} TND / seat
                                 </div>
                                 <div title="Available Seats">
                                     <i class="fas fa-users text-warning me-1 fa-fw"></i>
-                                    {{ offre.nombrePlaces }} Seat(s) available
+                                    {{ offre.nombrePlaces }} Seat(s) available {# Assuming public doesn't see reservations #}
                                 </div>
                                 <div title="Fuel Type">
                                     <i class="fas fa-gas-pump text-muted me-1 fa-fw"></i>
@@ -126,17 +109,21 @@
                                         <i class="fas fa-wind text-muted me-1 fa-fw" style="opacity: 0.5;"></i> <span class="text-muted">No A/C</span>
                                     {% endif %}
                                 </div>
+                                {# === ADDED DRIVER INFO === #}
+                                <div title="Driver">
+                                    <i class="fas fa-user-circle text-muted me-1 fa-fw"></i>
+                                    {{ offre.conducteur ? offre.conducteur.userName : 'Driver N/A' }}
+                                </div>
+                                {# === END ADDED DRIVER INFO === #}
                             </div>
 
                             {# Pushes button to bottom #}
                             <div class="mt-auto pt-2">
-                                {# --- CORRECTED BUTTON LINK --- #}
-                                {# Point to the PUBLIC show route for THIS specific offre #}
+                                {# Ensure 'app_public_offre_show' route exists #}
                                 <a href="{{ path('app_public_offre_show', {'idOffre': offre.idOffre}) }}"
                                    class="btn btn-primary w-100 rounded-pill">
-                                    <i class="fas fa-info-circle me-1"></i> View Details / Reserve {# Updated text slightly #}
+                                    <i class="fas fa-info-circle me-1"></i> View Details / Reserve
                                 </a>
-                                {# --- END CORRECTION --- #}
                             </div>
                         </div> {# End card-body #}
                     </div> {# End card #}
@@ -147,9 +134,7 @@
                         <div class="card-body text-center py-5">
                             <i class="fas fa-search text-body-tertiary mb-3" style="font-size: 2.5rem;"></i>
                             <h5 class="text-body-secondary">No carpool offers found</h5>
-                            <p class="text-body-secondary mb-0">There are currently no offers matching your criteria, or maybe create one yourself!</p>
-                            {# Optional: Link to offer creation page if public creation allowed #}
-                            {# <a href="#" class="btn btn-success mt-3">Offer a Ride</a> #}
+                            <p class="text-body-secondary mb-0">There are currently no offers matching your criteria.</p>
                         </div>
                     </div>
                 </div>
@@ -158,25 +143,9 @@
 
         {# Pagination #}
         <div class="mt-4 d-flex justify-content-center">
+            {# Ensure 'pagination' variable is passed from public controller #}
             {{ knp_pagination_render(pagination) }}
         </div>
 
     </div> {# End container #}
 {% endblock %} {# End public_content #}
-
-{# Optional: Add CSS for offer-card specific styles if needed #}
-{# {% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .offer-card:hover .offer-card-img {
-            transform: scale(1.05);
-            transition: transform 0.3s ease-in-out;
-        }
-        .offer-card-img {
-            transition: transform 0.3s ease-in-out;
-        }
-        .card-img-top-wrapper {
-             background-color: var(--bs-secondary-bg); /* Ensure placeholder has background */
-        }
-    </style>
-{% endblock %} #}

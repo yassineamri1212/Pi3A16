@@ -1,0 +1,41 @@
+{# File: templates/conducteur/_sidebar.html.twig #}
+{% set current_route = current_route|default('') %}
+
+<aside class="conducteur-sidebar admin-sidebar">
+    <h4>Conducteur Panel</h4>
+    <ul class="nav flex-column">
+
+        <li class="nav-item">
+            <a href="{{ path('app_conducteur_dashboard') }}"
+               class="nav-link{{ current_route == 'app_conducteur_dashboard' ? ' active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            {# Link to CONDUCTEUR offre index #}
+            <a href="{{ path('app_conducteur_offre_index') }}"
+               class="nav-link{{ current_route starts with 'app_conducteur_offre_' ? ' active' : '' }}">
+                <i class="fas fa-car-side"></i> <span>My Offres</span>
+            </a>
+        </li>
+        {# <<< CORRECTED LINK >>> #}
+        <li class="nav-item">
+            {# Points to the NEW Conducteur Parcour index #}
+            <a href="{{ path('app_conducteur_parcour_index') }}"
+               class="nav-link{{ current_route starts with 'app_conducteur_parcour_' ? ' active' : '' }}">
+                <i class="fas fa-route"></i> <span>Manage Parcours</span>
+            </a>
+        </li>
+        {# <<< END CORRECTION >>> #}
+        <li class="nav-item">
+            <a href="{{ path('app_home') }}" class="nav-link">
+                <i class="fas fa-home"></i> <span>Public Site</span>
+            </a>
+        </li>
+        <li class="nav-item mt-auto">
+            <a href="{{ path('app_logout') }}" class="nav-link text-danger">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</aside>

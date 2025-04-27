@@ -9,49 +9,57 @@
             <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #3498db, transparent); z-index: 0;"></span>
         </h2>
 
-        {% if reservedTransports|length > 0 %}
+        {% if reservedTransports is defined and reservedTransports|length > 0 %} {# Added defined check #}
             <div class="row g-4">
                 {% for transport in reservedTransports %}
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 overflow-hidden" style="border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
                             <div class="card-header" style="background: linear-gradient(135deg, #3498db, #2c3e50); color: white; border-bottom: none;">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0 fw-bold">{{ transport.type|upper }}</h5>
+                                    <h5 class="card-title mb-0 fw-bold">{{ transport.type|default('Transport')|upper }}</h5>
                                     <span class="badge rounded-pill" style="background: rgba(255,255,255,0.2);">
                                     <i class="fas fa-bus me-1"></i>
                                 </span>
                                 </div>
                             </div>
 
-                            <div class="card-body" style="background: #f8f9fa;">
-                                <div class="mb-3">
-                                    <h6 class="fw-bold" style="color: #2c3e50;">
-                                        <i class="fas fa-calendar-check me-2" style="color: #3498db;"></i>
-                                        Event: {{ transport.evenement.nom }}
-                                    </h6>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-calendar-alt me-2" style="color: #e74c3c; width: 20px;"></i>
-                                        <span class="text-muted">Date: {{ transport.evenement.dateEvenement|date('F j, Y') }}</span>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-map-marker-alt me-2" style="color: #2ecc71; width: 20px;"></i>
-                                        <span class="text-muted">Destination: {{ transport.evenement.lieu }}</span>
+                            {% if transport.evenement is defined and transport.evenement is not null %}
+                                <div class="card-body" style="background: #f8f9fa;">
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold" style="color: #2c3e50;">
+                                            <i class="fas fa-calendar-check me-2" style="color: #3498db;"></i>
+                                            Event: {{ transport.evenement.nom|default('N/A') }}
+                                        </h6>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-calendar-alt me-2" style="color: #e74c3c; width: 20px;"></i>
+                                            <span class="text-muted">Date: {{ transport.evenement.dateEvenement ? transport.evenement.dateEvenement|date('F j, Y') : 'N/A' }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-map-marker-alt me-2" style="color: #2ecc71; width: 20px;"></i>
+                                            <span class="text-muted">Destination: {{ transport.evenement.lieu|default('N/A') }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="card-footer bg-transparent" style="border-top: 1px dashed #ddd;">
-                                <div class="d-grid gap-2">
-                                    <form action="{{ path('client_transport_cancel', { id: transport.id }) }}" method="post">
-                                        <button type="submit" class="btn btn-sm w-100" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px;">
-                                            <i class="fas fa-times-circle me-1"></i> Cancel Reservation
-                                        </button>
-                                    </form>
-                                    <a href="{{ path('client_transport_index', { eventId: transport.evenement.id }) }}" class="btn btn-outline-primary btn-sm" style="border-radius: 8px;">
-                                        <i class="fas fa-info-circle me-1"></i> Details
-                                    </a>
+                                <div class="card-footer bg-transparent" style="border-top: 1px dashed #ddd;">
+                                    <div class="d-grid gap-2">
+                                        {# --- REMOVED Route Check --- #}
+                                        {# Assuming 'client_transport_cancel' route exists #}
+                                        <form action="{{ path('client_transport_cancel', { id: transport.id }) }}" method="post" onsubmit="return confirm('Are you sure you want to cancel this event transport reservation?');">
+                                            <button type="submit" class="btn btn-sm w-100" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px;">
+                                                <i class="fas fa-times-circle me-1"></i> Cancel Reservation
+                                            </button>
+                                        </form>
+                                        {# --- REMOVED Route Check --- #}
+                                        {# Assuming 'client_transport_index' route exists #}
+                                        <a href="{{ path('client_transport_index', { eventId: transport.evenement.id }) }}" class="btn btn-outline-primary btn-sm" style="border-radius: 8px;">
+                                            <i class="fas fa-info-circle me-1"></i> Details
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            {% else %}
+                                <div class="card-body"><p class="text-muted">Event details not available.</p></div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -63,6 +71,8 @@
                 </div>
                 <h4 class="fw-bold mb-3" style="color: #2c3e50;">No Reserved Event Trips</h4>
                 <p class="text-muted mb-4" style="color: #7f8c8d;">You haven't reserved any event transportation yet.</p>
+                {# --- REMOVED Route Check --- #}
+                {# Assuming 'client_evenement_index' route exists #}
                 <a href="{{ path('client_evenement_index') }}" class="btn px-4" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 8px;">
                     <i class="fas fa-bus me-1"></i> Browse Available Events
                 </a>
@@ -75,57 +85,68 @@
             <span style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #e67e22, transparent); z-index: 0;"></span>
         </h2>
 
-        {% if reservedOffers|length > 0 %}
+        {% if reservedOffers is defined and reservedOffers|length > 0 %} {# Added defined check #}
             <div class="row g-4">
                 {% for reservation in reservedOffers %}
-                    {% set offer = reservation.offre %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 overflow-hidden" style="border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
-                            <div class="card-header" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white; border-bottom: none;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0 fw-bold">CARPOOL</h5>
-                                    <span class="badge rounded-pill" style="background: rgba(255,255,255,0.2);">
-                                        <i class="fas fa-car me-1"></i>
-                                    </span>
+                    {% if reservation is defined and reservation and reservation.offre is defined and reservation.offre %}
+                        {% set offer = reservation.offre %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 border-0 overflow-hidden" style="border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                                <div class="card-header" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white; border-bottom: none;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0 fw-bold">CARPOOL</h5>
+                                        <span class="badge rounded-pill" style="background: rgba(255,255,255,0.2);">
+                                            <i class="fas fa-car me-1"></i>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="card-body" style="background: #f8f9fa;">
-                                <div class="mb-3">
-                                    <h6 class="fw-bold" style="color: #2c3e50;">
-                                        <i class="fas fa-route me-2" style="color: #e67e22;"></i>
-                                        Trip: {{ offer.parcour.trajet }}
-                                    </h6>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-calendar-alt me-2" style="color: #e74c3c; width: 20px;"></i>
-                                        <span class="text-muted">Date: {{ offer.dateDepart|date('F j, Y H:i') }}</span>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-money-bill-wave me-2" style="color: #27ae60; width: 20px;"></i>
-                                        <span class="text-muted">Price: {{ offer.prix }} TND</span>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-user-tie me-2" style="color: #9b59b6; width: 20px;"></i>
-                                        <span class="text-muted">Driver: {{ offer.conducteur.userName }}</span>
-                                    </div>
+                                <div class="card-body" style="background: #f8f9fa;">
+                                    {% if offer.parcour is defined and offer.parcour %}
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold" style="color: #2c3e50;">
+                                                <i class="fas fa-route me-2" style="color: #e67e22;"></i>
+                                                Trip: {{ offer.parcour.name|default('N/A') }} {# Use name property #}
+                                            </h6>
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-calendar-alt me-2" style="color: #e74c3c; width: 20px;"></i>
+                                                <span class="text-muted">Date: {{ offer.dateDepart ? offer.dateDepart|date('F j, Y H:i') : 'N/A' }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-money-bill-wave me-2" style="color: #27ae60; width: 20px;"></i>
+                                                <span class="text-muted">Price: {{ offer.prix|number_format(2, '.', ',') }} TND</span> {# Added number format #}
+                                            </div>
+                                            {% if offer.conducteur is defined and offer.conducteur %}
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-user-tie me-2" style="color: #9b59b6; width: 20px;"></i>
+                                                    <span class="text-muted">Driver: {{ offer.conducteur.userName|default('N/A') }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted">Route details not available.</p>
+                                    {% endif %} {# End offer.parcour check #}
                                 </div>
-                            </div>
 
-                            <div class="card-footer bg-transparent" style="border-top: 1px dashed #ddd;">
-                                <div class="d-grid gap-2">
-                                    <form action="{{ path('client_offer_cancel', { id: reservation.id }) }}" method="post">
-                                        <button type="submit" class="btn btn-sm w-100" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px;">
-                                            <i class="fas fa-times-circle me-1"></i> Cancel Reservation
-                                        </button>
-                                    </form>
-                                    {# Adjust this path to your offers detail route #}
-                                    <a href="{{ path('app_public_offers_index') }}" class="btn btn-outline-primary btn-sm" style="border-radius: 8px;">
-                                        <i class="fas fa-info-circle me-1"></i> Browse More Offers
-                                    </a>
+                                <div class="card-footer bg-transparent" style="border-top: 1px dashed #ddd;">
+                                    <div class="d-grid gap-2">
+                                        {# --- REMOVED Route Check --- #}
+                                        {# Assuming 'client_offer_cancel' route exists #}
+                                        <form action="{{ path('client_offer_cancel', { id: reservation.id }) }}" method="post" onsubmit="return confirm('Are you sure you want to cancel this carpool reservation?');">
+                                            <button type="submit" class="btn btn-sm w-100" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px;">
+                                                <i class="fas fa-times-circle me-1"></i> Cancel Reservation
+                                            </button>
+                                        </form>
+                                        {# --- REMOVED Route Check --- #}
+                                        {# Assuming 'app_public_offers_index' route exists #}
+                                        <a href="{{ path('app_public_offers_index') }}" class="btn btn-outline-primary btn-sm" style="border-radius: 8px;">
+                                            <i class="fas fa-info-circle me-1"></i> Browse More Offers
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </div> {# End Card #}
+                        </div> {# End Col #}
+                    {% endif %} {# End reservation/offer check #}
                 {% endfor %}
             </div>
         {% else %}
@@ -135,13 +156,16 @@
                 </div>
                 <h4 class="fw-bold mb-3" style="color: #2c3e50;">No Reserved Carpools</h4>
                 <p class="text-muted mb-4" style="color: #7f8c8d;">You haven't reserved any carpools yet.</p>
+                {# --- REMOVED Route Check --- #}
+                {# Assuming 'app_public_offers_index' route exists #}
                 <a href="{{ path('app_public_offers_index') }}" class="btn px-4" style="background: linear-gradient(135deg, #e67e22, #d35400); color: white; border-radius: 8px;">
                     <i class="fas fa-car me-1"></i> Browse Available Carpools
                 </a>
             </div>
-        {% endif %}
-    </div>
+        {% endif %} {# End reservedOffers check #}
+    </div> {# End Container #}
 
+    {# Styles can be moved to a CSS file #}
     <style>
         .card:hover {
             transform: translateY(-8px);
@@ -153,7 +177,7 @@
         }
 
         .btn-outline-primary:hover {
-            background: #3498db !important;
+            background: #3498db !important; /* Use appropriate color */
             color: white !important;
         }
 

@@ -1,0 +1,81 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Manage Comments{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Forum Comments</h1>
+
+        {# Note: Global comment creation is usually less practical. #}
+        {# Consider removing the global 'Create New' button unless needed. #}
+        {# <div class="d-flex justify-content-end mb-3">
+        <a href="{{ path('app_commentaire_new') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> Create New Comment (Global)
+        </a>
+    </div> #}
+
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Comment List</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th>Comment Excerpt</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Author', 'a.userName') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Post', 'p.title') }}</th>
+                            <th>{{ knp_pagination_sortable(pagination, 'Created At', 'c.createdAt') }}</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for commentaire in pagination %}
+                            <tr>
+                                <td>{{ commentaire.content|length > 100 ? commentaire.content|slice(0, 100) ~ '...' : commentaire.content }}</td>
+                                <td>{{ commentaire.author ? commentaire.author.userName : 'N/A' }}</td>
+                                <td>
+                                    {% if commentaire.post %}
+                                        <a href="{{ path('app_post_show', {'id': commentaire.post.id}) }}" title="{{ commentaire.post.title }}">
+                                            {{ commentaire.post.title|length > 40 ? commentaire.post.title|slice(0, 40) ~ '...' : commentaire.post.title }}
+                                        </a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>{{ commentaire.createdAt ? commentaire.createdAt|date('Y-m-d H:i') : '' }}</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ path('app_commentaire_show', {'id': commentaire.id}) }}" class="btn btn-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_commentaire_edit', {'id': commentaire.id}) }}" class="btn btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {# Include the delete form partial #}
+                                        {{ include('commentaire/_delete_form.html.twig', { 'commentaire': commentaire, 'button_label': '', 'button_class': 'btn btn-danger btn-sm' }) }}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4">No comments found.</td> {# Adjust colspan #}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div> {# End table-responsive #}
+            </div>{# End card-body #}
+
+            {# Display pagination controls #}
+            {% if pagination.pageCount > 1 %}
+                <div class="card-footer bg-white d-flex justify-content-center">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
+            {% endif %}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

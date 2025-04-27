@@ -72,7 +72,8 @@ final class ReponseController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // 'reponse' text is set by form binding
-
+            $reclamation->setEtat('handled'); // or your desired status
+            $entityManager->persist($reclamation);
             $entityManager->persist($reponse);
             $entityManager->flush();
 

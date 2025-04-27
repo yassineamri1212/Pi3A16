@@ -1,6 +1,7 @@
 {# templates/conducteur/offre/_delete_form.html.twig #}
-{# Action points to CONDUCTEUR delete route #}
-<form method="post" action="{{ path('app_conducteur_offre_delete', {'idOffre': offre.idOffre}) }}" onsubmit="return confirm('Are you sure you want to delete this offre? This cannot be undone.');" style="display: inline-block;">
+{# Expects 'offre' entity #}
+{# Optional: 'button_label', 'button_class' #}
+<form method="post" action="{{ path('app_conducteur_offre_delete', {'idOffre': offre.idOffre}) }}" onsubmit="return confirm('Are you sure you want to delete this offre?');" style="display: inline-block;">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idOffre) }}">
     <button class="{{ button_class|default('btn btn-danger btn-sm') }}">
         <i class="fas fa-trash-alt"></i> {{ button_label|default('Delete') }}

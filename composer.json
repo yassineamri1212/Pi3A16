@@ -34,6 +34,7 @@
         "symfony/validator": "6.4.*",
         "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "^6.4",
+        "symfonycasts/reset-password-bundle": "^1.23",
         "twig/extra-bundle": "*",
         "twig/string-extra": "^3.20",
         "vich/uploader-bundle": "^2.6"

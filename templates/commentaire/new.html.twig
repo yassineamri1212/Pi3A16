@@ -1,0 +1,31 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_title %}Create New Comment{% endblock %}
+
+{% block admin_content %}
+    <div class="container-fluid my-4">
+
+        <div class="card shadow rounded-3">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h4 mb-0">Create New Comment (Global)</h1>
+            </div>
+            <div class="card-body p-4">
+                <p class="alert alert-warning small">Note: Creating comments globally requires selecting the associated post. It's usually better to add comments directly from the post's page.</p>
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {# Ensure the 'post' field is added to CommentaireType if using this route #}
+                {{ form_widget(form) }}
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i> Create Comment
+                    </button>
+                    <a href="{{ path('app_commentaire_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Comment List
+                    </a>
+                </div>
+                {{ form_end(form) }}
+            </div> {# End card-body #}
+        </div> {# End card #}
+
+    </div> {# End container-fluid #}
+{% endblock %}

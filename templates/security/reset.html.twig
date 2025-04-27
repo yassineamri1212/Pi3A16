@@ -1,0 +1,38 @@
+{# templates/security/reset.html.twig #}
+{% extends 'base.html.twig' %} {# Or your frontend base template #}
+
+{% block title %}Reset your Password{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h1 class="card-title text-center mb-4">Reset your password</h1>
+
+                        {# Display potential flash messages from controller #}
+                        {% for flash_error in app.flashes('reset_password_error') %}
+                            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+                        {% endfor %}
+
+                        {# Render the Symfony form for changing password #}
+                        {{ form_start(resetForm) }}
+                        {# Use form_row to render label, input, errors for the repeated password field #}
+
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-primary">Reset password</button> {# Ensure type is submit #}
+                        </div>
+                        {{ form_end(resetForm) }}
+
+                    </div> {# End Card Body #}
+                </div> {# End Card #}
+            </div> {# End Col #}
+        </div> {# End Row #}
+    </div> {# End Container #}
+{% endblock %}
+
+{# JavaScript block is no longer needed for this form #}
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

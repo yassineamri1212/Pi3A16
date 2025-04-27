@@ -1,0 +1,12 @@
+{# templates/commentaire/_delete_form.html.twig #}
+{# Expects 'commentaire' entity variable #}
+{# Optional: 'button_label' (default: 'Delete'), 'button_class' (default: 'btn btn-danger btn-sm'), 'button_icon' (default: 'fas fa-trash') #}
+<form method="post"
+      action="{{ path('app_commentaire_delete', {'id': commentaire.id}) }}"
+      onsubmit="return confirm('Are you sure you want to delete this comment?');"
+      style="display: inline-block;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.id) }}">
+    <button class="{{ button_class|default('btn btn-danger btn-sm') }}" title="{{ button_label|default('Delete') }}">
+        <i class="{{ button_icon|default('fas fa-trash') }} me-1"></i> {{ button_label|default('') }}
+    </button>
+</form>

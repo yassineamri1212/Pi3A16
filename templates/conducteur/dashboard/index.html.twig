@@ -1,0 +1,33 @@
+{# templates/conducteur/dashboard/index.html.twig #}
+{% extends 'conducteur/base.html.twig' %}
+
+{% block conducteur_title %}Dashboard{% endblock %}
+
+{% block conducteur_content %}
+    <div class="container-fluid">
+        <h1 class="h3 mb-4">Conducteur Dashboard</h1>
+        <p>Welcome, {{ app.user.userName }}!</p>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header">Quick Actions</div>
+                    <div class="card-body">
+                        <a href="{{ path('app_conducteur_offre_new') }}" class="btn btn-primary mb-2 d-block"><i class="fas fa-plus"></i> Create New Offre</a>
+                        <a href="{{ path('app_conducteur_offre_index') }}" class="btn btn-info mb-2 d-block"><i class="fas fa-list"></i> View My Offres</a>
+                        {# <<< CORRECTED LINK >>> #}
+                        {# Points to the NEW Conducteur Parcour new #}
+                        <a href="{{ path('app_conducteur_parcour_new') }}" class="btn btn-secondary mb-2 d-block"><i class="fas fa-route"></i> Create New Parcour</a>
+                        {# <<< END CORRECTION >>> #}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header">My Stats</div>
+                    <div class="card-body"><p>Total Offers Created: {{ app.user.createdOffres.count }}</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

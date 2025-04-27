@@ -2,17 +2,28 @@
 
 {% block admin_title %}Create New Parcour{% endblock %}
 
+{# === Main content block === #}
 {% block admin_content %}
     <div class="container-fluid">
         <h1 class="h3 mb-4">Create New Parcour</h1>
 
         <div class="card shadow">
             <div class="card-body">
-                {# Render the form using Bootstrap 5 theme (should be default in newer Symfony) #}
                 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-                {# Render form fields - form_widget(form) renders all unrendered fields #}
-                {# Or render row-by-row for more control: {{ form_row(form.trajet) }} etc. #}
+                {# === Map Placeholder Div === #}
+                <div class="mb-3">
+                    <label class="form-label">Click on the map to set Pickup (1st click) & Destination (2nd click):</label>
+                    <div id="map-status" class="alert alert-info small p-2" role="alert">
+                        Click to set Pickup point.
+                    </div>
+                    <div id="map-picker" style="height: 400px; width: 100%; border: 1px solid #ccc; border-radius: 4px; background-color: #f8f9fa; cursor: crosshair;">
+                        <p class="text-center text-muted p-5" id="map-loading-text">Loading map...</p>
+                    </div>
+                </div>
+                {# === END Map Placeholder Div === #}
+
+                {# Render form fields (Coords are hidden, Distance/Time readonly, Addresses editable) #}
                 {{ form_widget(form) }}
 
                 <div class="mt-4"> {# Spacing before buttons #}
@@ -29,4 +40,214 @@
         </div> {# End card #}
 
     </div> {# End container-fluid #}
-{% endblock %}
+{% endblock %} {# === End of admin_content block === #}
+
+
+{# === JavaScript block (includes Leaflet and map interaction WITH ROUTING & REVERSE GEOCODING) === #}
+{% block javascripts %}
+    {# Include parent block's JS (important!) #}
+    {{ parent() }}
+
+    {# --- Leaflet Library via CDN (Ensure internet access) --- #}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    {# --- End Leaflet Library --- #}
+
+    {# --- Map Initialization & Interaction Script --- #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded. Initializing map...');
+            const mapContainer = document.getElementById('map-picker');
+            const mapLoadingText = document.getElementById('map-loading-text');
+            const mapStatus = document.getElementById('map-status');
+
+            // --- Get references to Form Input Fields ---
+            const latPickupInput = document.getElementById('{{ form.latitudePickup.vars.id }}');
+            const lngPickupInput = document.getElementById('{{ form.longitudePickup.vars.id }}');
+            const latDestInput = document.getElementById('{{ form.latitudeDestination.vars.id }}');
+            const lngDestInput = document.getElementById('{{ form.longitudeDestination.vars.id }}');
+            const distanceInput = document.getElementById('{{ form.distance.vars.id }}');
+            const timeInput = document.getElementById('{{ form.time.vars.id }}');
+            // Get Address Inputs
+            const pickupAddressInput = document.getElementById('{{ form.pickup.vars.id }}');
+            const destinationAddressInput = document.getElementById('{{ form.destination.vars.id }}');
+
+            // --- Check if Leaflet library (L object) is loaded and the container div exists ---
+            if (mapContainer && typeof L !== 'undefined') {
+                try {
+                    if(mapLoadingText) { mapLoadingText.remove(); } // Clear loading text
+
+                    const initialLat = 36.8065;
+                    const initialLng = 10.1815;
+                    const initialZoom = 10;
+
+                    const map = L.map('map-picker').setView([initialLat, initialLng], initialZoom);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    console.log('Leaflet map displayed successfully.');
+
+                    // --- Variables to hold markers ---
+                    let pickupMarker = null;
+                    let destinationMarker = null;
+
+                    // --- Update Status Function ---
+                    function updateStatus(message, type = 'info') {
+                        if (mapStatus) {
+                            mapStatus.textContent = message;
+                            mapStatus.className = `alert alert-${type} small p-2`;
+                        }
+                    }
+
+                    // --- Function to update coordinate form fields ---
+                    function updateCoordinateFields() {
+                        if (pickupMarker && latPickupInput && lngPickupInput) {
+                            const coords = pickupMarker.getLatLng();
+                            latPickupInput.value = coords.lat.toFixed(7);
+                            lngPickupInput.value = coords.lng.toFixed(7);
+                        } else if (latPickupInput && lngPickupInput) {
+                            latPickupInput.value = ''; latPickupInput.value = '';
+                        }
+                        if (destinationMarker && latDestInput && lngDestInput) {
+                            const coords = destinationMarker.getLatLng();
+                            latDestInput.value = coords.lat.toFixed(7);
+                            lngDestInput.value = coords.lng.toFixed(7);
+                        } else if (latDestInput && lngDestInput) {
+                            latDestInput.value = ''; lngDestInput.value = '';
+                        }
+                    }
+
+                    // --- Function to Reverse Geocode and Update Address Input ---
+                    async function reverseGeocodeAndUpdateInput(lat, lon, inputElement) {
+                        if (!inputElement) return; // Skip if input element doesn't exist
+
+                        const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+                        console.log(`Requesting reverse geocode: ${apiUrl}`);
+                        const originalPlaceholder = inputElement.placeholder;
+                        inputElement.placeholder = 'Fetching address...'; // Provide visual feedback
+
+                        try {
+                            const response = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+                            if (!response.ok) {
+                                throw new Error(`Nominatim request failed: ${response.status}`);
+                            }
+                            const data = await response.json();
+                            console.log('Nominatim response:', data);
+
+                            if (data && data.display_name) {
+                                inputElement.value = data.display_name; // Update the address field
+                            } else {
+                                throw new Error('Address not found in Nominatim response.');
+                            }
+                            inputElement.placeholder = originalPlaceholder; // Restore placeholder
+
+                        } catch (error) {
+                            console.error("Error during reverse geocoding:", error);
+                            // Optionally clear the input or leave it as is?
+                            // inputElement.value = ''; // Clear on error?
+                            inputElement.placeholder = 'Could not fetch address'; // Show error state
+                            // Maybe add error class to input? inputElement.classList.add('is-invalid');
+                            // Don't update status here, let routing status take precedence or add specific msg
+                        }
+                    } // --- End of reverseGeocodeAndUpdateInput ---
+
+                    // --- Function to Calculate Route and Update Fields ---
+                    async function calculateRouteAndUpdateForm() {
+                        if (!pickupMarker || !destinationMarker || !distanceInput || !timeInput) {
+                            if(distanceInput) distanceInput.value = '';
+                            if(timeInput) timeInput.value = '';
+                            return;
+                        }
+                        const pickupCoords = pickupMarker.getLatLng();
+                        const destCoords = destinationMarker.getLatLng();
+                        const coordinates = `${pickupCoords.lng.toFixed(7)},${pickupCoords.lat.toFixed(7)};${destCoords.lng.toFixed(7)},${destCoords.lat.toFixed(7)}`;
+                        const apiUrl = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=false`;
+
+                        console.log("Requesting route from OSRM:", apiUrl);
+                        updateStatus('Calculating route...', 'warning');
+                        distanceInput.placeholder = 'Calculating...'; // Visual feedback
+                        timeInput.placeholder = 'Calculating...';
+
+                        try {
+                            const response = await fetch(apiUrl);
+                            if (!response.ok) throw new Error(`OSRM failed: ${response.status}`);
+                            const data = await response.json();
+
+                            if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                                const route = data.routes[0];
+                                const distanceKm = (route.distance / 1000).toFixed(1);
+                                const durationMin = Math.round(route.duration / 60);
+                                distanceInput.value = distanceKm;
+                                timeInput.value = durationMin;
+                                updateStatus(`Route: ~${distanceKm} km, ${durationMin} min. Drag markers to adjust.`, 'success');
+                            } else { throw new Error('No route found by OSRM.'); }
+                        } catch (error) {
+                            console.error("Error calculating route:", error);
+                            distanceInput.value = ''; timeInput.value = '';
+                            distanceInput.placeholder = 'Calculation failed';
+                            timeInput.placeholder = 'Calculation failed';
+                            updateStatus(`Error calculating route: ${error.message}`, 'danger');
+                        }
+                    } // --- End of calculateRouteAndUpdateForm ---
+
+
+                    // --- Map Click Event Listener ---
+                    map.on('click', function(e) {
+                        const clickedLat = e.latlng.lat;
+                        const clickedLng = e.latlng.lng;
+
+                        if (!pickupMarker) {
+                            // --- Set Pickup ---
+                            pickupMarker = L.marker([clickedLat, clickedLng], { draggable: true, title: "Pickup Point" }).addTo(map);
+                            updateStatus('Pickup point set. Click map to set Destination.', 'primary');
+                            // Add drag listener
+                            pickupMarker.on('dragend', () => {
+                                const coords = pickupMarker.getLatLng();
+                                updateCoordinateFields();
+                                reverseGeocodeAndUpdateInput(coords.lat, coords.lng, pickupAddressInput); // Reverse geocode on dragend
+                                calculateRouteAndUpdateForm();
+                            });
+                            // Reverse geocode immediately after placing
+                            reverseGeocodeAndUpdateInput(clickedLat, clickedLng, pickupAddressInput);
+
+                        } else if (!destinationMarker) {
+                            // --- Set Destination ---
+                            destinationMarker = L.marker([clickedLat, clickedLng], { draggable: true, title: "Destination Point" }).addTo(map);
+                            // Add drag listener
+                            destinationMarker.on('dragend', () => {
+                                const coords = destinationMarker.getLatLng();
+                                updateCoordinateFields();
+                                reverseGeocodeAndUpdateInput(coords.lat, coords.lng, destinationAddressInput); // Reverse geocode on dragend
+                                calculateRouteAndUpdateForm();
+                            });
+                            // Reverse geocode immediately after placing
+                            reverseGeocodeAndUpdateInput(clickedLat, clickedLng, destinationAddressInput);
+                            // Both markers now exist, calculate route
+                            calculateRouteAndUpdateForm(); // This will update status
+
+                        } else {
+                            updateStatus('Both points set. Drag markers to adjust position.', 'success');
+                        }
+                        updateCoordinateFields(); // Update coords immediately on click
+                    }); // --- End of map.on('click') ---
+
+
+                } catch (error) {
+                    console.error("Error initializing Leaflet map:", error);
+                    if(mapContainer){ mapContainer.innerHTML = '<p class="text-center text-danger p-5">Error initializing map instance.</p>'; }
+                }
+            } else if (!mapContainer) {
+                console.error("Map container element #map-picker not found!");
+            } else {
+                console.error("Leaflet library (L) not loaded! Check network or script tags.");
+                if(mapLoadingText) { mapLoadingText.remove(); }
+                mapContainer.innerHTML = '<p class="text-center text-danger p-5">Error: Map library failed to load.</p>';
+            }
+        });
+    </script>
+    {# === End Map Initialization & Interaction Script === #}
+
+{% endblock %} {# === End of javascripts block === #}

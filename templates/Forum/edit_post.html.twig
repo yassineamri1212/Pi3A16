@@ -1,0 +1,32 @@
+{% extends 'public/base.html.twig' %}
+
+{% block public_title %}Edit Discussion{% endblock %}
+
+{% block public_content %}
+    <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <h1 class="h2 mb-4 text-center">Edit Discussion</h1>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                        {{ form_widget(form) }} {# Renders title and content #}
+
+                        <div class="mt-4 d-flex justify-content-between"> {# Buttons spread out #}
+                            <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                        {{ form_end(form) }}
+                    </div> {# End card-body #}
+                </div> {# End card #}
+
+            </div> {# End col #}
+        </div> {# End row #}
+    </div> {# End container #}
+{% endblock %}

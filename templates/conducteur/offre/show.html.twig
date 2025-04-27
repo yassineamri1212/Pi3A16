@@ -3,11 +3,12 @@
 
 {% block conducteur_content %}
     <div class="container-fluid">
-        <h1 class="h3 mb-4">My Offre Details</h1> {# Removed ID from title #}
+        <h1 class="h3 mb-4">My Offre Details</h1>
 
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-center bg-white">
-                <h5 class="mb-0">Offre from {{ offre.parcour.trajet }}</h5>
+                {# === UPDATED Header Title === #}
+                <h5 class="mb-0">Offre: {{ offre.parcour.name|default(offre.parcour.pickup ~ ' to ' ~ offre.parcour.destination) }}</h5>
                 <a href="{{ path('app_conducteur_offre_index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Back to My Offres
                 </a>
@@ -16,8 +17,23 @@
                 <div class="row">
                     <div class="col-md-8">
                         <table class="table">
-                            <tbody> {# Removed ID Row #}
-                            <tr><th>Parcour (Route)</th><td><a href="{{ path('app_admin_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">{{ offre.parcour.trajet }}</a> ({{ offre.parcour.distance|number_format(1,'.',',') }} km, ~{{ offre.parcour.estimationTemps }} min)</td></tr>
+                            <tbody>
+                            {# === UPDATED Parcour Row === #}
+                            <tr>
+                                <th>Parcour</th>
+                                <td>
+                                    {# Link to Conducteur Parcour Show #}
+                                    <a href="{{ path('app_conducteur_parcour_show', {'idParcours': offre.parcour.idParcours}) }}">
+                                        {{ offre.parcour.name|default(offre.parcour.pickup ~ ' to ' ~ offre.parcour.destination) }}
+                                    </a>
+                                    <br>
+                                    <small class="text-muted">
+                                        Dist: {{ offre.parcour.distance ? (offre.parcour.distance|number_format(1,'.',',')) ~ ' km' : 'N/A' }},
+                                        Time: {{ offre.parcour.time ? '~' ~ offre.parcour.time ~ ' min' : 'N/A' }}
+                                    </small>
+                                </td>
+                            </tr>
+                            {# === END Parcour Row === #}
                             <tr><th>Departure Date/Time</th><td>{{ offre.dateDepart ? offre.dateDepart|date('l, F j, Y \\a\\t H:i') : 'N/A' }}</td></tr>
                             <tr><th>Price per Seat</th><td>{{ offre.prix|number_format(3, '.', ',') }} TND</td></tr>
                             <tr><th>Total Seats</th><td>{{ offre.nombrePlaces }}</td></tr>
@@ -34,7 +50,7 @@
                 </div>
                 <hr>
                 <div class="d-flex justify-content-start gap-2 flex-wrap">
-                    {# Links use ID internally #}
+                    {# Use CONDUCTEUR routes #}
                     <a href="{{ path('app_conducteur_offre_edit', {'idOffre': offre.idOffre}) }}" class="btn btn-warning"><i class="fas fa-pencil-alt"></i> Edit Offre</a>
                     <a href="{{ path('app_conducteur_offre_reservations', {'idOffre': offre.idOffre}) }}" class="btn btn-info"><i class="fas fa-users"></i> View Reservations ({{ offre.reservations.count }})</a>
                     {{ include('conducteur/offre/_delete_form.html.twig', { 'offre': offre }) }}
